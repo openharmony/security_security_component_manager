@@ -14,13 +14,8 @@
  */
 #include "sec_comp_perm_manager.h"
 
-#include "location_button.h"
-#include "paste_button.h"
-#include "save_button.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
-#include "sec_comp_service.h"
-#include "sec_comp_tool.h"
 
 namespace OHOS {
 namespace Security {

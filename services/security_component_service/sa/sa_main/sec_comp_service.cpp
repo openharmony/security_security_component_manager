@@ -167,20 +167,29 @@ bool SecCompService::GetCallerInfo(SecCompCallerInfo& caller)
     return true;
 }
 
+int32_t SecCompService::ParseParams(const std::string& componentInfo,
+    SecCompCallerInfo& caller, nlohmann::json& jsonRes)
+{
+    if (!GetCallerInfo(caller)) {
+        SC_LOG_ERROR(LABEL, "Check caller failed");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+
+    jsonRes = nlohmann::json::parse(componentInfo, nullptr, false);
+    if (jsonRes.is_discarded()) {
+        SC_LOG_ERROR(LABEL, "component info invalid %{public}s", componentInfo.c_str());
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    return SC_OK;
+}
+
 int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
     const std::string& componentInfo, int32_t& scId)
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentRegister");
     SecCompCallerInfo caller;
-    if (!GetCallerInfo(caller)) {
-        SC_LOG_ERROR(LABEL, "Check caller failed");
-        FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-
-    nlohmann::json jsonRes = nlohmann::json::parse(componentInfo, nullptr, false);
-    if (jsonRes.is_discarded()) {
-        SC_LOG_ERROR(LABEL, "component info invalid %{public}s", componentInfo.c_str());
+    nlohmann::json jsonRes;
+    if (ParseParams(componentInfo, caller, jsonRes) != SC_OK) {
         FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
@@ -193,14 +202,8 @@ int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
 int32_t SecCompService::UpdateSecurityComponent(int32_t scId, const std::string& componentInfo)
 {
     SecCompCallerInfo caller;
-    if (!GetCallerInfo(caller)) {
-        SC_LOG_ERROR(LABEL, "Check caller failed");
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-
-    nlohmann::json jsonRes = nlohmann::json::parse(componentInfo, nullptr, false);
-    if (jsonRes.is_discarded()) {
-        SC_LOG_ERROR(LABEL, "component info invalid %{public}s", componentInfo.c_str());
+    nlohmann::json jsonRes;
+    if (ParseParams(componentInfo, caller, jsonRes) != SC_OK) {
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
     return SecCompManager::GetInstance().UpdateSecurityComponent(scId, jsonRes, caller);
@@ -222,15 +225,8 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(int32_t scId,
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentClick");
     SecCompCallerInfo caller;
-    if (!GetCallerInfo(caller)) {
-        SC_LOG_ERROR(LABEL, "Check caller failed");
-        FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-
-    nlohmann::json jsonRes = nlohmann::json::parse(componentInfo, nullptr, false);
-    if (jsonRes.is_discarded()) {
-        SC_LOG_ERROR(LABEL, "component info invalid %{public}s", componentInfo.c_str());
+    nlohmann::json jsonRes;
+    if (ParseParams(componentInfo, caller, jsonRes) != SC_OK) {
         FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }

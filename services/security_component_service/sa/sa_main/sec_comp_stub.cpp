@@ -39,11 +39,11 @@ int32_t SecCompStub::OnRemoteRequest(
         return SC_SERVICE_ERROR_IPC_REQUEST_FAIL;
     }
 
-    auto itFunc = requestFuncMap_.find(code);
-    if (itFunc != requestFuncMap_.end()) {
-        auto requestFunc = itFunc->second;
-        if (requestFunc != nullptr) {
-            return (this->*requestFunc)(data, reply);
+    auto funcIter = requestFuncMap_.find(code);
+    if (funcIter != requestFuncMap_.end()) {
+        auto func = funcIter->second;
+        if (func != nullptr) {
+            return (this->*func)(data, reply);
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -53,18 +53,18 @@ int32_t SecCompStub::RegisterSecurityComponentInner(MessageParcel& data, Message
 {
     uint32_t type;
     if (!data.ReadUint32(type)) {
-        SC_LOG_ERROR(LABEL, "Read component type fail");
+        SC_LOG_ERROR(LABEL, "Register read component type fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (type <= UNKNOWN_SC_TYPE || type >= MAX_SC_TYPE) {
-        SC_LOG_ERROR(LABEL, "Security component type invalid");
+        SC_LOG_ERROR(LABEL, "Register security component type invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
     std::string componentInfo;
     if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Read component info fail");
+        SC_LOG_ERROR(LABEL, "Register read component info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -87,18 +87,18 @@ int32_t SecCompStub::UpdateSecurityComponentInner(MessageParcel& data, MessagePa
 {
     int32_t scId;
     if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Read component id fail");
+        SC_LOG_ERROR(LABEL, "Update read component id fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (scId < 0) {
-        SC_LOG_ERROR(LABEL, "Security component id invalid");
+        SC_LOG_ERROR(LABEL, "Update security component id invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
     std::string componentInfo;
     if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Read component info fail");
+        SC_LOG_ERROR(LABEL, "Update read component info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -115,12 +115,12 @@ int32_t SecCompStub::UnregisterSecurityComponentInner(MessageParcel& data, Messa
 {
     int32_t scId;
     if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Read component id fail");
+        SC_LOG_ERROR(LABEL, "Unreigster read component id fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (scId < 0) {
-        SC_LOG_ERROR(LABEL, "Security component id invalid");
+        SC_LOG_ERROR(LABEL, "Unreigster security component id invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
@@ -136,23 +136,23 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
 {
     int32_t scId;
     if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Read component id fail");
+        SC_LOG_ERROR(LABEL, "Report read component id fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (scId < 0) {
-        SC_LOG_ERROR(LABEL, "Security component id invalid");
+        SC_LOG_ERROR(LABEL, "Report security component id invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
     std::string componentInfo;
     if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Read component info fail");
+        SC_LOG_ERROR(LABEL, "Report read component info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     sptr<SecCompClickEventParcel> touchInfoParcel = data.ReadParcelable<SecCompClickEventParcel>();
     if (touchInfoParcel == nullptr) {
-        SC_LOG_ERROR(LABEL, "Read touchInfo info fail");
+        SC_LOG_ERROR(LABEL, "Report read touchInfo info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -160,7 +160,7 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
     int32_t res =
         this->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfoParcel->touchInfoParams_, callerToken);
     if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Register security component result fail");
+        SC_LOG_ERROR(LABEL, "Report security component result fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     return SC_OK;
@@ -174,18 +174,18 @@ int32_t SecCompStub::ReduceAfterVerifySavePermissionInner(MessageParcel& data, M
     }
     uint32_t tokenId;
     if (!data.ReadUint32(tokenId)) {
-        SC_LOG_ERROR(LABEL, "Read component id fail");
+        SC_LOG_ERROR(LABEL, "Verify read component id fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (tokenId == 0) {
-        SC_LOG_ERROR(LABEL, "AccessTokenId invalid");
+        SC_LOG_ERROR(LABEL, "Verify AccessTokenId invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
     bool res = this->ReduceAfterVerifySavePermission(tokenId);
     if (!reply.WriteBool(res)) {
-        SC_LOG_ERROR(LABEL, "verify temp save permission result fail");
+        SC_LOG_ERROR(LABEL, "Verify temp save permission result fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     return SC_OK;
@@ -195,7 +195,7 @@ int32_t SecCompStub::GetEnhanceRemoteObjectInner(MessageParcel& data, MessagePar
 {
     auto res = this->GetEnhanceRemoteObject();
     if (!reply.WriteRemoteObject(res)) {
-        SC_LOG_ERROR(LABEL, "Register security component enhance remote object fail");
+        SC_LOG_ERROR(LABEL, "Security component enhance remote object fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     return SC_OK;

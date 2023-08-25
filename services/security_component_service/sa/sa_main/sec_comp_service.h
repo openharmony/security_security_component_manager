@@ -19,6 +19,7 @@
 #include <vector>
 #include "app_state_observer.h"
 #include "iremote_object.h"
+#include "nlohmann/json.hpp"
 #include "nocopyable.h"
 #include "sec_comp_manager.h"
 #include "sec_comp_stub.h"
@@ -50,6 +51,7 @@ public:
     int Dump(int fd, const std::vector<std::u16string>& args) override;
 
 private:
+    int32_t ParseParams(const std::string& componentInfo, SecCompCallerInfo& caller, nlohmann::json& jsonRes);
     bool Initialize() const;
     bool RegisterAppStateObserver();
     void UnregisterAppStateObserver();

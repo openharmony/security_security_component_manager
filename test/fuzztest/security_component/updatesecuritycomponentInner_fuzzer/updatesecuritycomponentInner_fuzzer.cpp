@@ -28,7 +28,6 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void UpdateSecurityComponentInnerFuzzTest(const uint8_t *data, size_t size)
 {
-    uint32_t code = SecurityComponentServiceInterfaceCode::UPDATE_SECURITY_COMPONENT;
     MessageParcel datas;
     datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
     datas.WriteBuffer(data, size);
@@ -36,6 +35,7 @@ static void UpdateSecurityComponentInnerFuzzTest(const uint8_t *data, size_t siz
     MessageParcel reply;
     MessageOption option;
     auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    uint32_t code = SecurityComponentServiceInterfaceCode::UPDATE_SECURITY_COMPONENT;
     service->OnRemoteRequest(code, datas, reply, option);
 }
 } // namespace OHOS
