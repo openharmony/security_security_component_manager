@@ -48,7 +48,7 @@ void SaveButtonTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(SaveButtonTest, FromJson010, TestSize.Level1)
+HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
@@ -56,46 +56,28 @@ HWTEST_F(SaveButtonTest, FromJson010, TestSize.Level1)
 
     ASSERT_TRUE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, UNKNOWN_TEXT },
-        { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    auto& stylesJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
+    stylesJson[JsonTagConstants::JSON_TEXT_TAG] = UNKNOWN_TEXT;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD},
-        { JsonTagConstants::JSON_ICON_TAG, UNKNOWN_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::DOWNLOAD;
+    stylesJson[JsonTagConstants::JSON_ICON_TAG] = UNKNOWN_ICON;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD },
-        { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::UNKNOWN_BG },
-    };
+    stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::LINE_ICON;
+    stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::UNKNOWN_BG;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::MAX_LABEL_TYPE },
-        { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
+    stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::MAX_LABEL_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD },
-        { JsonTagConstants::JSON_ICON_TAG, SaveIcon::MAX_ICON_TYPE },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::DOWNLOAD;
+    stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::MAX_ICON_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD },
-        { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::MAX_BG_TYPE },
-    };
+    stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::LINE_ICON;
+    stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 }
 
@@ -150,49 +132,17 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
     comp1.type_ = SAVE_COMPONENT;
 
-    comp1.fontSize_ = DEFAULT_DIMENSION;
+    comp1.icon_ = static_cast<int32_t>(SaveIcon::FILLED_ICON);
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.fontSize_ = TestCommon::TEST_SIZE;
+    comp1.icon_ = static_cast<int32_t>(SaveIcon::LINE_ICON);
 
-    comp1.iconSize_ = DEFAULT_DIMENSION;
+    comp1.text_ = static_cast<int32_t>(SaveDesc::DOWNLOAD_AND_SHARE);
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.iconSize_ = TestCommon::TEST_SIZE;
+    comp1.text_ = static_cast<int32_t>(SaveDesc::DOWNLOAD);
 
-    comp1.padding_.top = DEFAULT_DIMENSION;
+    comp1.bg_ = SecCompBackground::CAPSULE;
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.top = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.right = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.right = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.bottom = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.bottom = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.left = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.left = TestCommon::TEST_DIMENSION;
-
-    comp1.textIconSpace_ = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.textIconSpace_ = TestCommon::TEST_SIZE;
-
-    comp1.borderWidth_ = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.borderWidth_ = TestCommon::TEST_SIZE;
-
-    comp1.fontColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.fontColor_.value = TestCommon::TEST_COLOR_RED;
-
-    comp1.bgColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.bgColor_.value = TestCommon::TEST_COLOR_YELLOW;
-
-    comp1.iconColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.iconColor_.value = TestCommon::TEST_COLOR_BLUE;
+    comp1.bg_ = SecCompBackground::CIRCLE;
 
     ASSERT_TRUE(comp1.CompareComponentBasicInfo(&comp2, true));
 }

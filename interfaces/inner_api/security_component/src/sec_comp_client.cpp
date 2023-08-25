@@ -41,10 +41,7 @@ SecCompClient::~SecCompClient()
         return;
     }
     auto remoteObj = proxy_->AsObject();
-    if (remoteObj == nullptr) {
-        return;
-    }
-    if (serviceDeathObserver_ != nullptr) {
+    if ((remoteObj != nullptr) && (serviceDeathObserver_ != nullptr)) {
         remoteObj->RemoveDeathRecipient(serviceDeathObserver_);
     }
 }

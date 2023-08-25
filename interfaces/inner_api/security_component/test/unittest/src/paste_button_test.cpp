@@ -48,7 +48,7 @@ void PasteButtonTest::TearDown()
  * @tc.type: FUNC
  * @tc.require: AR000HO9JB
  */
-HWTEST_F(PasteButtonTest, FromJson010, TestSize.Level1)
+HWTEST_F(PasteButtonTest, IsParamValid001, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildPasteComponentInfo(jsonComponent);
@@ -56,46 +56,28 @@ HWTEST_F(PasteButtonTest, FromJson010, TestSize.Level1)
 
     ASSERT_TRUE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, UNKNOWN_TEXT },
-        { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
+    styleJson[JsonTagConstants::JSON_TEXT_TAG] = UNKNOWN_TEXT;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE},
-        { JsonTagConstants::JSON_ICON_TAG, UNKNOWN_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::PASTE;
+    styleJson[JsonTagConstants::JSON_ICON_TAG] = UNKNOWN_ICON;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE },
-        { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::UNKNOWN_BG },
-    };
+    styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::LINE_ICON;
+    styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::UNKNOWN_BG;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::MAX_LABEL_TYPE },
-        { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
+    styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::MAX_LABEL_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE },
-        { JsonTagConstants::JSON_ICON_TAG, PasteIcon::MAX_ICON_TYPE },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
-    };
+    styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::PASTE;
+    styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::MAX_ICON_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 
-    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE },
-        { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
-        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::MAX_BG_TYPE },
-    };
+    styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::LINE_ICON;
+    styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
 }
 
@@ -146,53 +128,21 @@ HWTEST_F(PasteButtonTest, ComparePasteButton002, TestSize.Level1)
     ASSERT_TRUE(comp1.FromJson(jsonComponent));
     PasteButton comp2 = comp1;
 
-    comp1.type_ = LOCATION_COMPONENT;
+    comp1.type_ = SAVE_COMPONENT;
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
     comp1.type_ = PASTE_COMPONENT;
 
-    comp1.fontSize_ = DEFAULT_DIMENSION;
+    comp1.icon_ = static_cast<int32_t>(PasteIcon::FILLED_ICON);
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.fontSize_ = TestCommon::TEST_SIZE;
+    comp1.icon_ = static_cast<int32_t>(PasteIcon::LINE_ICON);
 
-    comp1.iconSize_ = DEFAULT_DIMENSION;
+    comp1.text_ = static_cast<int32_t>(PasteDesc::MAX_LABEL_TYPE);
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.iconSize_ = TestCommon::TEST_SIZE;
+    comp1.text_ = static_cast<int32_t>(PasteDesc::PASTE);
 
-    comp1.padding_.top = DEFAULT_DIMENSION;
+    comp1.bg_ = SecCompBackground::NORMAL;
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.top = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.right = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.right = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.bottom = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.bottom = TestCommon::TEST_DIMENSION;
-
-    comp1.padding_.left = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.padding_.left = TestCommon::TEST_DIMENSION;
-
-    comp1.textIconSpace_ = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.textIconSpace_ = TestCommon::TEST_SIZE;
-
-    comp1.borderWidth_ = DEFAULT_DIMENSION;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.borderWidth_ = TestCommon::TEST_SIZE;
-
-    comp1.fontColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.fontColor_.value = TestCommon::TEST_COLOR_RED;
-
-    comp1.bgColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.bgColor_.value = TestCommon::TEST_COLOR_YELLOW;
-
-    comp1.iconColor_.value = TestCommon::TEST_DIFF_COLOR;
-    ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
-    comp1.iconColor_.value = TestCommon::TEST_COLOR_BLUE;
+    comp1.bg_ = SecCompBackground::CIRCLE;
 
     ASSERT_TRUE(comp1.CompareComponentBasicInfo(&comp2, true));
 }

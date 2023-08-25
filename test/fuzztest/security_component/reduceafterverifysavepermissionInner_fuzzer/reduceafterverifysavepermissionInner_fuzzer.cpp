@@ -27,7 +27,6 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void ReduceAfterVerifySavePermissionInnerFuzzTest(const uint8_t *data, size_t size)
 {
-    uint32_t code = SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION;
     MessageParcel datas;
     datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
     datas.WriteBuffer(data, size);
@@ -35,6 +34,7 @@ static void ReduceAfterVerifySavePermissionInnerFuzzTest(const uint8_t *data, si
     MessageParcel reply;
     MessageOption option;
     auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    uint32_t code = SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION;
     service->OnRemoteRequest(code, datas, reply, option);
 }
 } // namespace OHOS
