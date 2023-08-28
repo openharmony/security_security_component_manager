@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "reduceafterverifysavepermissionInner_fuzzer.h"
 
 #include <iostream>
 #include <string>
@@ -20,7 +21,6 @@
 #include "accesstoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "reduceafterverifysavepermissionInner_fuzzer.h"
 
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;

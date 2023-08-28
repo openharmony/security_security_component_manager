@@ -43,6 +43,8 @@ const std::string TYPE_KEY = "ohos.user.security.type";
 const std::string TOKEN_KEY = "ohos.ability.params.token";
 
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
+constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
+constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
 }
 
 bool FirstUseDialog::IsCfgDirExist(void)
@@ -78,7 +80,7 @@ bool FirstUseDialog::IsCfgFileValid(void)
         return false;
     }
     if (fstat.st_size > MAX_CFG_FILE_SIZE) {
-        SC_LOG_INFO(LABEL, "path %{public}s errno %{public}d.", FIRST_USE_RECORD_JSON.c_str(), errno);
+        SC_LOG_INFO(LABEL, "path %{public}s size too large.", FIRST_USE_RECORD_JSON.c_str());
         return false;
     }
     return true;
@@ -243,16 +245,16 @@ void FirstUseDialog::SendSaveEventHandler(void)
     secHandler_->ProxyPostTask(delayed);
 }
 
-void FirstUseDialog::NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, SecCompType type,
+bool FirstUseDialog::NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, SecCompType type,
     sptr<IRemoteObject> callerToken)
 {
     if (secHandler_ == nullptr) {
         SC_LOG_ERROR(LABEL, "event handler invalid.");
-        return;
+        return false;
     }
     if (callerToken == nullptr) {
         SC_LOG_INFO(LABEL, "callerToken is null, no need to notify dialog");
-        return;
+        return false;
     }
 
     uint64_t typeMask;
@@ -262,7 +264,7 @@ void FirstUseDialog::NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, Se
         typeMask = SAVE_BUTTON_FIRST_USE;
     } else {
         SC_LOG_INFO(LABEL, "this type need not notify dialog to user");
-        return;
+        return false;
     }
 
     std::unique_lock<std::mutex> lock(useMapMutex_);
@@ -272,17 +274,18 @@ void FirstUseDialog::NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, Se
         StartDialogAbility(type, callerToken);
         firstUseMap_[tokenId] = typeMask;
         SendSaveEventHandler();
-        return;
+        return true;
     }
 
     uint64_t compTypes = firstUseMap_[tokenId];
     if ((compTypes & typeMask) == typeMask) {
         SC_LOG_INFO(LABEL, "no need notify again.");
-        return;
+        return true;
     }
     StartDialogAbility(type, callerToken);
     firstUseMap_[tokenId] |= typeMask;
     SendSaveEventHandler();
+    return true;
 }
 
 void FirstUseDialog::Init(std::shared_ptr<SecEventHandler> secHandler)
@@ -294,4 +297,3 @@ void FirstUseDialog::Init(std::shared_ptr<SecEventHandler> secHandler)
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
-

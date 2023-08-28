@@ -38,7 +38,7 @@ public:
 
     static int GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo& hapTokenInfoRes)
     {
-        return 0;
+        return AccessTokenKit::getHapTokenInfoRes;
     };
 
     static AccessTokenID GetHapTokenID(int32_t userID, const std::string& bundleName, int32_t instIndex)
@@ -51,6 +51,7 @@ public:
         AccessTokenIDInner *idInner = reinterpret_cast<AccessTokenIDInner *>(&tokenID);
         return static_cast<ATokenTypeEnum>(idInner->type);
     };
+    static int getHapTokenInfoRes;
 };
 } // namespace SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H
 } // namespace Security

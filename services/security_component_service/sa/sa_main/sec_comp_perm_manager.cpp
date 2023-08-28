@@ -121,7 +121,6 @@ bool SecCompPermManager::InitEventHandler(const std::shared_ptr<SecEventHandler>
     secHandler_ = secHandler;
     return true;
 }
-
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

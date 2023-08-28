@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "sec_comp_enhance_test.h"
+#include <unistd.h>
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
-#include <unistd.h>
 
 using namespace testing::ext;
 using namespace OHOS::Security::SecurityComponent;

@@ -43,7 +43,7 @@ public:
 
 // for security component service to send command to enhance service
 class SecCompSrvEnhanceInterface {
- public:
+public:
     // enable input enhance, then enhance service send config to multimodalinput
     virtual int32_t EnableInputEnhance() = 0;
 

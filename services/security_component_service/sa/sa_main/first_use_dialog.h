@@ -29,14 +29,11 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
-constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
-
 class FirstUseDialog final {
 public:
     FirstUseDialog() = default;
     ~FirstUseDialog() = default;
-    void NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, SecCompType type, sptr<IRemoteObject> callerToken);
+    bool NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, SecCompType type, sptr<IRemoteObject> callerToken);
     void Init(std::shared_ptr<SecEventHandler> secHandler);
 
 private:
@@ -61,4 +58,3 @@ private:
 }  // namespace Security
 }  // namespace OHOS
 #endif  // FIRST_USE_DIALOG_H
-

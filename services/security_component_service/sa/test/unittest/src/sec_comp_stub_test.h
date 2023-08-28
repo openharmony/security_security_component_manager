@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-
 // stub is abstract class
 struct SecCompStubMock : public SecCompStub {
 public:
