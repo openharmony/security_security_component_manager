@@ -127,11 +127,46 @@ HWTEST_F(LocationButtonTest, FromJson004, TestSize.Level1)
 
 /**
  * @tc.name: FromJson005
- * @tc.desc: Test location button from wrong size json
+ * @tc.desc: Test location button from wrong rect json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
 HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    LocationButton comp;
+    jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    nlohmann::json wrongJson = nlohmann::json::parse("{", nullptr, false);
+    jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = wrongJson;
+    ASSERT_FALSE(comp.FromJson(jsonComponent));
+
+    TestCommon::BuildLocationComponentInfo(jsonComponent);
+    ASSERT_TRUE(comp.FromJson(jsonComponent));
+
+    auto& rectJson = jsonComponent[JsonTagConstants::JSON_WINDOW_RECT];
+    rectJson[JsonTagConstants::JSON_RECT_X] = WRONG_TYPE;
+    ASSERT_FALSE(comp.FromJson(jsonComponent));
+
+    rectJson[JsonTagConstants::JSON_RECT_X] = TestCommon::TEST_COORDINATE;
+    rectJson[JsonTagConstants::JSON_RECT_Y] = WRONG_TYPE;
+    ASSERT_FALSE(comp.FromJson(jsonComponent));
+
+    rectJson[JsonTagConstants::JSON_RECT_Y] = TestCommon::TEST_COORDINATE;
+    rectJson[JsonTagConstants::JSON_RECT_WIDTH] = WRONG_TYPE;
+    ASSERT_FALSE(comp.FromJson(jsonComponent));
+
+    rectJson[JsonTagConstants::JSON_RECT_WIDTH] = TestCommon::TEST_COORDINATE;
+    rectJson[JsonTagConstants::JSON_RECT_HEIGHT] = WRONG_TYPE;
+    ASSERT_FALSE(comp.FromJson(jsonComponent));
+}
+
+/**
+ * @tc.name: FromJson006
+ * @tc.desc: Test location button from wrong size json
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -152,12 +187,12 @@ HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson006
+ * @tc.name: FromJson007
  * @tc.desc: Test location button from wrong size json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -175,12 +210,12 @@ HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson007
+ * @tc.name: FromJson008
  * @tc.desc: Test location button from wrong size json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -198,12 +233,12 @@ HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson008
+ * @tc.name: FromJson009
  * @tc.desc: Test location button from wrong border and parent json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -223,12 +258,12 @@ HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson009
+ * @tc.name: FromJson010
  * @tc.desc: Test location button from wrong type params json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -249,12 +284,12 @@ HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson010
+ * @tc.name: FromJson011
  * @tc.desc: Test location button from wrong type params json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -275,12 +310,12 @@ HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
 }
 
 /**
- * @tc.name: FromJson011
+ * @tc.name: FromJson012
  * @tc.desc: Test location button from wrong value params json
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson012, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -440,4 +475,21 @@ HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level1)
     comp1.iconColor_.value = TestCommon::TEST_COLOR_BLUE;
 
     ASSERT_TRUE(comp1.CompareComponentBasicInfo(&comp2, true));
+}
+
+/**
+ * @tc.name: CompareLocationButton003
+ * @tc.desc: Test LocationButton compare
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(LocationButtonTest, CompareLocationButton003, TestSize.Level1)
+{
+    LocationButton button1;
+    SaveButton button2;
+    nlohmann::json jsonComponent;
+    TestCommon::BuildLocationComponentInfo(jsonComponent);
+
+    ASSERT_TRUE(button1.FromJson(jsonComponent));
+    ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, false));
 }

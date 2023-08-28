@@ -146,3 +146,20 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
 
     ASSERT_TRUE(comp1.CompareComponentBasicInfo(&comp2, true));
 }
+
+/**
+ * @tc.name: CompareSaveButton003
+ * @tc.desc: Test SaveButton compare
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level1)
+{
+    SaveButton button1;
+    PasteButton button2;
+    nlohmann::json jsonComponent;
+    TestCommon::BuildSaveComponentInfo(jsonComponent);
+
+    ASSERT_TRUE(button1.FromJson(jsonComponent));
+    ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, true));
+}

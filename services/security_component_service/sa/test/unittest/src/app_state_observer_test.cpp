@@ -154,6 +154,26 @@ HWTEST_F(AppStateObserverTest, OnProcessStateChanged001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnProcessStateChanged002
+ * @tc.desc: Test add process to foregroundset twice
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(AppStateObserverTest, OnProcessStateChanged002, TestSize.Level1)
+{
+    AppExecFwk::ProcessData processData;
+    processData.state = AppExecFwk::AppProcessState::APP_STATE_FOREGROUND;
+    processData.pid = ServiceTestCommon::TEST_PID_1;
+    observer_->OnProcessStateChanged(processData);
+    ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
+
+    processData.state = AppExecFwk::AppProcessState::APP_STATE_FOREGROUND;
+    processData.pid = ServiceTestCommon::TEST_PID_1;
+    observer_->OnProcessStateChanged(processData);
+    ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
+}
+
+/**
  * @tc.name: OnProcessDied001
  * @tc.desc: Test recieve process state died
  * @tc.type: FUNC

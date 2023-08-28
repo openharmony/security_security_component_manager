@@ -16,6 +16,9 @@
 #include "sec_comp_manager_test.h"
 
 #include "sec_comp_log.h"
+#define private public
+#include "sec_comp_manager.h"
+#undef private
 #include "location_button.h"
 #include "save_button.h"
 #include "sec_comp_err.h"
@@ -150,6 +153,24 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: AddSecurityComponentToList002
+ * @tc.desc: Test add security component to list sa not exit
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList002, TestSize.Level1)
+{
+    bool isSaExit = SecCompManager::GetInstance().isSaExit_;
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+
+    ASSERT_NE(SC_SERVICE_ERROR_SERVICE_NOT_EXIST,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, entity));
+    SecCompManager::GetInstance().isSaExit_ = isSaExit;
+}
+
+/**
  * @tc.name: DeleteSecurityComponentFromList001
  * @tc.desc: Test delete security component
  * @tc.type: FUNC
@@ -224,8 +245,9 @@ HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level1)
     ASSERT_NE(nullptr, component);
     SecCompManager::GetInstance().NotifyProcessForeground(ServiceTestCommon::TEST_PID_1);
     ASSERT_TRUE(SecCompManager::GetInstance().IsForegroundCompExist());
-
     SecCompManager::GetInstance().NotifyProcessBackground(ServiceTestCommon::TEST_PID_1);
+    ASSERT_FALSE(SecCompManager::GetInstance().IsForegroundCompExist());
+    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_1);
     ASSERT_FALSE(SecCompManager::GetInstance().IsForegroundCompExist());
 }
 
@@ -352,4 +374,40 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     buttonValid.ToJson(jsonVaild);
     ASSERT_NE(SC_OK,
         SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1, jsonVaild, caller, touchInfo, nullptr));
+}
+
+/**
+ * @tc.name: CheckClickSecurityComponentInfo001
+ * @tc.desc: Test check click security component info failed
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, entity));
+
+    SecCompClickEvent touchInfo;
+    nlohmann::json jsonVaild;
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.ToJson(jsonVaild);
+    jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
+    ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
+
+    jsonVaild[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
+
+    jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
+    ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
 }

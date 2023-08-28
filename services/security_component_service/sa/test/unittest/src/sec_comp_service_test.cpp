@@ -277,6 +277,9 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
     EXPECT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
         secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, touch, nullptr));
+    // already in malicious list
+    EXPECT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
+        secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, touch, nullptr));
     EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_NOT_EXIST, secCompService_->UnregisterSecurityComponent(scId));
 #else
     EXPECT_EQ(SC_OK,
@@ -284,4 +287,47 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
 #endif
     setuid(uid);
+}
+
+/**
+ * @tc.name: Dump001
+ * @tc.desc: Test dump
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompServiceTest, Dump001, TestSize.Level1)
+{
+    int fd = -1;
+    std::vector<std::u16string> args;
+
+    ASSERT_EQ(ERR_INVALID_VALUE, secCompService_->Dump(fd, args));
+
+    fd = 0;
+
+    // hidumper
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
+
+    // hidumper -h
+    args.emplace_back(Str8ToStr16("-h"));
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
+
+    args.clear();
+    // hidumper -p
+    args.emplace_back(Str8ToStr16("-p"));
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
+
+    args.clear();
+    // hidumper -a
+    args.emplace_back(Str8ToStr16("-a"));
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
+
+    args.clear();
+    // hidumper -""
+    args.emplace_back(Str8ToStr16(""));
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
+
+    args.clear();
+    // hidumper -t
+    args.emplace_back(Str8ToStr16("-t"));
+    ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
 }

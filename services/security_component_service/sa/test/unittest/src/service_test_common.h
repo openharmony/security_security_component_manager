@@ -44,7 +44,7 @@ public:
     static constexpr uint32_t QUARTER = 4;
 
     static constexpr uint32_t TEST_COLOR_INVALID = 0x66000000;
-    static constexpr uint32_t TEST_COLOR_BLACK = 0x00000000;
+    static constexpr uint32_t TEST_COLOR_BLACK = 0xff000000;
     static constexpr uint32_t TEST_COLOR_WHITE = 0xffffffff;
     static constexpr uint32_t TEST_COLOR_YELLOW = 0xff7fff00;
     static constexpr uint32_t TEST_COLOR_RED = 0xffff0000;

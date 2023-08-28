@@ -149,20 +149,33 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
 
     rect.x_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.x_ = g_testWidth;
+
     rect.y_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.y_ = g_testHeight;
+
     rect.x_ = g_curScreenWidth + 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.x_ = g_testWidth;
+
     rect.y_ = g_curScreenHeight + 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.y_ = g_testHeight;
+
     rect.width_ = g_curScreenWidth;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
     rect.height_ = g_curScreenHeight;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.width_ = g_testWidth;
+    rect.height_ = g_testHeight;
+
     rect.x_ = g_curScreenWidth - g_testWidth;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.x_ = g_testWidth;
     rect.y_ = g_curScreenHeight - g_testHeight;
+
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    rect.y_ = g_testHeight;
 }
 
 /**
@@ -179,16 +192,27 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
 
     windowRect.x_ = g_testWidth + 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.x_ = g_testWidth;
+
     windowRect.y_ = g_testHeight + 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.y_ = g_testHeight;
+
     windowRect.width_ = g_testWidth - 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.width_ = g_testWidth;
+
     windowRect.height_ = g_testHeight - 1;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.height_ = g_testHeight;
+
     windowRect.width_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.width_ = g_testWidth;
+
     windowRect.height_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.height_ = g_testHeight;
 }
 
 /**
@@ -437,6 +461,33 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
 
 
 /**
+ * @tc.name: ParseComponent015
+ * @tc.desc: Test parse component info with similar color
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
+    ASSERT_TRUE(comp->GetValid());
+
+    jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
+        { JsonTagConstants::JSON_TEXT_TAG, LocationDesc::SELECT_LOCATION },
+        { JsonTagConstants::JSON_ICON_TAG, LocationIcon::LINE_ICON },
+        { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE }
+    };
+    jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
+        { JsonTagConstants::JSON_FONT_COLOR_TAG, ServiceTestCommon::TEST_COLOR_YELLOW },
+        { JsonTagConstants::JSON_ICON_COLOR_TAG, ServiceTestCommon::TEST_COLOR_BLACK },
+        { JsonTagConstants::JSON_BG_COLOR_TAG, ServiceTestCommon::TEST_COLOR_YELLOW }
+    };
+    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
+    ASSERT_FALSE(comp->GetValid());
+}
+
+/**
  * @tc.name: CheckComponentValid001
  * @tc.desc: Test CheckComponentValid with invalid color
  * @tc.type: FUNC
@@ -448,11 +499,13 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level1)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
     ASSERT_TRUE(comp->GetValid());
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp));
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, ServiceTestCommon::TEST_COLOR_RED },
         { JsonTagConstants::JSON_ICON_COLOR_TAG, ServiceTestCommon::TEST_COLOR_BLACK },
         { JsonTagConstants::JSON_BG_COLOR_TAG, ServiceTestCommon::TEST_COLOR_WHITE }
     };
+    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
     ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp));
 }
 
@@ -494,4 +547,15 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
 
     comp->type_ = SecCompType::MAX_SC_TYPE;
     ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp));
+}
+
+/**
+ * @tc.name: RevokeTempPermission001
+ * @tc.desc: Test revoke temp permission componentInfo is null
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompInfoHelperTest, RevokeTempPermission001, TestSize.Level1)
+{
+    ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, SecCompInfoHelper::RevokeTempPermission(0, nullptr));
 }

@@ -63,7 +63,8 @@ bool SecCompEntity::CheckTouchInfo(const SecCompClickEvent& touchInfo) const
     }
 
     if (!componentInfo_->rect_.IsInRect(touchInfo.touchX, touchInfo.touchY)) {
-        SC_LOG_ERROR(LABEL, "touch point is not in component rect");
+        SC_LOG_ERROR(LABEL, "touch point is not in component rect, %{public}lf, %{public}lf",
+            touchInfo.touchX, touchInfo.touchY);
         return false;
     }
 
