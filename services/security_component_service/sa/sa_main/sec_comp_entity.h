@@ -28,7 +28,7 @@ class SecCompEntity {
 public:
     SecCompEntity(std::shared_ptr<SecCompBase> component,
         AccessToken::AccessTokenID token, int32_t scId) : componentInfo_(component),
-        tokenId_(token), scId_(scId){};
+        tokenId_(token), scId_(scId) {};
     ~SecCompEntity() = default;
     int32_t RevokeTempPermission();
     int32_t GrantTempPermission();

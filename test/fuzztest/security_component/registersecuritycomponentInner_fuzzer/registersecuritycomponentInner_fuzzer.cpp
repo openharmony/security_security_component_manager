@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "registersecuritycomponentInner_fuzzer.h"
 
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-#include "registersecuritycomponentInner_fuzzer.h"
 #include "accesstoken_kit.h"
 #include "sec_comp_service.h"
 #include "securec.h"
