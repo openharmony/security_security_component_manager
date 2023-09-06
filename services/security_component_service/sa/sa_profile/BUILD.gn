@@ -15,5 +15,5 @@ import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("security_component_sa_profile_standard") {
   sources = [ "3506.json" ]
-  part_name = "security_component"
+  part_name = "security_component_manager"
 }

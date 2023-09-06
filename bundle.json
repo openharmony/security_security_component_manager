@@ -1,22 +1,22 @@
 {
-  "name": "@openharmony/security_component",
-  "description": "security_component",
+  "name": "@openharmony/security_component_manager",
+  "description": "security_component_manager",
   "version": "4.0.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
-    "destPath": "base/security/security_component"
+    "destPath": "base/security/security_component_manager"
   },
   "dirs": {},
   "scripts": {},
   "component": {
-    "name": "security_component",
+    "name": "security_component_manager",
     "subsystem": "security",
     "syscap": [],
     "hisysevent_config": [
-      "//base/security/security_component/hisysevent.yaml"
+      "//base/security/security_component_manager/hisysevent.yaml"
     ],
-    "features": [ "security_component_feature_coverage = false" ],
+    "features": [ "security_component_manager_feature_coverage = false" ],
     "adapted_system_type": [
       "standard"
     ],
@@ -44,61 +44,61 @@
     },
     "build": {
       "sub_component": [
-        "//base/security/security_component:security_component_build_module"
+        "//base/security/security_component_manager:security_component_build_module"
       ],
       "inner_kits": [
         {
-          "name": "//base/security/security_component/interfaces/inner_api/security_component:libsecurity_component_sdk",
+          "name": "//base/security/security_component_manager/interfaces/inner_api/security_component:libsecurity_component_sdk",
           "header": {
             "header_files": [
               "i_sec_comp_probe.h",
               "sec_comp_kit.h"
             ],
-            "header_base": "//base/security/security_component/interfaces/inner_api/security_component/include"
+            "header_base": "//base/security/security_component_manager/interfaces/inner_api/security_component/include"
           }
         },
         {
-          "name": "//base/security/security_component/interfaces/inner_api/enhance_kits:libsecurity_component_enhance_sdk",
+          "name": "//base/security/security_component_manager/interfaces/inner_api/enhance_kits:libsecurity_component_enhance_sdk",
           "header": {
             "header_files": [
               "sec_comp_enhance_kit.h"
             ],
-            "header_base": "//base/security/security_component/interfaces/inner_api/enhance_kits/include"
+            "header_base": "//base/security/security_component_manager/interfaces/inner_api/enhance_kits/include"
           }
         },
         {
-          "name": "//base/security/security_component/frameworks:libsecurity_component_framework",
+          "name": "//base/security/security_component_manager/frameworks:libsecurity_component_framework",
           "header": {
             "header_files": [
                "location_button.h",
                "paste_button.h",
                "save_button.h"
             ],
-            "header_base": "//base/security/security_component/interfaces/inner_api/security_component/include"
+            "header_base": "//base/security/security_component_manager/interfaces/inner_api/security_component/include"
           }
         },
         {
-          "name": "//base/security/security_component/frameworks:libsecurity_component_enhance_adapter",
+          "name": "//base/security/security_component_manager/frameworks:libsecurity_component_enhance_adapter",
           "header": {
             "header_files": [
                "sec_comp_enhance_adapter.h"
             ],
-            "header_base": "//base/security/security_component/frameworks/enhance_adapter/include"
+            "header_base": "//base/security/security_component_manager/frameworks/enhance_adapter/include"
           }
         },
         {
-          "name": "//base/security/security_component/services/security_component_service/sa:security_component_service",
+          "name": "//base/security/security_component_manager/services/security_component_service/sa:security_component_service",
           "header": {
             "header_files": [
                "sec_comp_manager.h"
             ],
-            "header_base": "//base/security/security_component/services/security_component_service/sa/sa_main"
+            "header_base": "//base/security/security_component_manager/services/security_component_service/sa/sa_main"
           }
         }
       ],
       "test": [
-        "//base/security/security_component:security_component_build_module_test",
-        "//base/security/security_component:security_component_build_fuzz_test"
+        "//base/security/security_component_manager:security_component_build_module_test",
+        "//base/security/security_component_manager:security_component_build_fuzz_test"
       ]
     }
   }

@@ -26,7 +26,7 @@ config("sec_comp_enhance_config") {
 
 ohos_shared_library("libsecurity_component_enhance_sdk") {
   subsystem_name = "security"
-  part_name = "security_component"
+  part_name = "security_component_manager"
   output_name = "libsecurity_component_enhance_sdk"
 
   public_configs = [ ":sec_comp_enhance_config" ]

@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-sec_comp_dir = "//base/security/security_component"
+sec_comp_dir = "//base/security/security_component_manager"
 
 if (!defined(global_parts_info) ||
     defined(global_parts_info.security_security_component_enhance)) {

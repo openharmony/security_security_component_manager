@@ -24,7 +24,7 @@ config("libsecurity_component_framework_config") {
 
 ohos_shared_library("libsecurity_component_framework") {
   subsystem_name = "security"
-  part_name = "security_component"
+  part_name = "security_component_manager"
   output_name = "libsecurity_component_framework"
 
   include_dirs = [
@@ -65,7 +65,7 @@ config("libsecurity_component_enhance_adapter_config") {
 
 ohos_shared_library("libsecurity_component_enhance_adapter") {
   subsystem_name = "security"
-  part_name = "security_component"
+  part_name = "security_component_manager"
   output_name = "libsecurity_component_enhance_adapter"
 
   include_dirs = [
