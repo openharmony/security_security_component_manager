@@ -12,11 +12,11 @@
 # limitations under the License.
 
 declare_args() {
-  security_component_feature_coverage = false
+  security_component_manager_feature_coverage = false
 }
 
 config("coverage_flags") {
-  if (security_component_feature_coverage) {
+  if (security_component_manager_feature_coverage) {
     cflags = [ "--coverage" ]
     ldflags = [ "--coverage" ]
   }

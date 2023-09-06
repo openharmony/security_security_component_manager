@@ -29,12 +29,12 @@ ohos_prebuilt_etc("security_component_service.rc") {
   source = "security_component_service.cfg"
   relative_install_dir = "init"
   subsystem_name = "security"
-  part_name = "security_component"
+  part_name = "security_component_manager"
 }
 
 ohos_shared_library("security_component_service") {
   subsystem_name = "security"
-  part_name = "security_component"
+  part_name = "security_component_manager"
 
   include_dirs = [
     "sa_main",

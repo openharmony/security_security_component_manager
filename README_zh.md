@@ -26,7 +26,7 @@
 ## 目录
 
 ```
-/base/security/security_component
+/base/security/security_component_manager
 ├── frameworks                  # 框架层，基础功能代码存放目录
 │   ├── common                  # 框架公共代码存放目录
 │   ├── enhance_adapter         # 能力增强适配代码存放目录
