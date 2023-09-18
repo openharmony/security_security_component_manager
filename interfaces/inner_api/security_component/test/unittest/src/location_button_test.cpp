@@ -54,6 +54,7 @@ HWTEST_F(LocationButtonTest, FromJson001, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton comp;
+    
     ASSERT_TRUE(comp.FromJson(jsonComponent));
 }
 
