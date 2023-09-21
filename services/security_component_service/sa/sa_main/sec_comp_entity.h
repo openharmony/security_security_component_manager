@@ -66,7 +66,7 @@ public:
     };
 
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
-    bool CheckTouchInfo(const SecCompClickEvent& touchInfo) const;
+    int32_t CheckTouchInfo(const SecCompClickEvent& touchInfo) const;
 
 private:
     std::shared_ptr<SecCompBase> componentInfo_;
