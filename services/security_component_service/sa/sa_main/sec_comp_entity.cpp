@@ -52,20 +52,20 @@ bool SecCompEntity::CompareComponentBasicInfo(SecCompBase* other, bool isRectChe
     return componentInfo_->CompareComponentBasicInfo(other, isRectCheck);
 }
 
-bool SecCompEntity::CheckTouchInfo(const SecCompClickEvent& touchInfo) const
+int32_t SecCompEntity::CheckTouchInfo(const SecCompClickEvent& touchInfo) const
 {
     auto current = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
     if (touchInfo.timestamp < current - MAX_TOUCH_INTERVAL || touchInfo.timestamp > current) {
         SC_LOG_ERROR(LABEL, "touch timestamp invalid touchInfo. timestamp: %{public}llu, current: %{public}llu",
             static_cast<unsigned long long>(touchInfo.timestamp), static_cast<unsigned long long>(current));
-        return false;
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
     if (!componentInfo_->rect_.IsInRect(touchInfo.touchX, touchInfo.touchY)) {
         SC_LOG_ERROR(LABEL, "touch point is not in component rect, %{public}lf, %{public}lf",
             touchInfo.touchX, touchInfo.touchY);
-        return false;
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
     int32_t res = SecCompEnhanceAdapter::CheckExtraInfo(touchInfo);
@@ -77,9 +77,9 @@ bool SecCompEntity::CheckTouchInfo(const SecCompClickEvent& touchInfo) const
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId_, "SC_TYPE", componentInfo_->type_);
-        return false;
+        return SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL;
     }
-    return true;
+    return SC_OK;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

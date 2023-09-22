@@ -459,11 +459,14 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return res;
     }
 
-    if (!sc->CheckTouchInfo(touchInfo)) {
+    res = sc->CheckTouchInfo(touchInfo);
+    if (res != SC_OK) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", sc->GetType());
-        AddAppToMaliciousAppList(caller.pid);
+        if (res == SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL) {
+            AddAppToMaliciousAppList(caller.pid);
+        }
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
     res = sc->GrantTempPermission();
