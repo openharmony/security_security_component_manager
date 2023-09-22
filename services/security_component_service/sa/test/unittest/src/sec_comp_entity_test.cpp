@@ -134,11 +134,11 @@ HWTEST_F(SecCompEntityTest, CheckTouchInfo001, TestSize.Level1)
         .touchY = ServiceTestCommon::TEST_COORDINATE,
         .timestamp = 0,
     };
-    ASSERT_FALSE(entity_->CheckTouchInfo(touch));
+    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
 
     uint64_t current = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     touch.timestamp = current + 10000L; // 10s
-    ASSERT_FALSE(entity_->CheckTouchInfo(touch));
+    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_DIFF_COORDINATE; // click event will not hit this rect
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
@@ -146,15 +146,15 @@ HWTEST_F(SecCompEntityTest, CheckTouchInfo001, TestSize.Level1)
     entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
     touch.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_FALSE(entity_->CheckTouchInfo(touch));
+    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     touch.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_FALSE(entity_->CheckTouchInfo(touch));
+    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
 #else
-    ASSERT_TRUE(entity_->CheckTouchInfo(touch));
+    ASSERT_EQ(entity_->CheckTouchInfo(touch), SC_OK);
 #endif
 }
