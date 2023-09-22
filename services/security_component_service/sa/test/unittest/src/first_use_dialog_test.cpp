@@ -369,4 +369,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level1)
     ASSERT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     diag.StartDialogAbility(PASTE_COMPONENT, nullptr);
+
+    // wait for event handler done
+    sleep(3);
 }
