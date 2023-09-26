@@ -15,7 +15,7 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import("../../../../security_component.gni")
 
-module_output_path = "security_component/security_component"
+module_output_path = "security_component_manager/security_component_manager"
 
 ohos_fuzztest("ReduceAfterVerifySavePermissionFuzzTest") {
   module_out_path = module_output_path
