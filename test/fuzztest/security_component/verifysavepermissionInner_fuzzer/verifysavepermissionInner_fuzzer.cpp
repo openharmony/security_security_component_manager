@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "reduceafterverifysavepermissionInner_fuzzer.h"
+#include "verifysavepermissionInner_fuzzer.h"
 
 #include <iostream>
 #include <string>
@@ -25,7 +25,7 @@
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
-static void ReduceAfterVerifySavePermissionInnerFuzzTest(const uint8_t *data, size_t size)
+static void VerifySavePermissionInnerFuzzTest(const uint8_t *data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
@@ -43,6 +43,6 @@ static void ReduceAfterVerifySavePermissionInnerFuzzTest(const uint8_t *data, si
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::ReduceAfterVerifySavePermissionInnerFuzzTest(data, size);
+    OHOS::VerifySavePermissionInnerFuzzTest(data, size);
     return 0;
 }
