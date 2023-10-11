@@ -15,9 +15,8 @@
 #ifndef SECURITY_COMPONENT_PERMISSION_MANAGER_H
 #define SECURITY_COMPONENT_PERMISSION_MANAGER_H
 
-#include <deque>
 #include <map>
-#include <set>
+#include <deque>
 #include "accesstoken_kit.h"
 #include "rwlock.h"
 #include "sec_comp_base.h"
@@ -32,35 +31,25 @@ public:
     virtual ~SecCompPermManager() = default;
     static SecCompPermManager& GetInstance();
 
-    int32_t GrantTempSavePermission(AccessToken::AccessTokenID tokenId);
-    bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
+    int32_t GrantLocationPermission(AccessToken::AccessTokenID tokenId,
+        const std::string& permissionName, int flag);
+    int32_t RevokeLocationPermission(AccessToken::AccessTokenID tokenId,
+        const std::string& permissionName, int flag);
 
-    int32_t GrantAppPermission(AccessToken::AccessTokenID tokenId, const std::string& permissionName);
-    int32_t RevokeAppPermission(AccessToken::AccessTokenID tokenId, const std::string& permissionName);
+    int32_t GrantTempSavePermission(AccessToken::AccessTokenID tokenId);
+    int32_t RevokeTempSavePermission(AccessToken::AccessTokenID tokenId);
 
     bool InitEventHandler(const std::shared_ptr<SecEventHandler>& secHandler);
     std::shared_ptr<SecEventHandler> GetSecEventHandler() const;
 
-    void RevokeAppPermisionsDelayed(AccessToken::AccessTokenID tokenId);
-    void RevokeAppPermisionsImmediately(AccessToken::AccessTokenID tokenId);
-    void CancelAppRevokingPermisions(AccessToken::AccessTokenID tokenId);
-
 private:
-    bool DelaySaveRevokePermission(AccessToken::AccessTokenID tokenId, const std::string& taskName);
+    bool DelayRevokePermission(AccessToken::AccessTokenID tokenId, const std::string& taskName);
     bool RevokeSavePermissionTask(const std::string& taskName);
-    void RevokeTempSavePermission(AccessToken::AccessTokenID tokenId);
-
-    void AddAppGrantPermissionRecord(AccessToken::AccessTokenID tokenId,
-        const std::string& permissionName);
-    void RemoveAppGrantPermissionRecord(AccessToken::AccessTokenID tokenId,
-        const std::string& permissionName);
 
     std::unordered_map<AccessToken::AccessTokenID, int32_t> applySaveCountMap_;
+    std::deque<std::string> taskQue_;
     std::mutex mutex_;
     std::shared_ptr<SecEventHandler> secHandler_;
-
-    std::mutex grantMtx_;
-    std::unordered_map<int32_t, std::set<std::string>> grantMap_;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

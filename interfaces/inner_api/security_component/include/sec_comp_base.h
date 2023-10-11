@@ -119,8 +119,7 @@ public:
 
     int32_t nodeId_ = 0;
 protected:
-    virtual bool IsTextIconTypeValid() = 0;
-    virtual bool IsCorrespondenceType() = 0;
+    virtual bool IsParamValid() = 0;
 private:
     bool ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res);
     bool ParseColor(const nlohmann::json& json, const std::string& tag, SecCompColor& res);
@@ -137,3 +136,4 @@ private:
 }  // namespace Security
 }  // namespace OHOS
 #endif  // SECURITY_COMPONENT_BASE_H
+

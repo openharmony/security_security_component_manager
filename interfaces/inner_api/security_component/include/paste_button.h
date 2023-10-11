@@ -35,9 +35,7 @@ enum class PasteIcon : int32_t {
 
 class PasteButton : public SecCompBase {
 public:
-    virtual bool IsTextIconTypeValid() override;
-    virtual bool IsCorrespondenceType() override;
-
+    virtual bool IsParamValid() override;
     virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const override;
 private:
     bool ParseStyle(const nlohmann::json& json, const std::string& tag);

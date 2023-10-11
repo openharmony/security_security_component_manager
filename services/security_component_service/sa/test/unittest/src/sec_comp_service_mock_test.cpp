@@ -14,10 +14,11 @@
  */
 #include "sec_comp_service_mock_test.h"
 
-#include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "location_button.h"
+#include "mock_system_ability_proxy.h"
+#include "mock_app_mgr_proxy.h"
 #include "paste_button.h"
 #include "save_button.h"
 #include "sec_comp_err.h"
@@ -105,8 +106,8 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
     };
 
     EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
+    sleep(5);
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
-    SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
 /**
@@ -140,7 +141,6 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
-    SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
 /**
@@ -174,7 +174,6 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
         secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
-    SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
 /**
@@ -208,41 +207,30 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
 
     ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
 
-    // test 10s valid
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
-    sleep(11);
-    ASSERT_FALSE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
 
-    // test 10s multiple clicks
-    touchInfo.timestamp = static_cast<uint64_t>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+
     ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
-    sleep(3);
-    touchInfo.timestamp = static_cast<uint64_t>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
-    sleep(8);
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
-    sleep(2);
+    sleep(6);
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
 }
 
 /**
  * @tc.name: ReportSecurityComponentClickEvent002
- * @tc.desc: Test verify location permission
+ * @tc.desc: Test report security component click with save button
  * @tc.type: FUNC
  * @tc.require: AR000HO9IN
  */
 HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
 {
-    SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEvent002");
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
     nlohmann::json jsonRes;
-    ServiceTestCommon::BuildLocationComponentJson(jsonRes);
-    std::string locationInfo = jsonRes.dump();
+    ServiceTestCommon::BuildSaveComponentJson(jsonRes);
+    std::string saveInfo = jsonRes.dump();
 
     ASSERT_EQ(0, SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID));
     AppExecFwk::AppStateData stateData = {
@@ -250,31 +238,86 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
-    struct SecCompClickEvent touchInfo1 = {
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    struct SecCompClickEvent touchInfo = {
         .touchX = 100,
         .touchY = 100,
         .timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
             ServiceTestCommon::TIME_CONVERSION_UNIT
     };
 
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, touchInfo1, nullptr));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
 
-    // test 10s valid
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID,
-        "ohos.permission.APPROXIMATELY_LOCATION"), 0);
-    sleep(11);
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID,
-        "ohos.permission.APPROXIMATELY_LOCATION"), 0);
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
 
-    SecCompManager::GetInstance().NotifyProcessBackground(getpid());
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);
-    ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID,
-        "ohos.permission.APPROXIMATELY_LOCATION"), 0);
-    sleep(11);
-    ASSERT_NE(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);
-    ASSERT_NE(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID,
-        "ohos.permission.APPROXIMATELY_LOCATION"), 0);
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(3);
+    touchInfo.timestamp = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(3);
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+
+    touchInfo.timestamp = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(3);
+    touchInfo.timestamp = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    sleep(3);
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEvent003
+ * @tc.desc: Test report security component click twice with save button
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent003, TestSize.Level1)
+{
+    int32_t scId;
+    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
+    secCompService_->Initialize();
+    nlohmann::json jsonRes;
+    ServiceTestCommon::BuildSaveComponentJson(jsonRes);
+    std::string saveInfo = jsonRes.dump();
+
+    ASSERT_EQ(0, SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID));
+    AppExecFwk::AppStateData stateData = {
+        .uid = getuid()
+    };
+    secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
+    // register security component ok
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    struct SecCompClickEvent touchInfo = {
+        .touchX = 100,
+        .touchY = 100,
+        .timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
+            ServiceTestCommon::TIME_CONVERSION_UNIT
+    };
+
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(3);
+    touchInfo.timestamp = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(6);
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+
+    touchInfo.timestamp = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    sleep(3);
+    ASSERT_TRUE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(secCompService_->ReduceAfterVerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
 }

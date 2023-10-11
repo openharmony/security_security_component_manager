@@ -51,7 +51,6 @@ ohos_shared_library("security_component_service") {
     "sa_main/first_use_dialog.cpp",
     "sa_main/sec_comp_entity.cpp",
     "sa_main/sec_comp_info_helper.cpp",
-    "sa_main/sec_comp_malicious_apps.cpp",
     "sa_main/sec_comp_manager.cpp",
     "sa_main/sec_comp_perm_manager.cpp",
     "sa_main/sec_comp_service.cpp",

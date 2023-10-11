@@ -31,6 +31,16 @@ static constexpr uint64_t MAX_TOUCH_INTERVAL = 1000000L; // 1000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
 }
 
+int32_t SecCompEntity::RevokeTempPermission()
+{
+    if (!isGrant_) {
+        SC_LOG_ERROR(LABEL, "security component is not granted");
+        return SC_OK;
+    }
+    isGrant_ = false;
+    return SecCompInfoHelper::RevokeTempPermission(tokenId_, componentInfo_);
+}
+
 int32_t SecCompEntity::GrantTempPermission()
 {
     isGrant_ = true;

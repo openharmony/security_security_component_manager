@@ -49,7 +49,7 @@ public:
         return 0;
     };
 
-    bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override
+    bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId) override
     {
         return true;
     }

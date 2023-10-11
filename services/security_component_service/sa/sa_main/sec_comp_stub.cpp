@@ -166,7 +166,7 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
     return SC_OK;
 }
 
-int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParcel& reply)
+int32_t SecCompStub::ReduceAfterVerifySavePermissionInner(MessageParcel& data, MessageParcel& reply)
 {
     if (!IsMediaLibraryCalling()) {
         SC_LOG_ERROR(LABEL, "Not medialibrary called");
@@ -183,7 +183,7 @@ int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParce
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    bool res = this->VerifySavePermission(tokenId);
+    bool res = this->ReduceAfterVerifySavePermission(tokenId);
     if (!reply.WriteBool(res)) {
         SC_LOG_ERROR(LABEL, "Verify temp save permission result fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
@@ -228,7 +228,7 @@ SecCompStub::SecCompStub()
         SecurityComponentServiceInterfaceCode::REPORT_SECURITY_COMPONENT_CLICK_EVENT)] =
         &SecCompStub::ReportSecurityComponentClickEventInner;
     requestFuncMap_[static_cast<uint32_t>(SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION)] =
-        &SecCompStub::VerifySavePermissionInner;
+        &SecCompStub::ReduceAfterVerifySavePermissionInner;
     requestFuncMap_[static_cast<uint32_t>(
         SecurityComponentServiceInterfaceCode::GET_SECURITY_COMPONENT_ENHANCE_OBJECT)] =
         &SecCompStub::GetEnhanceRemoteObjectInner;

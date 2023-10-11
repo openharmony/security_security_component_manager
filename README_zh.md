@@ -52,7 +52,7 @@
 | int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo, const SecCompClickEvent& touchInfo, sptr&lt;IRemoteObject&gt; callerToken); | 上报点击事件，申请临时授权 |
 | int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen); | 设置安全控件增强的配置，供多模服务使用 |
 | int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen, uint8_t* enhanceData, uint32_t& enHancedataLen); | 获取点击事件的安全增强数据，供多模服务使用 |
-| bool VerifySavePermission(AccessToken::AccessTokenID tokenId); | 校验保存控件权限 |
+| bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId); | 校验后取消保存控件权限 |
 
 ## 相关仓
 

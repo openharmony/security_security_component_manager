@@ -28,7 +28,6 @@
 #include "sec_comp_base.h"
 #include "sec_comp_entity.h"
 #include "sec_comp_info.h"
-#include "sec_comp_malicious_apps.h"
 #include "sec_event_handler.h"
 
 namespace OHOS {
@@ -43,7 +42,6 @@ struct SecCompCallerInfo {
 struct ProcessCompInfos {
     std::vector<SecCompEntity> compList;
     bool isForeground = false;
-    AccessToken::AccessTokenID tokenId;
 };
 
 class SecCompManager {
@@ -58,6 +56,7 @@ public:
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller, const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken);
+    bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
     void NotifyProcessDied(int32_t pid);
@@ -69,12 +68,15 @@ public:
 private:
     SecCompManager();
     bool IsForegroundCompExist();
-    int32_t AddSecurityComponentToList(int32_t pid,
-        AccessToken::AccessTokenID tokenId, const SecCompEntity& newEntity);
+    int32_t AddSecurityComponentToList(int32_t pid, const SecCompEntity& newEntity);
     int32_t DeleteSecurityComponentFromList(int32_t pid, int32_t scId);
     SecCompEntity* GetSecurityComponentFromList(int32_t pid, int32_t scId);
     int32_t CheckClickSecurityComponentInfo(SecCompEntity* sc, int32_t scId,
         const nlohmann::json& jsonComponent,  const SecCompCallerInfo& caller);
+    bool IsInMaliciousAppList(int32_t pid);
+    void AddAppToMaliciousAppList(int32_t pid);
+    void RemoveAppFromMaliciousAppList(int32_t pid);
+    bool IsMaliciousAppListEmpty();
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();
@@ -87,8 +89,9 @@ private:
 
     std::shared_ptr<AppExecFwk::EventRunner> secRunner_;
     std::shared_ptr<SecEventHandler> secHandler_;
+    std::set<int32_t> maliciousAppList_; // pid set
+    std::mutex maliciousMtx_;
     FirstUseDialog firstUseDialog_;
-    SecCompMaliciousApps malicious_;
 
     DISALLOW_COPY_AND_MOVE(SecCompManager);
 };

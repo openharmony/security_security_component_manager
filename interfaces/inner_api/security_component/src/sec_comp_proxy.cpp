@@ -206,7 +206,7 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
     return res;
 }
 
-bool SecCompProxy::VerifySavePermission(AccessToken::AccessTokenID tokenId)
+bool SecCompProxy::ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(SecCompProxy::GetDescriptor())) {
