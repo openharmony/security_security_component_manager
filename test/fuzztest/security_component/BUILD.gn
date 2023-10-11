@@ -19,6 +19,8 @@ group("fuzztest") {
     "getenhanceremoteobjectInner_fuzzer:GetEnhanceRemoteObjectInnerFuzzTest",
     "getenhanceremoteobject_fuzzer:GetEnhanceRemoteObjectFuzzTest",
     "getpointereventenhancedata_fuzzer:GetPointerEventEnhanceDataFuzzTest",
+    "reduceafterverifysavepermissionInner_fuzzer:ReduceAfterVerifySavePermissionInnerFuzzTest",
+    "reduceafterverifysavepermission_fuzzer:ReduceAfterVerifySavePermissionFuzzTest",
     "registersecuritycomponentInner_fuzzer:RegisterSecurityComponentInnerFuzzTest",
     "registersecuritycomponent_fuzzer:RegisterSecurityComponentFuzzTest",
     "reportsecuritycomponentclickeventInner_fuzzer:ReportSecurityComponentClickEventInnerFuzzTest",
@@ -28,7 +30,5 @@ group("fuzztest") {
     "unregistersecuritycomponent_fuzzer:UnregisterSecurityComponentFuzzTest",
     "updatesecuritycomponentInner_fuzzer:UpdateSecurityComponentInnerFuzzTest",
     "updatesecuritycomponent_fuzzer:UpdateSecurityComponentFuzzTest",
-    "verifysavepermissionInner_fuzzer:VerifySavePermissionInnerFuzzTest",
-    "verifysavepermission_fuzzer:VerifySavePermissionFuzzTest",
   ]
 }

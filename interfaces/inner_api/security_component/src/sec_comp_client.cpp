@@ -92,7 +92,7 @@ int32_t SecCompClient::ReportSecurityComponentClickEvent(int32_t scId,
     return proxy->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfo, callerToken);
 }
 
-bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
+bool SecCompClient::ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId)
 {
     auto proxy = GetProxy(false);
     if (proxy == nullptr) {
@@ -100,7 +100,7 @@ bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
         return false;
     }
 
-    return proxy->VerifySavePermission(tokenId);
+    return proxy->ReduceAfterVerifySavePermission(tokenId);
 }
 
 sptr<IRemoteObject> SecCompClient::GetEnhanceRemoteObject(bool doLoadSa)

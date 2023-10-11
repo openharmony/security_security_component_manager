@@ -15,9 +15,6 @@
 #ifndef SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H
 #define SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H
 
-#include <map>
-#include <mutex>
-#include <set>
 #include <string>
 #include "access_token.h"
 
@@ -29,11 +26,15 @@ struct HapTokenInfo {
 
 class AccessTokenKit {
 public:
-    static int RevokePermission(AccessTokenID tokenID, const std::string& permissionName, int flag);
+    static int RevokePermission(AccessTokenID tokenID, const std::string& permissionName, int flag)
+    {
+        return 0;
+    };
 
-    static int GrantPermission(AccessTokenID tokenID, const std::string& permissionName, int flag);
-
-    static int VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName);
+    static int GrantPermission(AccessTokenID tokenID, const std::string& permissionName, int flag)
+    {
+        return 0;
+    };
 
     static int GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo& hapTokenInfoRes)
     {
@@ -50,9 +51,6 @@ public:
         AccessTokenIDInner *idInner = reinterpret_cast<AccessTokenIDInner *>(&tokenID);
         return static_cast<ATokenTypeEnum>(idInner->type);
     };
-
-    static std::mutex mutex_;
-    static std::map<AccessTokenID, std::set<std::string>> permMap_;
     static int getHapTokenInfoRes;
 };
 } // namespace SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H

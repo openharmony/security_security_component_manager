@@ -548,3 +548,14 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
     comp->type_ = SecCompType::MAX_SC_TYPE;
     ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp));
 }
+
+/**
+ * @tc.name: RevokeTempPermission001
+ * @tc.desc: Test revoke temp permission componentInfo is null
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompInfoHelperTest, RevokeTempPermission001, TestSize.Level1)
+{
+    ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, SecCompInfoHelper::RevokeTempPermission(0, nullptr));
+}

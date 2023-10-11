@@ -216,14 +216,10 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
     int32_t value = jsonSrc.at(JsonTagConstants::JSON_SC_TYPE).get<int32_t>();
     if ((value <= static_cast<int32_t>(SecCompType::UNKNOWN_SC_TYPE)) ||
         (value >= static_cast<int32_t>(SecCompType::MAX_SC_TYPE))) {
-        SC_LOG_ERROR(LABEL, "scType value is invalid.");
+        SC_LOG_ERROR(LABEL, "scType is invalid.");
         return false;
     }
     type_ = static_cast<SecCompType>(value);
-    if (!IsCorrespondenceType()) {
-        SC_LOG_ERROR(LABEL, "scType type is not correspondence.");
-        return false;
-    }
 
     if ((jsonSrc.find(JsonTagConstants::JSON_NODE_ID) == jsonSrc.end()) ||
         !jsonSrc.at(JsonTagConstants::JSON_NODE_ID).is_number()) {
@@ -354,7 +350,7 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
     }
     text_ = jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).get<int32_t>();
     icon_ = jsonStyle.at(JsonTagConstants::JSON_ICON_TAG).get<int32_t>();
-    if (!IsTextIconTypeValid()) {
+    if (!IsParamValid()) {
         SC_LOG_ERROR(LABEL, "text or icon is invalid.");
         return false;
     }
@@ -370,3 +366,4 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
 }  // namespace base
 }  // namespace Security
 }  // namespace OHOS
+

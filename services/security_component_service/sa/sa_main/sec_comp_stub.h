@@ -35,7 +35,7 @@ private:
     int32_t UpdateSecurityComponentInner(MessageParcel& data, MessageParcel& reply);
     int32_t UnregisterSecurityComponentInner(MessageParcel& data, MessageParcel& reply);
     int32_t ReportSecurityComponentClickEventInner(MessageParcel& data, MessageParcel& reply);
-    int32_t VerifySavePermissionInner(MessageParcel& data, MessageParcel& reply);
+    int32_t ReduceAfterVerifySavePermissionInner(MessageParcel& data, MessageParcel& reply);
     int32_t GetEnhanceRemoteObjectInner(MessageParcel& data, MessageParcel& reply);
     bool IsMediaLibraryCalling();
 

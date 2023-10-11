@@ -31,7 +31,7 @@ public:
     static int32_t UnregisterSecurityComponent(int32_t scId);
     static int32_t ReportSecurityComponentClickEvent(int32_t scId,
         std::string& componentInfo, const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken = nullptr);
-    static bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
+    static bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId);
     static sptr<IRemoteObject> GetEnhanceRemoteObject(bool isLoad);
 };
 }  // namespace SecurityComponent

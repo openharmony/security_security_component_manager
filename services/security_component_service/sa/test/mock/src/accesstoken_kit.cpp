@@ -15,53 +15,10 @@
 
 #include "accesstoken_kit.h"
 
-#include "sec_comp_log.h"
-
 namespace OHOS {
 namespace Security {
 namespace AccessToken {
 int32_t AccessTokenKit::getHapTokenInfoRes = 0;
-std::mutex AccessTokenKit::mutex_;
-std::map<AccessTokenID, std::set<std::string>> AccessTokenKit::permMap_;
-
-int AccessTokenKit::RevokePermission(AccessTokenID tokenID, const std::string& permissionName, int flag)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    auto iter = permMap_.find(tokenID);
-    if (iter == permMap_.end()) {
-        return 0;
-    }
-
-    permMap_[tokenID].erase(permissionName);
-    if (permMap_[tokenID].size() == 0) {
-        permMap_.erase(tokenID);
-    }
-    return 0;
-};
-
-int AccessTokenKit::GrantPermission(AccessTokenID tokenID, const std::string& permissionName, int flag)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    auto iter = permMap_.find(tokenID);
-    if (iter != permMap_.end()) {
-        iter->second.insert(permissionName);
-        return 0;
-    }
-    std::set<std::string> permSet;
-    permSet.insert(permissionName);
-    permMap_[tokenID] = permSet;
-    return 0;
-};
-
-int AccessTokenKit::VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    auto iter = permMap_.find(tokenID);
-    if (iter == permMap_.end() || permMap_[tokenID].count(permissionName) < 1) {
-        return -1;
-    }
-    return 0;
-};
 } // namespace SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H
 } // namespace Security
 } // namespace OHOS

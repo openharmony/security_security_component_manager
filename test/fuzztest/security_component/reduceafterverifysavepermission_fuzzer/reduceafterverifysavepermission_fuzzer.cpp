@@ -20,14 +20,14 @@
 #include "accesstoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "verifysavepermission_fuzzer.h"
+#include "reduceafterverifysavepermission_fuzzer.h"
 
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
-static void VerifySavePermissionFuzzTest(const uint8_t *data, size_t size)
+static void ReduceAfterVerifySavePermissionFuzzTest(const uint8_t *data, size_t size)
 {
-    SecCompKit::VerifySavePermission(size);
+    SecCompKit::ReduceAfterVerifySavePermission(size);
 }
 } // namespace OHOS
 
@@ -35,6 +35,6 @@ static void VerifySavePermissionFuzzTest(const uint8_t *data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::VerifySavePermissionFuzzTest(data, size);
+    OHOS::ReduceAfterVerifySavePermissionFuzzTest(data, size);
     return 0;
 }
