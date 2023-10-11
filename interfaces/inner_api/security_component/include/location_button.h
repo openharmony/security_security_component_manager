@@ -46,7 +46,8 @@ enum class LocationIcon : int32_t {
 
 class LocationButton : public SecCompBase {
 public:
-    virtual bool IsParamValid() override;
+    virtual bool IsTextIconTypeValid() override;
+    virtual bool IsCorrespondenceType() override;
     virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const override;
 private:
     bool ParseStyle(const nlohmann::json& json, const std::string& tag);
