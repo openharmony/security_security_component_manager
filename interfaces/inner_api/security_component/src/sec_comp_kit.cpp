@@ -119,10 +119,10 @@ int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
     return res;
 }
 
-bool SecCompKit::ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId)
+bool SecCompKit::VerifySavePermission(AccessToken::AccessTokenID tokenId)
 {
     bool res =
-        SecCompClient::GetInstance().ReduceAfterVerifySavePermission(tokenId);
+        SecCompClient::GetInstance().VerifySavePermission(tokenId);
     if (!res) {
         SC_LOG_ERROR(LABEL, "verify temp save permission, error: %{public}d", res);
     }

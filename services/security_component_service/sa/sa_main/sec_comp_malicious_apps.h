@@ -12,37 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef SECURITY_COMPONENT_PASTE_BUTTON_H
-#define SECURITY_COMPONENT_PASTE_BUTTON_H
+#ifndef SECURITY_COMPONENT_MALICIOUS_APPS_H
+#define SECURITY_COMPONENT_MALICIOUS_APPS_H
 
-#include <string>
-#include "nlohmann/json.hpp"
-#include "sec_comp_base.h"
+#include <mutex>
+#include <set>
 
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-enum class PasteDesc : int32_t {
-    PASTE = 0,
-    MAX_LABEL_TYPE
-};
-
-enum class PasteIcon : int32_t {
-    FILLED_ICON = 0,
-    LINE_ICON = 1,
-    MAX_ICON_TYPE
-};
-
-class PasteButton : public SecCompBase {
+class SecCompMaliciousApps {
 public:
-    virtual bool IsTextIconTypeValid() override;
-    virtual bool IsCorrespondenceType() override;
+    SecCompMaliciousApps() = default;
+    virtual ~SecCompMaliciousApps() = default;
+    bool IsInMaliciousAppList(int32_t pid, int32_t uid);
+    void AddAppToMaliciousAppList(int32_t pid);
+    void RemoveAppFromMaliciousAppList(int32_t pid);
+    bool IsMaliciousAppListEmpty();
 
-    virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const override;
 private:
-    bool ParseStyle(const nlohmann::json& json, const std::string& tag);
+    std::set<int32_t> maliciousAppList_; // pid set
+    std::mutex maliciousMtx_;
 };
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
-#endif  // SECURITY_COMPONENT_LOCATION_BUTTON_H
+#endif  // SECURITY_COMPONENT_MALICIOUS_APPS_H

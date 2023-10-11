@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "PasteButton"};
 }
 
-bool PasteButton::IsParamValid()
+bool PasteButton::IsTextIconTypeValid()
 {
     if ((text_ <= UNKNOWN_TEXT) || (static_cast<PasteDesc>(text_) >= PasteDesc::MAX_LABEL_TYPE) ||
         (icon_ <= UNKNOWN_ICON) || (static_cast<PasteIcon>(icon_) >= PasteIcon::MAX_ICON_TYPE)) {
@@ -32,6 +32,11 @@ bool PasteButton::IsParamValid()
     }
 
     return true;
+}
+
+bool PasteButton::IsCorrespondenceType()
+{
+    return (type_ == PASTE_COMPONENT);
 }
 
 bool PasteButton::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const

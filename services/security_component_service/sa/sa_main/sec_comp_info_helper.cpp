@@ -206,25 +206,28 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
     }
 
     SecCompType type = componentInfo->type_;
+    int32_t res;
     switch (type) {
         case LOCATION_COMPONENT:
             {
-                int32_t res = SecCompPermManager::GetInstance().GrantLocationPermission(tokenId,
-                    "ohos.permission.APPROXIMATELY_LOCATION", AccessToken::PermissionFlag::PERMISSION_COMPONENT_SET);
+                int32_t res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId,
+                    "ohos.permission.APPROXIMATELY_LOCATION");
                 if (res != SC_OK) {
                     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
                 }
-                res = SecCompPermManager::GetInstance().GrantLocationPermission(tokenId, "ohos.permission.LOCATION",
-                    AccessToken::PermissionFlag::PERMISSION_COMPONENT_SET);
+                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.LOCATION");
                 if (res != SC_OK) {
-                    SecCompPermManager::GetInstance().RevokeLocationPermission(
-                        tokenId, "ohos.permission.APPROXIMATELY_LOCATION",
-                        AccessToken::PermissionFlag::PERMISSION_COMPONENT_SET);
+                    SecCompPermManager::GetInstance().RevokeAppPermission(
+                        tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
                     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
                 }
                 return SC_OK;
             }
         case PASTE_COMPONENT:
+            res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.SECURE_PASTE");
+            if (res != SC_OK) {
+                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+            }
             SC_LOG_DEBUG(LABEL, "grant paste permission");
             return SC_OK;
         case SAVE_COMPONENT:
@@ -232,37 +235,6 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
             return SecCompPermManager::GetInstance().GrantTempSavePermission(tokenId);
         default:
             SC_LOG_ERROR(LABEL, "Parse component type unknown");
-            break;
-    }
-    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-}
-
-int32_t SecCompInfoHelper::RevokeTempPermission(AccessToken::AccessTokenID tokenId,
-    const std::shared_ptr<SecCompBase>& componentInfo)
-{
-    if (componentInfo == nullptr) {
-        SC_LOG_ERROR(LABEL, "revoke component is null");
-        return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-    }
-
-    SecCompType type = componentInfo->type_;
-    switch (type) {
-        case LOCATION_COMPONENT:
-            {
-                int32_t locationRes = SecCompPermManager::GetInstance().RevokeLocationPermission(tokenId,
-                    "ohos.permission.LOCATION", AccessToken::PermissionFlag::PERMISSION_COMPONENT_SET);
-                int32_t approxLocationRes = SecCompPermManager::GetInstance().RevokeLocationPermission(tokenId,
-                    "ohos.permission.APPROXIMATELY_LOCATION", AccessToken::PermissionFlag::PERMISSION_COMPONENT_SET);
-                if ((locationRes != SC_OK) || (approxLocationRes != SC_OK)) {
-                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-                }
-                return SC_OK;
-            }
-        case PASTE_COMPONENT:
-            SC_LOG_DEBUG(LABEL, "revoke paste permission");
-            return SC_OK;
-        default:
-            SC_LOG_ERROR(LABEL, "revoke component type unknown");
             break;
     }
     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
