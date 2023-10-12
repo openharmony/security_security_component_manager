@@ -210,7 +210,7 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
     switch (type) {
         case LOCATION_COMPONENT:
             {
-                int32_t res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId,
+                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId,
                     "ohos.permission.APPROXIMATELY_LOCATION");
                 if (res != SC_OK) {
                     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;

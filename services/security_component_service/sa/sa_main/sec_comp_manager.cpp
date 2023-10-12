@@ -204,7 +204,8 @@ void SecCompManager::NotifyProcessDied(int32_t pid)
     }
     SC_LOG_INFO(LABEL, "App pid %{public}d died", pid);
     iter->second.compList.clear();
-    SecCompPermManager::GetInstance().RevokeAppPermisionsImmediately(iter->second.tokenId);
+    SecCompPermManager::GetInstance().RevokeAppPermissions(iter->second.tokenId);
+    SecCompPermManager::GetInstance().RevokeTempSavePermission(iter->second.tokenId);
     componentMap_.erase(pid);
 
     if (!IsForegroundCompExist()) {
@@ -245,7 +246,8 @@ void SecCompManager::ExitWhenAppMgrDied()
     OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     for (auto iter = componentMap_.begin(); iter != componentMap_.end(); ++iter) {
         iter->second.compList.clear();
-        SecCompPermManager::GetInstance().RevokeAppPermisionsImmediately(iter->second.tokenId);
+        SecCompPermManager::GetInstance().RevokeAppPermissions(iter->second.tokenId);
+        SecCompPermManager::GetInstance().RevokeTempSavePermission(iter->second.tokenId);
     }
     componentMap_.clear();
 
