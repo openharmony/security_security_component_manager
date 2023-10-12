@@ -193,5 +193,6 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
     ASSERT_EQ(SC_OK,
         SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_NE(-1, scId);
+    EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 #endif
 }

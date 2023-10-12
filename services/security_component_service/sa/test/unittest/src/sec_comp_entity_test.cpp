@@ -58,28 +58,6 @@ void SecCompEntityTest::TearDown()
 }
 
 /**
- * @tc.name: RevokeTempPermission001
- * @tc.desc: Test revoke temp permission
- * @tc.type: FUNC
- * @tc.require: AR000HO9J7
- */
-HWTEST_F(SecCompEntityTest, RevokeTempPermission001, TestSize.Level1)
-{
-    entity_->isGrant_ = false;
-    ASSERT_EQ(SC_OK, entity_->RevokeTempPermission());
-
-    entity_->isGrant_ = true;
-    entity_->componentInfo_->type_ = UNKNOWN_SC_TYPE;
-    ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, entity_->RevokeTempPermission());
-    ASSERT_FALSE(entity_->isGrant_);
-
-    entity_->isGrant_ = true;
-    entity_->componentInfo_->type_ = LOCATION_COMPONENT;
-    ASSERT_EQ(SC_OK, entity_->RevokeTempPermission());
-    ASSERT_FALSE(entity_->isGrant_);
-}
-
-/**
  * @tc.name: GrantTempPermission001
  * @tc.desc: Test grant location permission
  * @tc.type: FUNC
@@ -118,7 +96,6 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
     ASSERT_NE(nullptr, entity_);
 
     ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, entity_->GrantTempPermission());
-    ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, entity_->RevokeTempPermission());
 }
 
 /**

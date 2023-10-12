@@ -236,9 +236,9 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(int32_t scId,
     return res;
 }
 
-bool SecCompService::ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId)
+bool SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId)
 {
-    return SecCompManager::GetInstance().ReduceAfterVerifySavePermission(tokenId);
+    return SecCompPermManager::GetInstance().VerifySavePermission(tokenId);
 }
 
 sptr<IRemoteObject> SecCompService::GetEnhanceRemoteObject()

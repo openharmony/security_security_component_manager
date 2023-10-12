@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SaveButton"};
 }
 
-bool SaveButton::IsParamValid()
+bool SaveButton::IsTextIconTypeValid()
 {
     if ((text_ <= UNKNOWN_TEXT) || (static_cast<SaveDesc>(text_) >= SaveDesc::MAX_LABEL_TYPE) ||
         (icon_ <= UNKNOWN_ICON) || (static_cast<SaveIcon>(icon_) >= SaveIcon::MAX_ICON_TYPE)) {
@@ -32,6 +32,11 @@ bool SaveButton::IsParamValid()
     }
 
     return true;
+}
+
+bool SaveButton::IsCorrespondenceType()
+{
+    return (type_ == SAVE_COMPONENT);
 }
 
 bool SaveButton::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const

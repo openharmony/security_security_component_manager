@@ -291,7 +291,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
 
     ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
     uint32_t selfTokenId = GetSelfTokenID();
-    ASSERT_TRUE(SecCompKit::ReduceAfterVerifySavePermission(selfTokenId));
+    ASSERT_TRUE(SecCompKit::VerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -396,12 +396,12 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
 }
 
 /**
- * @tc.name: ReduceAfterVerifySavePermission001
+ * @tc.name: VerifySavePermission001
  * @tc.desc: Test register security component wrong hap
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -423,21 +423,21 @@ HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission001, TestSi
 
     ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
     setuid(100);
-    ASSERT_FALSE(SecCompKit::ReduceAfterVerifySavePermission(TestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
     // mediaLibraryTokenId_ != 0
-    ASSERT_FALSE(SecCompKit::ReduceAfterVerifySavePermission(TestCommon::HAP_TOKEN_ID));
+    ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
 
 /**
- * @tc.name: ReduceAfterVerifySavePermission002
+ * @tc.name: VerifySavePermission002
  * @tc.desc: Test register security component invalid tokenId
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission002, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -457,7 +457,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission002, TestSi
     touchInfo.extraInfo.data = data;
 
     ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
-    ASSERT_FALSE(SecCompKit::ReduceAfterVerifySavePermission(0));
+    ASSERT_FALSE(SecCompKit::VerifySavePermission(0));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -506,7 +506,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level
     TestCommon::BuildSaveComponentInfo(jsonRes);
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, saveInfo, scId));
+    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     ASSERT_NE(-1, scId);
     ASSERT_EQ(SC_OK, SecCompKit::UpdateSecurityComponent(scId, saveInfo));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
@@ -526,7 +526,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level
     int32_t scId;
 
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, saveInfo, scId));
+    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     ASSERT_NE(-1, scId);
     setuid(100);
     ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, SecCompKit::UpdateSecurityComponent(scId, saveInfo));
