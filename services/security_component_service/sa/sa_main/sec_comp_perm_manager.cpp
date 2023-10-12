@@ -42,7 +42,7 @@ bool SecCompPermManager::DelaySaveRevokePermission(AccessToken::AccessTokenID to
 
     std::function<void()> delayed = ([tokenId]() {
         SC_LOG_DEBUG(LABEL, "delay revoke save permission");
-        SecCompPermManager::GetInstance().RevokeTempSavePermission(tokenId);
+        SecCompPermManager::GetInstance().RevokeTempSavePermissionCount(tokenId);
     });
 
     SC_LOG_DEBUG(LABEL, "revoke save permission after %{public}d ms", DELAY_REVOKE_MILLISECONDS);
@@ -70,13 +70,14 @@ int32_t SecCompPermManager::GrantTempSavePermission(AccessToken::AccessTokenID t
         return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    saveTaskDequeMap_[tokenId].push_back(taskName);
     applySaveCountMap_[tokenId]++;
     SC_LOG_DEBUG(LABEL, "tokenId: %{public}d current permission apply counts is: %{public}d.",
         tokenId, applySaveCountMap_[tokenId]);
     return SC_OK;
 }
 
-void SecCompPermManager::RevokeTempSavePermission(AccessToken::AccessTokenID tokenId)
+void SecCompPermManager::RevokeTempSavePermissionCount(AccessToken::AccessTokenID tokenId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     auto iter = applySaveCountMap_.find(tokenId);
@@ -84,11 +85,32 @@ void SecCompPermManager::RevokeTempSavePermission(AccessToken::AccessTokenID tok
         SC_LOG_ERROR(LABEL, "This hap has no permissions to save files.");
         return;
     }
+    std::string taskName = saveTaskDequeMap_[tokenId].front();
+    if (!RevokeSavePermissionTask(taskName)) {
+        return;
+    }
+    saveTaskDequeMap_[tokenId].pop_front();
     SC_LOG_DEBUG(LABEL, "tokenId: %{public}d current permission apply counts is: %{public}d.",
         tokenId, applySaveCountMap_[tokenId]);
     if ((--applySaveCountMap_[tokenId]) == 0) {
         applySaveCountMap_.erase(tokenId);
+        SC_LOG_INFO(LABEL, "tokenId: %{public}d save permission count is 0, revoke it.", tokenId);
     }
+    return;
+}
+
+void SecCompPermManager::RevokeTempSavePermission(AccessToken::AccessTokenID tokenId)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    applySaveCountMap_.erase(tokenId);
+    auto& taskDeque = saveTaskDequeMap_[tokenId];
+    for (auto iter = taskDeque.begin(); iter != taskDeque.end(); ++iter) {
+        if (!RevokeSavePermissionTask(*iter)) {
+            continue;
+        }
+    }
+    taskDeque.clear();
+    SC_LOG_INFO(LABEL, "tokenId: %{public}d revoke save permission.", tokenId);
     return;
 }
 
@@ -151,6 +173,12 @@ int32_t SecCompPermManager::RevokeAppPermission(AccessToken::AccessTokenID token
 
     RemoveAppGrantPermissionRecord(tokenId, permissionName);
     return res;
+}
+
+void SecCompPermManager::RevokeAppPermissions(AccessToken::AccessTokenID tokenId)
+{
+    RevokeAppPermisionsImmediately(tokenId);
+    CancelAppRevokingPermisions(tokenId);
 }
 
 void SecCompPermManager::RevokeAppPermisionsDelayed(AccessToken::AccessTokenID tokenId)
