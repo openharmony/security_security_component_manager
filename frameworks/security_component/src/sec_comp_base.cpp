@@ -220,10 +220,6 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
         return false;
     }
     type_ = static_cast<SecCompType>(value);
-    if (!IsCorrespondenceType()) {
-        SC_LOG_ERROR(LABEL, "scType type is not correspondence.");
-        return false;
-    }
 
     if ((jsonSrc.find(JsonTagConstants::JSON_NODE_ID) == jsonSrc.end()) ||
         !jsonSrc.at(JsonTagConstants::JSON_NODE_ID).is_number()) {
