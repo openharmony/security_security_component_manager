@@ -417,3 +417,195 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
         ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
 }
+
+/**
+ * @tc.name: AddSecurityComponentToList003
+ * @tc.desc: Test add security component to list sa not exit
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList003, TestSize.Level1)
+{
+    SecCompManager::GetInstance().isSaExit_ = true;
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    ASSERT_EQ(SC_SERVICE_ERROR_SERVICE_NOT_EXIST,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+    SecCompManager::GetInstance().isSaExit_ = false;
+}
+
+/**
+ * @tc.name: DeleteSecurityComponentFromList002
+ * @tc.desc: Test delete security component
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    auto component = SecCompManager::GetInstance().GetSecurityComponentFromList(1, 1);
+    ASSERT_NE(nullptr, component);
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().DeleteSecurityComponentFromList(1, 11));
+}
+
+/**
+ * @tc.name: RegisterSecurityComponent002
+ * @tc.desc: Test register security component
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, RegisterSecurityComponent002, TestSize.Level1)
+{
+    nlohmann::json jsonInvalid;
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.ToJson(jsonInvalid);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    int32_t scId;
+    ASSERT_NE(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
+        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
+    ASSERT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
+        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
+}
+
+/**
+ * @tc.name: UpdateSecurityComponent002
+ * @tc.desc: Test update security component
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level1)
+{
+    nlohmann::json jsonValid;
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    ASSERT_NE(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().UpdateSecurityComponent(
+        ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.ToJson(jsonValid);
+    ASSERT_NE(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST, SecCompManager::GetInstance().UpdateSecurityComponent(
+        ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
+}
+
+/**
+ * @tc.name: ExitSaProcess001
+ * @tc.desc: Test check ExitSaProcess
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
+{
+    SecCompManager::GetInstance().ExitSaProcess();
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_FALSE(SecCompManager::GetInstance().malicious_.IsMaliciousAppListEmpty());
+    SecCompManager::GetInstance().ExitSaProcess();
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+    SecCompManager::GetInstance().ExitSaProcess();
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsMaliciousAppListEmpty());
+    SecCompManager::GetInstance().ExitSaProcess();
+}
+
+/**
+ * @tc.name: ExitWhenAppMgrDied001
+ * @tc.desc: Test check ExitWhenAppMgrDied
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level1)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(1, 0, entity));
+    SecCompManager::GetInstance().ExitWhenAppMgrDied();
+    SecCompManager::GetInstance().ExitWhenAppMgrDied();
+}
+
+/**
+ * @tc.name: SendCheckInfoEnhanceSysEvent001
+ * @tc.desc: Test check SendCheckInfoEnhanceSysEvent
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level1)
+{
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsMaliciousAppListEmpty());
+    int32_t scId = INVALID_SC_ID;
+    const std::string scene = "";
+    int32_t res = SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+}
+
+/**
+ * @tc.name: DumpSecComp001
+ * @tc.desc: Test check DumpSecComp
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, DumpSecComp001, TestSize.Level1)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    SecCompManager::GetInstance().isSaExit_ = false;
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+    std::string dumpStr;
+    SecCompManager::GetInstance().DumpSecComp(dumpStr);
+}
+
+/**
+ * @tc.name: TransformCallBackResult001
+ * @tc.desc: Test check TransformCallBackResult
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompManagerTest, TransformCallBackResult001, TestSize.Level1)
+{
+    int32_t scId = INVALID_SC_ID;
+    const std::string scene = "REGISTER";
+    int32_t res = SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+    res = SC_ENHANCE_ERROR_VALUE_INVALID;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+    res = SC_ENHANCE_ERROR_CALLBACK_OPER_FAIL;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+    res = SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+    res = SC_ENHANCE_ERROR_CALLBACK_CHECK_FAIL;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+    res = SC_SERVICE_ERROR_VALUE_INVALID;
+    SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+}

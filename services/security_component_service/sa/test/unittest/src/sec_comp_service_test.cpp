@@ -331,3 +331,48 @@ HWTEST_F(SecCompServiceTest, Dump001, TestSize.Level1)
     args.emplace_back(Str8ToStr16("-t"));
     ASSERT_EQ(SC_OK, secCompService_->Dump(fd, args));
 }
+
+/**
+ * @tc.name: Onstart002
+ * @tc.desc: Test OnStart
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompServiceTest, OnStart002, TestSize.Level1)
+{
+    secCompService_->state_ = ServiceRunningState::STATE_NOT_START;
+    secCompService_->appStateObserver_ = nullptr;
+    std::shared_ptr<SystemAbilityManagerClient> saClient = std::make_shared<SystemAbilityManagerClient>();
+    ASSERT_NE(nullptr, saClient);
+    SystemAbilityManagerClient::clientInstance = saClient.get();
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(nullptr));
+    secCompService_->OnStart();
+    secCompService_->state_ = ServiceRunningState::STATE_NOT_START;
+    secCompService_->appStateObserver_ = new (std::nothrow) AppStateObserver();
+    secCompService_->OnStart();
+}
+
+/**
+ * @tc.name: GetCallerInfo002
+ * @tc.desc: Test get caller info
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
+{
+    SecCompCallerInfo caller;
+    setuid(1);
+    SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID);
+    EXPECT_FALSE(secCompService_->GetCallerInfo(caller));
+
+    const std::string componentInfo;
+    nlohmann::json jsonRes;
+    int32_t scId  = 0;
+    EXPECT_EQ(secCompService_->ParseParams(componentInfo, caller, jsonRes), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_EQ(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
+
+    struct SecCompClickEvent touchInfo;
+    EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfo, nullptr),
+      SC_SERVICE_ERROR_VALUE_INVALID);
+    secCompService_->GetEnhanceRemoteObject();
+}

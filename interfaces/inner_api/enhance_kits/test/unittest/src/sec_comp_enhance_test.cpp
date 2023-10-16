@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
+#include "sec_comp_info.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::SecurityComponent;
@@ -132,4 +133,82 @@ HWTEST_F(SecCompEnhanceTest, DisableInputEnhance001, TestSize.Level1)
     } else {
         EXPECT_EQ(result, SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE);
     }
+}
+
+/**
+ * @tc.name: InitEnhanceHandler001
+ * @tc.desc: test InitEnhanceHandler
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9IN
+ */
+HWTEST_F(SecCompEnhanceTest, InitEnhanceHandler001, TestSize.Level1)
+{
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    uint8_t originData[16] = { 0 };
+    uint32_t dataLen = 16;
+    uint8_t* enhanceData = nullptr;
+    uint32_t enHancedataLen = MAX_HMAC_SIZE;
+    ASSERT_EQ(SC_OK,
+      SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    SecCompClickEvent touchInfo;
+    ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    
+    std::string componentInfo;
+    int32_t scId = 1;
+    ASSERT_FALSE(SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo));
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::DisableInputEnhance());
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    SecCompEnhanceAdapter::StartEnhanceService();
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    SecCompEnhanceAdapter::ExistEnhanceService();
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    SecCompEnhanceAdapter::NotifyProcessDied(scId);
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    std::shared_ptr<SecCompBase> compInfo;
+    const nlohmann::json jsonComponent;
+    ASSERT_NE(SC_OK, SecCompEnhanceAdapter::CheckComponentInfoEnhnace(scId, compInfo, jsonComponent));
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
+    ASSERT_NE(nullptr, SecCompEnhanceAdapter::GetEnhanceRemoteObject());
+}
+
+/**
+ * @tc.name: InitEnhanceHandler002
+ * @tc.desc: test InitEnhanceHandler
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9IN
+ */
+HWTEST_F(SecCompEnhanceTest, InitEnhanceHandler002, TestSize.Level1)
+{
+    SecCompEnhanceAdapter::isEnhanceInputHandlerInit = true;
+    uint8_t cfgData[SEC_COMP_ENHANCE_CFG_SIZE] = { 0 };
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE,
+      SecCompEnhanceAdapter::SetEnhanceCfg(cfgData, SEC_COMP_ENHANCE_CFG_SIZE));
+    uint8_t originData[16] = { 0 };
+    uint32_t dataLen = 16;
+    uint8_t* enhanceData = nullptr;
+    uint32_t enHancedataLen = MAX_HMAC_SIZE;
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE,
+      SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
+    SecCompClickEvent touchInfo;
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
+    std::string componentInfo;
+    int32_t scId = 1;
+    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceDataPreprocess(componentInfo));
+    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo));
+    SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
+    ASSERT_EQ(SecCompEnhanceAdapter::srvHandler, nullptr);
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::EnableInputEnhance());
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::DisableInputEnhance());
+    SecCompEnhanceAdapter::StartEnhanceService();
+    SecCompEnhanceAdapter::ExistEnhanceService();
+    SecCompEnhanceAdapter::NotifyProcessDied(scId);
+    std::shared_ptr<SecCompBase> compInfo;
+    const nlohmann::json jsonComponent;
+    ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::CheckComponentInfoEnhnace(scId, compInfo, jsonComponent));
+    ASSERT_EQ(nullptr, SecCompEnhanceAdapter::GetEnhanceRemoteObject());
 }

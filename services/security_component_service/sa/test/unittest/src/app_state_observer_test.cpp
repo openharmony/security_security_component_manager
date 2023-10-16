@@ -197,3 +197,51 @@ HWTEST_F(AppStateObserverTest, OnProcessDied001, TestSize.Level1)
     observer_->OnProcessDied(processData);
     ASSERT_FALSE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
 }
+
+/**
+ * @tc.name: AddProcessToForegroundSet002
+ * @tc.desc: Test add process to foreground
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet002, TestSize.Level1)
+{
+    AppExecFwk::ProcessData procData = {
+        .pid = ServiceTestCommon::TEST_UID_1,
+        .uid = ServiceTestCommon::TEST_UID_1,
+    };
+    observer_->AddProcessToForegroundSet(procData);
+    procData = {
+        .pid = -1,
+        .uid = ServiceTestCommon::TEST_UID_1,
+    };
+    observer_->AddProcessToForegroundSet(procData);
+    ASSERT_FALSE(observer_->IsProcessForeground(-1, ServiceTestCommon::TEST_UID_1));
+}
+
+/**
+ * @tc.name: DumpProcess001
+ * @tc.desc: Test DumpProcess
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(AppStateObserverTest, DumpProcess001, TestSize.Level1)
+{
+    AppExecFwk::AppStateData stateData = {
+        .pid = ServiceTestCommon::TEST_PID_1,
+        .uid = ServiceTestCommon::TEST_UID_1,
+    };
+    observer_->AddProcessToForegroundSet(stateData);
+    observer_->AddProcessToForegroundSet(stateData);
+    ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
+
+    AppExecFwk::ProcessData procData = {
+        .pid = ServiceTestCommon::TEST_PID_2,
+        .uid = ServiceTestCommon::TEST_UID_2,
+    };
+    observer_->AddProcessToForegroundSet(procData);
+    observer_->AddProcessToForegroundSet(procData);
+    ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_2, ServiceTestCommon::TEST_UID_2));
+    std::string dumpStr;
+    observer_->DumpProcess(dumpStr);
+}

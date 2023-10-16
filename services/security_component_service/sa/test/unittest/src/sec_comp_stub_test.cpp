@@ -175,3 +175,22 @@ HWTEST_F(SecCompStubTest, ReportSecurityComponentClickEventInner001, TestSize.Le
     data.WriteParcelable(parcel);
     ASSERT_EQ(SC_OK, stub_->ReportSecurityComponentClickEventInner(data, reply));
 }
+
+/**
+ * @tc.name: VerifySavePermissionInner001
+ * @tc.desc: Test VerifySavePermissionInner
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompStubTest, VerifySavePermissionInner001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    ASSERT_TRUE(stub_->IsMediaLibraryCalling());
+    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->VerifySavePermissionInner(data, reply));
+    data.WriteInt32(0);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->VerifySavePermissionInner(data, reply));
+    data.WriteInt32(1);
+    ASSERT_EQ(SC_OK, stub_->VerifySavePermissionInner(data, reply));
+    ASSERT_NE(SC_OK, stub_->GetEnhanceRemoteObjectInner(data, reply));
+}
