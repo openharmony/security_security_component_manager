@@ -21,6 +21,7 @@
 #include "sec_comp_err.h"
 #include "sec_comp_tool.h"
 #include "service_test_common.h"
+#include "sec_comp_info_helper_test.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -134,4 +135,19 @@ HWTEST_F(SecCompEntityTest, CheckTouchInfo001, TestSize.Level1)
 #else
     ASSERT_EQ(entity_->CheckTouchInfo(touch), SC_OK);
 #endif
+}
+
+/**
+ * @tc.name: CompareComponentBasicInfo001
+ * @tc.desc: Test Basic info
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    SecCompBase* other = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
+    bool isRectCheck = true;
+    ASSERT_FALSE(entity_->CompareComponentBasicInfo(other, isRectCheck));
 }
