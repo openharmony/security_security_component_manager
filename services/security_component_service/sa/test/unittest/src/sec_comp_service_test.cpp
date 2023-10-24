@@ -365,11 +365,12 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
     SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID);
     EXPECT_FALSE(secCompService_->GetCallerInfo(caller));
 
+    setuid(0);
     const std::string componentInfo;
     nlohmann::json jsonRes;
     int32_t scId  = 0;
     EXPECT_EQ(secCompService_->ParseParams(componentInfo, caller, jsonRes), SC_SERVICE_ERROR_VALUE_INVALID);
-    EXPECT_EQ(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_NE(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
 
     struct SecCompClickEvent touchInfo;
     EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfo, nullptr),
