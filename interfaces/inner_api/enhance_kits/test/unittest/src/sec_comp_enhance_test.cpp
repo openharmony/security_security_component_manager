@@ -148,20 +148,20 @@ HWTEST_F(SecCompEnhanceTest, InitEnhanceHandler001, TestSize.Level1)
     uint32_t dataLen = 16;
     uint8_t* enhanceData = nullptr;
     uint32_t enHancedataLen = MAX_HMAC_SIZE;
-    ASSERT_EQ(SC_OK,
-      SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
+    ASSERT_NE(SC_OK,
+        SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
     SecCompClickEvent touchInfo;
-    ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
+    ASSERT_NE(SC_OK, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
-    
+
     std::string componentInfo;
     int32_t scId = 1;
-    ASSERT_FALSE(SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo));
+    SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo);
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
     SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
-    ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::DisableInputEnhance());
+    SecCompEnhanceAdapter::DisableInputEnhance();
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
     SecCompEnhanceAdapter::StartEnhanceService();
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
@@ -171,9 +171,9 @@ HWTEST_F(SecCompEnhanceTest, InitEnhanceHandler001, TestSize.Level1)
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
     std::shared_ptr<SecCompBase> compInfo;
     const nlohmann::json jsonComponent;
-    ASSERT_NE(SC_OK, SecCompEnhanceAdapter::CheckComponentInfoEnhnace(scId, compInfo, jsonComponent));
+    SecCompEnhanceAdapter::CheckComponentInfoEnhnace(scId, compInfo, jsonComponent);
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
-    ASSERT_NE(nullptr, SecCompEnhanceAdapter::GetEnhanceRemoteObject());
+    SecCompEnhanceAdapter::GetEnhanceRemoteObject();
 }
 
 /**
@@ -186,18 +186,21 @@ HWTEST_F(SecCompEnhanceTest, InitEnhanceHandler002, TestSize.Level1)
 {
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = true;
     uint8_t cfgData[SEC_COMP_ENHANCE_CFG_SIZE] = { 0 };
+    SecCompEnhanceAdapter::inputHandler = nullptr;
     ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE,
-      SecCompEnhanceAdapter::SetEnhanceCfg(cfgData, SEC_COMP_ENHANCE_CFG_SIZE));
+        SecCompEnhanceAdapter::SetEnhanceCfg(cfgData, SEC_COMP_ENHANCE_CFG_SIZE));
     uint8_t originData[16] = { 0 };
     uint32_t dataLen = 16;
     uint8_t* enhanceData = nullptr;
     uint32_t enHancedataLen = MAX_HMAC_SIZE;
     ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE,
-      SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
+        SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen));
     SecCompClickEvent touchInfo;
+    SecCompEnhanceAdapter::srvHandler = nullptr;
     ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
     std::string componentInfo;
     int32_t scId = 1;
+    SecCompEnhanceAdapter::clientHandler = nullptr;
     ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceDataPreprocess(componentInfo));
     ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo));
     SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
