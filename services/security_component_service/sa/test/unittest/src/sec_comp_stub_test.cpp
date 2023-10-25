@@ -186,6 +186,7 @@ HWTEST_F(SecCompStubTest, VerifySavePermissionInner001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
+    setuid(0);
     ASSERT_TRUE(stub_->IsMediaLibraryCalling());
     ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->VerifySavePermissionInner(data, reply));
     data.WriteInt32(0);

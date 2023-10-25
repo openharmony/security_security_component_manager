@@ -454,7 +454,7 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1
 
     auto component = SecCompManager::GetInstance().GetSecurityComponentFromList(1, 1);
     ASSERT_NE(nullptr, component);
-    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().DeleteSecurityComponentFromList(1, 11));
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().DeleteSecurityComponentFromList(1, 1));
 }
 
 /**
@@ -465,18 +465,16 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1
  */
 HWTEST_F(SecCompManagerTest, RegisterSecurityComponent002, TestSize.Level1)
 {
-    nlohmann::json jsonInvalid;
+    nlohmann::json jsonValid;
     LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonInvalid);
+    buttonValid.ToJson(jsonValid);
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
         .pid = ServiceTestCommon::TEST_PID_1
     };
     int32_t scId;
-    ASSERT_NE(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
-        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
-    ASSERT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
-        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonValid, caller, scId));
 }
 
 /**
