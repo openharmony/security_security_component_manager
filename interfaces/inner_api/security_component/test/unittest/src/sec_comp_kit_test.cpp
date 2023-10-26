@@ -17,6 +17,8 @@
 #include "location_button.h"
 #define private public
 #include "sec_comp_caller_authorization.h"
+#include "sec_comp_client.h"
+#include "sec_comp_load_callback.h"
 #undef private
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
@@ -195,4 +197,37 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
     ASSERT_NE(-1, scId);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 #endif
+}
+
+/**
+ * @tc.name: FinishStartSAFail001
+ * @tc.desc: Test update security component caller error
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9IN
+ */
+HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level1)
+{
+    SecCompClient::GetInstance().FinishStartSAFail();
+    EXPECT_TRUE(SecCompClient::GetInstance().readyFlag_);
+    SecCompClient::GetInstance().OnRemoteDiedHandle();
+    EXPECT_EQ(nullptr, SecCompClient::GetInstance().proxy_);
+    SecCompClient::GetInstance().GetProxyFromRemoteObject(nullptr);
+}
+
+/**
+ * @tc.name: OnLoadSystemAbilitySuccess001
+ * @tc.desc: Test update security component caller error
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9IN
+ */
+HWTEST_F(SecCompKitTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
+{
+    std::shared_ptr<SecCompLoadCallback> loadCallback = std::make_shared<SecCompLoadCallback>();
+    EXPECT_NE(nullptr, loadCallback);
+    int32_t systemAbilityId = SC_OK;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, nullptr);
+    loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
+    systemAbilityId = SA_ID_SECURITY_COMPONENT_SERVICE;
+    loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, nullptr);
+    loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
 }
