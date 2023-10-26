@@ -85,6 +85,10 @@ void SecCompPermManager::RevokeTempSavePermissionCount(AccessToken::AccessTokenI
         SC_LOG_ERROR(LABEL, "This hap has no permissions to save files.");
         return;
     }
+    if (saveTaskDequeMap_[tokenId].size() == 0) {
+        SC_LOG_ERROR(LABEL, "Current no task need to be revoke.");
+        return;
+    }
     std::string taskName = saveTaskDequeMap_[tokenId].front();
     if (!RevokeSavePermissionTask(taskName)) {
         return;

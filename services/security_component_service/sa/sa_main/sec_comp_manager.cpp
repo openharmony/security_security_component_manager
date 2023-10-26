@@ -69,7 +69,7 @@ int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
     if (iter != componentMap_.end()) {
         if (iter->second.compList.size() > MAX_SINGLE_PROC_COMP_SIZE) {
             SC_LOG_ERROR(LABEL, "single proccess has too many component.");
-            return SC_SERVICE_ERROR_SERVICE_NOT_EXIST;
+            return SC_SERVICE_ERROR_VALUE_INVALID;
         }
         iter->second.isForeground = true;
         iter->second.compList.emplace_back(newEntity);

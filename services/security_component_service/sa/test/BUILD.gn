@@ -51,6 +51,7 @@ ohos_unittest("sec_comp_service_test") {
     "unittest/src/sec_comp_entity_test.cpp",
     "unittest/src/sec_comp_info_helper_test.cpp",
     "unittest/src/sec_comp_manager_test.cpp",
+    "unittest/src/sec_comp_perm_manager_test.cpp",
     "unittest/src/sec_comp_service_test.cpp",
     "unittest/src/sec_comp_stub_test.cpp",
     "unittest/src/service_test_common.cpp",

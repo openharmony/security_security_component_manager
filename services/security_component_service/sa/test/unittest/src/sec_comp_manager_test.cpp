@@ -382,6 +382,26 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
 }
 
 /**
+ * @tc.name: AddSecurityComponentToList004
+ * @tc.desc: Test add security component too many components
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level1)
+{
+    std::shared_ptr<SecCompManager> managerInstance = std::make_shared<SecCompManager>();
+    managerInstance->isSaExit_ = false;
+    int pid = 1;
+    SecCompEntity entity(nullptr, 0, 0);
+    const int MAX_COMPONENT_SIZE = 500;
+    for (int i = 0; i < MAX_COMPONENT_SIZE; i++) {
+        managerInstance->componentMap_[pid].compList.emplace_back(entity);
+    }
+
+    ASSERT_NE(managerInstance->AddSecurityComponentToList(pid, 0, entity), SC_SERVICE_ERROR_VALUE_INVALID);
+}
+
+/**
  * @tc.name: CheckClickSecurityComponentInfo001
  * @tc.desc: Test check click security component info failed
  * @tc.type: FUNC
