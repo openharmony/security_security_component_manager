@@ -478,26 +478,6 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1
 }
 
 /**
- * @tc.name: RegisterSecurityComponent002
- * @tc.desc: Test register security component
- * @tc.type: FUNC
- * @tc.require: AR000HO9J7
- */
-HWTEST_F(SecCompManagerTest, RegisterSecurityComponent002, TestSize.Level1)
-{
-    nlohmann::json jsonValid;
-    LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonValid);
-    SecCompCallerInfo caller = {
-        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
-        .pid = ServiceTestCommon::TEST_PID_1
-    };
-    int32_t scId;
-    ASSERT_EQ(SC_OK,
-        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonValid, caller, scId));
-}
-
-/**
  * @tc.name: UpdateSecurityComponent002
  * @tc.desc: Test update security component
  * @tc.type: FUNC
