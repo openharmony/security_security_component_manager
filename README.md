@@ -50,7 +50,7 @@ The security component manager service provides the following functions:
 | int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId); | Registers a security component.|
 | int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo); | Updates security component information.|
 | int32_t UnregisterSecurityComponent(int32_t scId); | Unregisters a security component.|
-| int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo, const SecCompClickEvent& touchInfo, sptr&lt;IRemoteObject&gt; callerToken); | Reports a click event to apply for temporary authorization.|
+| int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr&lt;IRemoteObject&gt; callerToken); | Reports a click event to apply for temporary authorization.|
 | int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen); | Sets enhanced configuration of the security component for multimodal services.|
 | int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen, uint8_t* enhanceData, uint32_t& enHancedataLen); | Obtains security enhancement data of the click event for multimodal services.|
 | bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId); | Cancels the saving of the component permissions after verification.|

@@ -267,9 +267,11 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
 #endif
     uint8_t data[16] = { 0 };
     struct SecCompClickEvent touch = {
-        .touchX = 100,
-        .touchY = 100,
-        .timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = 100,
+        .point.touchY = 100,
+        .point.timestamp =
+            static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
             ServiceTestCommon::TIME_CONVERSION_UNIT,
         .extraInfo.data = data,
         .extraInfo.dataSize = 16,

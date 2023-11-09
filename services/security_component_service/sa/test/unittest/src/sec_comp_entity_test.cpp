@@ -100,40 +100,41 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
 }
 
 /**
- * @tc.name: CheckTouchInfo001
+ * @tc.name: CheckClickInfo001
  * @tc.desc: Test touch info
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
-HWTEST_F(SecCompEntityTest, CheckTouchInfo001, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
 {
     SecCompClickEvent touch = {
-        .touchX = ServiceTestCommon::TEST_COORDINATE,
-        .touchY = ServiceTestCommon::TEST_COORDINATE,
-        .timestamp = 0,
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = ServiceTestCommon::TEST_COORDINATE,
+        .point.touchY = ServiceTestCommon::TEST_COORDINATE,
+        .point.timestamp = 0,
     };
-    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
 
     uint64_t current = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-    touch.timestamp = current + 10000L; // 10s
-    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
+    touch.point.timestamp = current + 10000L; // 10s
+    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_DIFF_COORDINATE; // click event will not hit this rect
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
     entity_->componentInfo_->rect_.width_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
     entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
-    touch.timestamp = static_cast<uint64_t>(
+    touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
-    touch.timestamp = static_cast<uint64_t>(
+    touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_NE(entity_->CheckTouchInfo(touch), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
 #else
-    ASSERT_EQ(entity_->CheckTouchInfo(touch), SC_OK);
+    ASSERT_EQ(entity_->CheckClickInfo(touch), SC_OK);
 #endif
 }
 

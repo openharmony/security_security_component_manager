@@ -66,9 +66,11 @@ public:
     };
 
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
-    int32_t CheckTouchInfo(const SecCompClickEvent& touchInfo) const;
+    int32_t CheckClickInfo(const SecCompClickEvent& clickInfo) const;
 
 private:
+    int32_t CheckKeyEvent(const SecCompClickEvent& clickInfo) const;
+    int32_t CheckPointEvent(const SecCompClickEvent& clickInfo) const;
     std::shared_ptr<SecCompBase> componentInfo_;
     bool isGrant_ = false;
     AccessToken::AccessTokenID tokenId_;

@@ -169,9 +169,10 @@ HWTEST_F(SecCompStubTest, ReportSecurityComponentClickEventInner001, TestSize.Le
 
     data.WriteInt32(1);
     data.WriteString("");
-    SecCompClickEvent touchInfo;
+    SecCompClickEvent clickInfo;
+    clickInfo.type = ClickEventType::POINT_EVENT_TYPE;
     sptr<SecCompClickEventParcel> parcel = new (std::nothrow) SecCompClickEventParcel();
-    parcel->touchInfoParams_ = touchInfo;
+    parcel->clickInfoParams_ = clickInfo;
     data.WriteParcelable(parcel);
     ASSERT_EQ(SC_OK, stub_->ReportSecurityComponentClickEventInner(data, reply));
 }

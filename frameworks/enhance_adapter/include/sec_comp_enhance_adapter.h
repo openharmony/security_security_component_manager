@@ -51,7 +51,7 @@ public:
     virtual int32_t DisableInputEnhance() = 0;
 
     // send click event to enhance service for checking extra data validity
-    virtual int32_t CheckExtraInfo(const SecCompClickEvent& touchInfo) = 0;
+    virtual int32_t CheckExtraInfo(const SecCompClickEvent& clickInfo) = 0;
 
     // send component info to enhance service for checking its validity
     virtual int32_t CheckComponentInfoEnhnace(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
@@ -90,7 +90,7 @@ public:
     static int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen,
         uint8_t* enhanceData, uint32_t& enHancedataLen);
 
-    static int32_t CheckExtraInfo(const SecCompClickEvent& touchInfo);
+    static int32_t CheckExtraInfo(const SecCompClickEvent& clickInfo);
     static int32_t EnableInputEnhance();
     static int32_t DisableInputEnhance();
     static int32_t CheckComponentInfoEnhnace(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,

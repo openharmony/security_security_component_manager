@@ -150,15 +150,15 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
         SC_LOG_ERROR(LABEL, "Report read component info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    sptr<SecCompClickEventParcel> touchInfoParcel = data.ReadParcelable<SecCompClickEventParcel>();
-    if (touchInfoParcel == nullptr) {
-        SC_LOG_ERROR(LABEL, "Report read touchInfo info fail");
+    sptr<SecCompClickEventParcel> clickInfoParcel = data.ReadParcelable<SecCompClickEventParcel>();
+    if (clickInfoParcel == nullptr) {
+        SC_LOG_ERROR(LABEL, "Report read clickInfo info fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     int32_t res =
-        this->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfoParcel->touchInfoParams_, callerToken);
+        this->ReportSecurityComponentClickEvent(scId, componentInfo, clickInfoParcel->clickInfoParams_, callerToken);
     if (!reply.WriteInt32(res)) {
         SC_LOG_ERROR(LABEL, "Report security component result fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;

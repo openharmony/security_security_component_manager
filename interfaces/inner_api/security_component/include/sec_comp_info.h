@@ -30,6 +30,9 @@ static constexpr DimensionT MIN_PADDING_SIZE = 0.0;
 static constexpr DimensionT MIN_PADDING_WITHOUT_BG = 4.0;
 static constexpr uint32_t MAX_EXTRA_SIZE = 0x1000;
 
+static constexpr int32_t KEY_SPACE = 2050;
+static constexpr int32_t KEY_ENTER = 2054;
+
 struct PaddingSize {
     DimensionT top = DEFAULT_DIMENSION;
     DimensionT right = DEFAULT_DIMENSION;
@@ -112,17 +115,30 @@ struct ExtraInfo {
     uint8_t* data;
 };
 
-struct SecCompClickEvent {
-    double touchX;
-    double touchY;
-    uint64_t timestamp;
-    ExtraInfo extraInfo;
+enum class ClickEventType : int32_t {
+    UNKNOWN_EVENT_TYPE,
+    POINT_EVENT_TYPE,
+    KEY_EVENT_TYPE
 };
 
 struct SecCompPointEvent {
     double touchX;
     double touchY;
     uint64_t timestamp;
+};
+
+struct SecCompKeyEvent {
+    uint64_t timestamp;
+    int32_t keyCode;
+};
+
+struct SecCompClickEvent {
+    ClickEventType type;
+    union {
+        SecCompPointEvent point;
+        SecCompKeyEvent key;
+    };
+    ExtraInfo extraInfo;
 };
 }  // namespace SecurityComponent
 }  // namespace Security
