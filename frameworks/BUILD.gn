@@ -26,7 +26,12 @@ ohos_shared_library("libsecurity_component_framework") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   output_name = "libsecurity_component_framework"
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "common/include",
     "security_component/include",
@@ -67,7 +72,12 @@ ohos_shared_library("libsecurity_component_enhance_adapter") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   output_name = "libsecurity_component_enhance_adapter"
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "common/include",
     "enhance_adapter/include",

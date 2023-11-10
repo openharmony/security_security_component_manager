@@ -20,7 +20,12 @@ ohos_unittest("sec_comp_service_test") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   module_out_path = part_name + "/" + part_name
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/enhance_adapter/include",
@@ -91,7 +96,11 @@ ohos_unittest("sec_comp_service_mock_test") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   module_out_path = part_name + "/" + part_name
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/security_component/include",
