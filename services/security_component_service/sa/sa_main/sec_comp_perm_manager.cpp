@@ -206,8 +206,8 @@ void SecCompPermManager::RevokeAppPermisionsDelayed(AccessToken::AccessTokenID t
 void SecCompPermManager::RevokeAppPermisionsImmediately(AccessToken::AccessTokenID tokenId)
 {
     std::lock_guard<std::mutex> lock(grantMtx_);
-    auto iter = grantMap_.find(tokenId);
-    if (iter == grantMap_.end()) {
+    auto it = grantMap_.find(tokenId);
+    if (it == grantMap_.end()) {
         return;
     }
 
