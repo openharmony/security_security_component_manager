@@ -36,11 +36,11 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static void TestInCallerNotCheckList()
 {
     int32_t scId = -1;
-    struct SecCompClickEvent touch;
+    struct SecCompClickEvent click;
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, touch, nullptr);
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr);
 
     EXPECT_EQ(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -50,11 +50,11 @@ static void TestInCallerNotCheckList()
 static void TestInCallerCheckList()
 {
     int32_t scId = -1;
-    struct SecCompClickEvent touch;
+    struct SecCompClickEvent click;
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, touch, nullptr);
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr);
 
     EXPECT_NE(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_NE(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -118,9 +118,10 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
     ASSERT_NE(SC_OK, SecCompKit::UpdateSecurityComponent(scId, jsonStr));
 
     struct SecCompClickEvent touch = {
-        .touchX = TestCommon::TEST_COORDINATE,
-        .touchY = TestCommon::TEST_COORDINATE,
-        .timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count())
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = TestCommon::TEST_COORDINATE,
+        .point.touchY = TestCommon::TEST_COORDINATE,
+        .point.timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count())
     };
     EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, jsonStr, touch, nullptr));
     EXPECT_NE(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));

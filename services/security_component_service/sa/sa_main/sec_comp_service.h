@@ -44,7 +44,7 @@ public:
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo) override;
     int32_t UnregisterSecurityComponent(int32_t scId) override;
     int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        const std::string& componentInfo, const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken) override;
+        const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken) override;
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override;
     sptr<IRemoteObject> GetEnhanceRemoteObject() override;
 

@@ -25,77 +25,153 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClickEventParcel"};
 }
 
-bool SecCompClickEventParcel::Marshalling(Parcel& out) const
+bool SecCompClickEventParcel::MarshallingPointEvent(Parcel& out) const
 {
-    if (!(out.WriteDouble(this->touchInfoParams_.touchX)) || !(out.WriteDouble(this->touchInfoParams_.touchY))) {
+    if (!(out.WriteDouble(this->clickInfoParams_.point.touchX)) ||
+        !(out.WriteDouble(this->clickInfoParams_.point.touchY))) {
         SC_LOG_ERROR(LABEL, "Write touch xy pointer fail");
         return false;
     }
 
-    if (!(out.WriteUint64(this->touchInfoParams_.timestamp))) {
+    if (!(out.WriteUint64(this->clickInfoParams_.point.timestamp))) {
         SC_LOG_ERROR(LABEL, "Write touch timestamp fail");
         return false;
     }
+    return true;
+}
 
-    if (!(out.WriteUint32(this->touchInfoParams_.extraInfo.dataSize))) {
-        SC_LOG_ERROR(LABEL, "Write extraInfo dataSize fail");
+bool SecCompClickEventParcel::MarshallingKeyEvent(Parcel& out) const
+{
+    if (!(out.WriteUint64(this->clickInfoParams_.key.timestamp))) {
+        SC_LOG_ERROR(LABEL, "Write key timestamp fail");
         return false;
     }
 
-    if (this->touchInfoParams_.extraInfo.dataSize != 0 &&
-        !(out.WriteBuffer(this->touchInfoParams_.extraInfo.data, this->touchInfoParams_.extraInfo.dataSize))) {
-        SC_LOG_ERROR(LABEL, "Write touch extraInfo data fail");
+    if (!(out.WriteInt32(this->clickInfoParams_.key.keyCode))) {
+        SC_LOG_ERROR(LABEL, "Write key code fail");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompClickEventParcel::Marshalling(Parcel& out) const
+{
+    if (!(out.WriteInt32(static_cast<int32_t>(this->clickInfoParams_.type)))) {
+        SC_LOG_ERROR(LABEL, "Write click type fail");
+        return false;
+    }
+
+    if (this->clickInfoParams_.type == ClickEventType::POINT_EVENT_TYPE) {
+        if (!MarshallingPointEvent(out)) {
+            return false;
+        }
+    } else if (this->clickInfoParams_.type == ClickEventType::KEY_EVENT_TYPE) {
+        if (!MarshallingKeyEvent(out)) {
+            return false;
+        }
+    } else {
+        SC_LOG_ERROR(LABEL, "click type %{public}d is error", this->clickInfoParams_.type);
+        return false;
+    }
+
+    if (!(out.WriteUint32(this->clickInfoParams_.extraInfo.dataSize))) {
+        SC_LOG_ERROR(LABEL, "Write extraInfo dataSize fail");
+        return false;
+    }
+    if (this->clickInfoParams_.extraInfo.dataSize != 0 &&
+        !(out.WriteBuffer(this->clickInfoParams_.extraInfo.data, this->clickInfoParams_.extraInfo.dataSize))) {
+        SC_LOG_ERROR(LABEL, "Write click extraInfo data fail");
         return false;
     }
 
     return true;
 }
 
+bool SecCompClickEventParcel::UnmarshallingPointEvent(Parcel& in, SecCompClickEvent& clickInfo)
+{
+    if (!in.ReadDouble(clickInfo.point.touchX) || !in.ReadDouble(clickInfo.point.touchY)) {
+        SC_LOG_ERROR(LABEL, "Read touch xy porinter fail");
+        return false;
+    }
+
+    if (!in.ReadUint64(clickInfo.point.timestamp)) {
+        SC_LOG_ERROR(LABEL, "Read timestamp fail");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompClickEventParcel::UnmarshallingKeyEvent(Parcel& in, SecCompClickEvent& clickInfo)
+{
+    if (!in.ReadUint64(clickInfo.key.timestamp)) {
+        SC_LOG_ERROR(LABEL, "Read timestamp fail");
+        return false;
+    }
+
+    if (!in.ReadInt32(clickInfo.key.keyCode)) {
+        SC_LOG_ERROR(LABEL, "Read keyCode fail");
+        return false;
+    }
+    return true;
+}
+
 SecCompClickEventParcel* SecCompClickEventParcel::Unmarshalling(Parcel& in)
 {
-    SecCompClickEventParcel* touchInfoParcel = new (std::nothrow) SecCompClickEventParcel();
-    if (touchInfoParcel == nullptr) {
+    SecCompClickEventParcel* clickInfoParcel = new (std::nothrow) SecCompClickEventParcel();
+    if (clickInfoParcel == nullptr) {
         SC_LOG_ERROR(LABEL, "Alloc policy parcel fail");
         return nullptr;
     }
 
-    SecCompClickEvent touchInfo;
-    if (!in.ReadDouble(touchInfo.touchX) || !in.ReadDouble(touchInfo.touchY)) {
-        SC_LOG_ERROR(LABEL, "Read touch xy porinter fail");
-        delete touchInfoParcel;
+    SecCompClickEvent clickInfo;
+    int32_t type;
+    if (!in.ReadInt32(type)) {
+        SC_LOG_ERROR(LABEL, "Read click type fail");
+        delete clickInfoParcel;
+        return nullptr;
+    }
+    clickInfo.type = static_cast<ClickEventType>(type);
+
+    if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
+        if (!UnmarshallingPointEvent(in, clickInfo)) {
+            delete clickInfoParcel;
+            return nullptr;
+        }
+    } else if (clickInfo.type == ClickEventType::KEY_EVENT_TYPE) {
+        if (!UnmarshallingKeyEvent(in, clickInfo)) {
+            delete clickInfoParcel;
+            return nullptr;
+        }
+    } else {
+        SC_LOG_ERROR(LABEL, "click type %{public}d is error", clickInfo.type);
+        delete clickInfoParcel;
         return nullptr;
     }
 
-    if (!in.ReadUint64(touchInfo.timestamp)) {
-        SC_LOG_ERROR(LABEL, "Read timestamp fail");
-        delete touchInfoParcel;
-        return nullptr;
-    }
-
-    if (!in.ReadUint32(touchInfo.extraInfo.dataSize)) {
+    if (!in.ReadUint32(clickInfo.extraInfo.dataSize)) {
         SC_LOG_ERROR(LABEL, "Read extraInfo data size fail");
-        delete touchInfoParcel;
+        delete clickInfoParcel;
         return nullptr;
     }
 
-    if (touchInfo.extraInfo.dataSize == 0) {
-        touchInfoParcel->touchInfoParams_ = touchInfo;
-        return touchInfoParcel;
-    } else if (touchInfo.extraInfo.dataSize > MAX_EXTRA_SIZE) {
+    if (clickInfo.extraInfo.dataSize == 0) {
+        clickInfoParcel->clickInfoParams_ = clickInfo;
+        return clickInfoParcel;
+    } else if (clickInfo.extraInfo.dataSize > MAX_EXTRA_SIZE) {
         SC_LOG_ERROR(LABEL, "Read extraInfo data size invalid");
-        delete touchInfoParcel;
+        delete clickInfoParcel;
         return nullptr;
     }
 
-    touchInfo.extraInfo.data = const_cast<uint8_t*>(in.ReadBuffer(touchInfo.extraInfo.dataSize));
-    if (touchInfo.extraInfo.data == nullptr) {
+    clickInfo.extraInfo.data = const_cast<uint8_t*>(in.ReadBuffer(clickInfo.extraInfo.dataSize));
+    if (clickInfo.extraInfo.data == nullptr) {
         SC_LOG_ERROR(LABEL, "Read extraInfo data failed");
-        delete touchInfoParcel;
+        delete clickInfoParcel;
         return nullptr;
     }
 
-    touchInfoParcel->touchInfoParams_ = touchInfo;
-    return touchInfoParcel;
+    clickInfoParcel->clickInfoParams_ = clickInfo;
+    return clickInfoParcel;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

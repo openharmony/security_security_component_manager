@@ -150,7 +150,7 @@ int32_t SecCompProxy::UnregisterSecurityComponent(int32_t scId)
 }
 
 int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken)
+    const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(SecCompProxy::GetDescriptor())) {
@@ -173,9 +173,9 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
         SC_LOG_ERROR(LABEL, "Report new click event parcel failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    parcel->touchInfoParams_ = touchInfo;
+    parcel->clickInfoParams_ = clickInfo;
     if (!data.WriteParcelable(parcel)) {
-        SC_LOG_ERROR(LABEL, "Report write touchInfo fail");
+        SC_LOG_ERROR(LABEL, "Report write clickInfo fail");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 

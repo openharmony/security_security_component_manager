@@ -32,13 +32,14 @@ static void ReportSecurityComponentClickEventFuzzTest(const uint8_t *data, size_
     const double touchX = size;
     const double touchY = size;
     const uint64_t timesStamp = size;
-    struct SecCompClickEvent touchInfo;
-    touchInfo.touchX = touchX;
-    touchInfo.touchY = touchY;
-    touchInfo.timestamp = timesStamp;
-    touchInfo.extraInfo.data = data1;
-    touchInfo.extraInfo.dataSize = size;
-    SecCompKit::ReportSecurityComponentClickEvent(size, componentInfo, touchInfo);
+    struct SecCompClickEvent clickInfo;
+    clickInfo.type = ClickEventType::POINT_EVENT_TYPE,
+    clickInfo.point.touchX = touchX;
+    clickInfo.point.touchY = touchY;
+    clickInfo.point.timestamp = timesStamp;
+    clickInfo.extraInfo.data = data1;
+    clickInfo.extraInfo.dataSize = size;
+    SecCompKit::ReportSecurityComponentClickEvent(size, componentInfo, clickInfo);
 }
 } // namespace OHOS
 

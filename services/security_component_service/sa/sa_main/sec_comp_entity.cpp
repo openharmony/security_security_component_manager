@@ -42,28 +42,56 @@ bool SecCompEntity::CompareComponentBasicInfo(SecCompBase* other, bool isRectChe
     return componentInfo_->CompareComponentBasicInfo(other, isRectCheck);
 }
 
-int32_t SecCompEntity::CheckTouchInfo(const SecCompClickEvent& touchInfo) const
+int32_t SecCompEntity::CheckPointEvent(const SecCompClickEvent& clickInfo) const
 {
     auto current = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
-    if (touchInfo.timestamp < current - MAX_TOUCH_INTERVAL || touchInfo.timestamp > current) {
-        SC_LOG_ERROR(LABEL, "touch timestamp invalid touchInfo. timestamp: %{public}llu, current: %{public}llu",
-            static_cast<unsigned long long>(touchInfo.timestamp), static_cast<unsigned long long>(current));
+    if (clickInfo.point.timestamp < current - MAX_TOUCH_INTERVAL || clickInfo.point.timestamp > current) {
+        SC_LOG_ERROR(LABEL, "touch timestamp invalid clickInfo. timestamp: %{public}llu, current: %{public}llu",
+            static_cast<unsigned long long>(clickInfo.point.timestamp), static_cast<unsigned long long>(current));
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    if (!componentInfo_->rect_.IsInRect(touchInfo.touchX, touchInfo.touchY)) {
+    if (!componentInfo_->rect_.IsInRect(clickInfo.point.touchX, clickInfo.point.touchY)) {
         SC_LOG_ERROR(LABEL, "touch point is not in component rect, %{public}lf, %{public}lf",
-            touchInfo.touchX, touchInfo.touchY);
+            clickInfo.point.touchX, clickInfo.point.touchY);
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
+{
+    auto current = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
+    if (clickInfo.key.timestamp < current - MAX_TOUCH_INTERVAL || clickInfo.key.timestamp > current) {
+        SC_LOG_ERROR(LABEL, "keyboard timestamp invalid clickInfo. timestamp: %{public}llu, current: %{public}llu",
+            static_cast<unsigned long long>(clickInfo.key.timestamp), static_cast<unsigned long long>(current));
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    }
+    if ((clickInfo.key.keyCode != KEY_SPACE) && (clickInfo.key.keyCode != KEY_ENTER)) {
+        SC_LOG_ERROR(LABEL, "keyboard keyCode invalid. keyCode: %{public}d", clickInfo.key.keyCode);
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    int32_t res = SecCompEnhanceAdapter::CheckExtraInfo(touchInfo);
+    return SC_OK;
+}
+
+int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
+{
+    int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
+        res = CheckPointEvent(clickInfo);
+    } else if (clickInfo.type == ClickEventType::KEY_EVENT_TYPE) {
+        res = CheckKeyEvent(clickInfo);
+    }
+    if (res != SC_OK) {
+        return res;
+    }
+
+    res = SecCompEnhanceAdapter::CheckExtraInfo(clickInfo);
     if ((res != SC_OK) && (res != SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE)) {
-        SC_LOG_ERROR(LABEL, "HMAC checkout failed,"
-            "touchX:%{public}f, touchY:%{public}f, timestamp:%{public}llu, dataSize:%{public}d",
-            touchInfo.touchX, touchInfo.touchY, static_cast<unsigned long long>(touchInfo.timestamp),
-            touchInfo.extraInfo.dataSize);
+        SC_LOG_ERROR(LABEL, "HMAC checkout failed");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId_, "SC_TYPE", componentInfo_->type_);

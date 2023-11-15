@@ -412,7 +412,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(SecCompEntity* sc, int32
 
 int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller,
-    const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken)
+    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
 {
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
@@ -431,7 +431,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return res;
     }
 
-    res = sc->CheckTouchInfo(touchInfo);
+    res = sc->CheckClickInfo(clickInfo);
     if (res != SC_OK) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),

@@ -409,12 +409,12 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
         .pid = ServiceTestCommon::TEST_PID_1
     };
-    SecCompClickEvent touchInfo;
+    SecCompClickEvent clickInfo;
     nlohmann::json jsonVaild;
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
     ASSERT_NE(SC_OK,
-        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1, jsonVaild, caller, touchInfo, nullptr));
+        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1, jsonVaild, caller, clickInfo, nullptr));
 }
 
 /**
@@ -456,22 +456,22 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
-    SecCompClickEvent touchInfo;
+    SecCompClickEvent clickInfo;
     nlohmann::json jsonVaild;
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
 
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
 
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, touchInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
 }
 
 /**

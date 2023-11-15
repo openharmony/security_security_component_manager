@@ -57,7 +57,7 @@ public:
         const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& jsonComponent,
-        const SecCompCallerInfo& caller, const SecCompClickEvent& touchInfo, sptr<IRemoteObject> callerToken);
+        const SecCompCallerInfo& caller, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
     void NotifyProcessDied(int32_t pid);
