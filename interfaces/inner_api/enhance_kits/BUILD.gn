@@ -28,7 +28,12 @@ ohos_shared_library("libsecurity_component_enhance_sdk") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   output_name = "libsecurity_component_enhance_sdk"
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":sec_comp_enhance_config" ]
 
   include_dirs = [
