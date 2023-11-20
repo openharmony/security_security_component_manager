@@ -35,7 +35,12 @@ ohos_prebuilt_etc("security_component_service.rc") {
 ohos_shared_library("security_component_service") {
   subsystem_name = "security"
   part_name = "security_component_manager"
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   include_dirs = [
     "sa_main",
     "${sec_comp_root_dir}/frameworks/common/include",
