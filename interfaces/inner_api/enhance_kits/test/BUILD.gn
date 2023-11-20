@@ -19,12 +19,7 @@ ohos_unittest("sec_comp_enhance_sdk_test") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   module_out_path = part_name + "/" + part_name
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-  branch_protector_ret = "pac_ret"
+
   include_dirs = [ "unittest/src" ]
 
   sources = [ "unittest/src/sec_comp_enhance_test.cpp" ]
