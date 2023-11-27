@@ -22,7 +22,7 @@
 #ifndef __cplusplus
 
 #undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002F07
+#define LOG_DOMAIN 0xD005A05
 
 #define SC_LOG_DEBUG(fmt, ...) HILOG_DEBUG(LOG_CORE, "[%{public}s]:" fmt, __func__, ##__VA_ARGS__)
 #define SC_LOG_INFO(fmt, ...) HILOG_INFO(LOG_CORE, "[%{public}s]:" fmt, __func__, ##__VA_ARGS__)
@@ -32,7 +32,7 @@
 
 #else
 
-static constexpr unsigned int SECURITY_DOMAIN_SECURITY_COMPONENT = 0xD002F07;
+static constexpr unsigned int SECURITY_DOMAIN_SECURITY_COMPONENT = 0xD005A05;
 
 #define SC_LOG_DEBUG(label, fmt, ...) \
     OHOS::HiviewDFX::HiLog::Debug(label, "[%{public}s]:" fmt, __func__, ##__VA_ARGS__)
