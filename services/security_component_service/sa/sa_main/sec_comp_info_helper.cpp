@@ -99,25 +99,25 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
 
     if (GreatNotEqual(ZERO_OFFSET, rect.x_) || GreatNotEqual(ZERO_OFFSET, rect.y_) ||
         GreatNotEqual(rect.x_, curScreenWidth) || GreatNotEqual(rect.y_, curScreenHeight)) {
-        SC_LOG_ERROR(LABEL, "start point is out of screen");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         return false;
     }
 
     if (GreatOrEqual((rect.x_ + rect.width_), curScreenWidth) ||
         GreatOrEqual((rect.y_ + rect.height_), curScreenHeight)) {
-        SC_LOG_ERROR(LABEL, "rect is out of screen");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         return false;
     }
 
     if (GreatNotEqual(windowRect.x_, rect.x_) || GreatNotEqual(windowRect.y_, rect.y_) ||
         GreatNotEqual(rect.width_, windowRect.width_) || GreatNotEqual(rect.height_, windowRect.height_)) {
-        SC_LOG_ERROR(LABEL, "rect is out of window");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         return false;
     }
 
     // check rect > 10%
     if (GreatOrEqual((rect.width_ * rect.height_), (curScreenWidth * curScreenHeight * MAX_RECT_PERCENT))) {
-        SC_LOG_ERROR(LABEL, "rect area is too large");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is larger than 10 % of screen");
         return false;
     }
     SC_LOG_DEBUG(LABEL, "check component rect success.");
@@ -131,18 +131,18 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp)
         return false;
     }
     if ((comp->text_ >= 0) && comp->fontSize_ < MIN_FONT_SIZE) {
-        SC_LOG_INFO(LABEL, "font size invalid.");
+        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontSize is too small.");
         return false;
     }
     if ((comp->icon_ >= 0) && comp->iconSize_ < MIN_ICON_SIZE) {
-        SC_LOG_INFO(LABEL, "icon size invalid.");
+        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconSize is too small.");
         return false;
     }
 
     if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) &&
         (((comp->text_ != NO_TEXT) && (IsColorSimilar(comp->fontColor_, comp->bgColor_))) ||
         ((comp->icon_ != NO_ICON) && (IsColorSimilar(comp->iconColor_, comp->bgColor_))))) {
-        SC_LOG_INFO(LABEL, "fontColor or iconColor is similar whith backgroundColor.");
+        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontColor or iconColor is similar with backgroundColor.");
         return false;
     }
 
@@ -159,21 +159,22 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp)
 static bool CheckSecCompBase(const SecCompBase* comp)
 {
     if (comp->parentEffect_) {
-        SC_LOG_ERROR(LABEL, "parentEffect is active, security component invalid.");
+        SC_LOG_ERROR(LABEL,
+            "SecurityComponentCheckFail: the parents of security component have invalid effect.");
         return false;
     }
 
     if ((comp->padding_.top < MIN_PADDING_SIZE) || (comp->padding_.right < MIN_PADDING_SIZE) ||
         (comp->padding_.bottom < MIN_PADDING_SIZE) || (comp->padding_.left < MIN_PADDING_SIZE) ||
         (comp->textIconSpace_ < MIN_PADDING_SIZE)) {
-        SC_LOG_ERROR(LABEL, "size is invalid.");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: padding or textIconSpace is too small.");
         return false;
     }
 
     if (((comp->bg_ != SecCompBackground::NO_BG_TYPE) && (IsColorTransparent(comp->bgColor_))) ||
         ((comp->text_ != NO_TEXT) && (IsColorTransparent(comp->fontColor_))) ||
         ((comp->icon_ != NO_ICON) && (IsColorTransparent(comp->iconColor_)))) {
-        SC_LOG_ERROR(LABEL, "bgColor or fontColor or iconColor is too transparent.");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: fontColor, iconColor or backgroundColor is too transparent.");
         return false;
     }
     if (!CheckSecCompBaseButton(comp)) {
