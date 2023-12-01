@@ -24,6 +24,7 @@
 #include "sec_comp_log.h"
 #include "sec_comp_service.h"
 #include "sec_comp_tool.h"
+#include "window_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -32,7 +33,37 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompInfoHelper"};
 static constexpr double MAX_RECT_PERCENT = 0.1F; // 10%
 static constexpr double ZERO_OFFSET = 0.0F;
+static constexpr float FULL_SCREEN_SCALE = 1.0F;
 static std::mutex g_renderLock;
+}
+
+float SecCompInfoHelper::GetWindowScale(int32_t windowId)
+{
+    float scale = FULL_SCREEN_SCALE;
+    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
+    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
+        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
+        return scale;
+    }
+    for (auto& info : infos) {
+        if ((info != nullptr) && (info->wid_ == windowId)) {
+            scale = info->scaleVal_;
+            SC_LOG_INFO(LABEL, "Get scale %{public}f", scale);
+            break;
+        }
+    }
+    return scale;
+}
+
+void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
+{
+    comp->rect_.width_ *= scale;
+    comp->rect_.height_ *= scale;
+    comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scale;
+    comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scale;
+
+    SC_LOG_DEBUG(LABEL, "After adjust x %{public}lf, y %{public}lf, width %{public}lf, height %{public}lf",
+        comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
 }
 
 SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent)
@@ -183,11 +214,16 @@ static bool CheckSecCompBase(const SecCompBase* comp)
     return true;
 }
 
-bool SecCompInfoHelper::CheckComponentValid(const SecCompBase* comp)
+bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
 {
     if ((comp == nullptr) || !IsComponentTypeValid(comp->type_)) {
         SC_LOG_INFO(LABEL, "comp is null or type is invalid.");
         return false;
+    }
+
+    float scale = GetWindowScale(comp->windowId_);
+    if (!IsEqual(scale, FULL_SCREEN_SCALE)) {
+        AdjustSecCompRect(comp, scale);
     }
 
     if (!CheckSecCompBase(comp)) {

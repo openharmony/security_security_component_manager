@@ -71,6 +71,7 @@ public:
     static const std::string JSON_TEXT_TAG;
     static const std::string JSON_ICON_TAG;
     static const std::string JSON_BG_TAG;
+    static const std::string JSON_WINDOW_ID;
 };
 
 class SecCompBase {
@@ -117,6 +118,7 @@ public:
     int32_t icon_ = UNKNOWN_ICON;
     SecCompBackground bg_ = SecCompBackground::UNKNOWN_BG;
 
+    int32_t windowId_ = 0;
     int32_t nodeId_ = 0;
 protected:
     virtual bool IsTextIconTypeValid() = 0;
