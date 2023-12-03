@@ -83,6 +83,7 @@ ohos_unittest("sec_comp_service_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "window_manager:libdm",
+    "window_manager:libwm",
   ]
 }
 
@@ -150,6 +151,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "window_manager:libdm",
+    "window_manager:libwm",
   ]
 }
 

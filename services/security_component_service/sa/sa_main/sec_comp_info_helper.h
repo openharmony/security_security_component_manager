@@ -40,8 +40,12 @@ public:
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent);
     static int32_t GrantTempPermission(AccessToken::AccessTokenID tokenId,
         const std::shared_ptr<SecCompBase>& componentInfo);
-    static bool CheckComponentValid(const SecCompBase* comp);
+    static bool CheckComponentValid(SecCompBase* comp);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect);
+
+private:
+    static float GetWindowScale(int32_t windowId);
+    static void AdjustSecCompRect(SecCompBase* comp, float scale);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

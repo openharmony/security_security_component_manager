@@ -93,5 +93,6 @@ ohos_shared_library("security_component_service") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "window_manager:libdm",
+    "window_manager:libwm",
   ]
 }
