@@ -222,7 +222,7 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
     }
 
     float scale = GetWindowScale(comp->windowId_);
-    if (!IsEqual(scale, FULL_SCREEN_SCALE)) {
+    if (!IsEqual(scale, FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
         AdjustSecCompRect(comp, scale);
     }
 
