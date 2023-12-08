@@ -64,6 +64,7 @@ void ServiceTestCommon::BuildLocationComponentJson(nlohmann::json& jsonComponent
         { JsonTagConstants::JSON_ICON_TAG, LocationIcon::LINE_ICON },
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
+    jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
 }
 
 void ServiceTestCommon::BuildSaveComponentJson(nlohmann::json& jsonComponent)
@@ -113,6 +114,7 @@ void ServiceTestCommon::BuildSaveComponentJson(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
+    jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
 }
 
 void ServiceTestCommon::BuildPasteComponentJson(nlohmann::json& jsonComponent)
@@ -162,6 +164,7 @@ void ServiceTestCommon::BuildPasteComponentJson(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
+    jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security
