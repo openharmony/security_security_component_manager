@@ -35,6 +35,7 @@ enum EnhanceInterfaceCode {
 
 enum EnhanceCallbackCheckCode {
     GET_CALLER_SECURITY_COMPONENT_INFO = 0,
+    SET_WINDOW_ENHANCE_CFG = 1,
 };
 } // namespace SecurityComponent
 } // namespace Security
