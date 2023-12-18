@@ -45,13 +45,14 @@ float SecCompInfoHelper::GetWindowScale(int32_t windowId)
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return scale;
     }
-    for (auto& info : infos) {
-        if ((info != nullptr) && (info->wid_ == windowId)) {
-            scale = info->scaleVal_;
-            SC_LOG_INFO(LABEL, "Get scale %{public}f", scale);
-            break;
-        }
+    auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
+        return windowId == info->wid_;
+    });
+    if (iter == infos.end()) {
+        return scale;
     }
+    scale = (*iter)->scaleVal_;
+    SC_LOG_INFO(LABEL, "Get scale %{public}f", scale);
     return scale;
 }
 
