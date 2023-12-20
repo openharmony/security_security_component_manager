@@ -22,6 +22,7 @@
 #include "sec_comp_tool.h"
 #include "service_test_common.h"
 #include "sec_comp_info_helper_test.h"
+#include "window_manager.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -51,6 +52,8 @@ void SecCompEntityTest::SetUp()
 
     entity_ = std::make_shared<SecCompEntity>(component, 1, 1);
     ASSERT_NE(nullptr, entity_);
+
+    Rosen::WindowManager::GetInstance().SetDefaultSecCompScene();
 }
 
 void SecCompEntityTest::TearDown()
@@ -136,6 +139,32 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
 #else
     ASSERT_EQ(entity_->CheckClickInfo(touch), SC_OK);
 #endif
+}
+
+/**
+ * @tc.name: CheckClickInfo002
+ * @tc.desc: Test touch info with window check failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
+{
+    SecCompClickEvent touch = {
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = ServiceTestCommon::TEST_COORDINATE,
+        .point.touchY = ServiceTestCommon::TEST_COORDINATE,
+        .point.timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()),
+    };
+    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
+
+    entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+
+    // GetAccessibilityWindowInfo failed
+    OHOS::Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
+    ASSERT_EQ(entity_->CheckClickInfo(touch), SC_SERVICE_ERROR_CLICK_EVENT_INVALID);
 }
 
 /**

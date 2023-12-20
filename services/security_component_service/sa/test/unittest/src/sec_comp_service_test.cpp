@@ -27,6 +27,7 @@
 #include "service_test_common.h"
 #include "system_ability.h"
 #include "token_setproc.h"
+#include "window_manager.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -59,6 +60,8 @@ void SecCompServiceTest::SetUp()
     secCompService_->appStateObserver_ = new (std::nothrow) AppStateObserver();
     ASSERT_NE(nullptr, secCompService_->appStateObserver_);
     g_selfTokenId = GetSelfTokenID();
+
+    Rosen::WindowManager::GetInstance().SetDefaultSecCompScene();
 }
 
 void SecCompServiceTest::TearDown()

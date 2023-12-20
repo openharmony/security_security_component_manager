@@ -24,6 +24,7 @@
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
 #include "service_test_common.h"
+#include "window_manager.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -69,6 +70,7 @@ void SecCompInfoHelperTest::TearDownTestCase()
 void SecCompInfoHelperTest::SetUp()
 {
     SC_LOG_INFO(LABEL, "setup");
+    Rosen::WindowManager::GetInstance().SetDefaultSecCompScene();
 }
 
 void SecCompInfoHelperTest::TearDown()
@@ -547,4 +549,49 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
 
     comp->type_ = SecCompType::MAX_SC_TYPE;
     ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp));
+}
+
+/**
+ * @tc.name: CheckComponentValid004
+ * @tc.desc: Test CheckComponentValid with window scale changed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
+
+    Rosen::WindowManager::GetInstance().result_ = Rosen::WMError::WM_OK;
+    std::vector<sptr<Rosen::AccessibilityWindowInfo>> list;
+    sptr<Rosen::AccessibilityWindowInfo> compWin = new Rosen::AccessibilityWindowInfo();
+    compWin->wid_ = 0;
+    compWin->layer_ = 1;
+    compWin->scaleVal_ = 0.99; // change window scale to 0.99
+    list.emplace_back(compWin);
+
+    sptr<Rosen::AccessibilityWindowInfo> otherWin = new Rosen::AccessibilityWindowInfo();
+    otherWin->wid_ = 1;
+    otherWin->layer_ = 0;
+    otherWin->scaleVal_ = 0.0;
+    list.emplace_back(otherWin);
+    Rosen::WindowManager::GetInstance().list_ = list;
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp));
+}
+
+/**
+ * @tc.name: CheckComponentValid005
+ * @tc.desc: Test CheckComponentValid with get GetWindowScale failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
+
+    Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp));
 }
