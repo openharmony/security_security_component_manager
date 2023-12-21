@@ -62,6 +62,7 @@ ohos_shared_library("security_component_service") {
     "sa_main/sec_comp_service.cpp",
     "sa_main/sec_comp_stub.cpp",
     "sa_main/sec_event_handler.cpp",
+    "sa_main/window_info_helper.cpp",
   ]
 
   cflags_cc = [ "-DHILOG_ENABLE" ]

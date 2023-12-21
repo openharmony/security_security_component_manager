@@ -43,6 +43,7 @@ ohos_unittest("sec_comp_service_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
@@ -54,6 +55,7 @@ ohos_unittest("sec_comp_service_test") {
     "unittest/src/sec_comp_service_test.cpp",
     "unittest/src/sec_comp_stub_test.cpp",
     "unittest/src/service_test_common.cpp",
+    "unittest/src/window_info_helper_test.cpp",
   ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
@@ -83,7 +85,6 @@ ohos_unittest("sec_comp_service_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "window_manager:libdm",
-    "window_manager:libwm",
   ]
 }
 
@@ -120,6 +121,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
@@ -151,7 +153,6 @@ ohos_unittest("sec_comp_service_mock_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "window_manager:libdm",
-    "window_manager:libwm",
   ]
 }
 

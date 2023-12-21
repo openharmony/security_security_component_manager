@@ -24,7 +24,7 @@
 #include "sec_comp_log.h"
 #include "sec_comp_service.h"
 #include "sec_comp_tool.h"
-#include "window_manager.h"
+#include "window_info_helper.h"
 
 namespace OHOS {
 namespace Security {
@@ -33,27 +33,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompInfoHelper"};
 static constexpr double MAX_RECT_PERCENT = 0.1F; // 10%
 static constexpr double ZERO_OFFSET = 0.0F;
-static constexpr float FULL_SCREEN_SCALE = 1.0F;
 static std::mutex g_renderLock;
-}
-
-float SecCompInfoHelper::GetWindowScale(int32_t windowId)
-{
-    float scale = FULL_SCREEN_SCALE;
-    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
-        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
-        return scale;
-    }
-    auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
-        return windowId == info->wid_;
-    });
-    if (iter == infos.end()) {
-        return scale;
-    }
-    scale = (*iter)->scaleVal_;
-    SC_LOG_INFO(LABEL, "Get scale %{public}f", scale);
-    return scale;
 }
 
 void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
@@ -222,8 +202,8 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
         return false;
     }
 
-    float scale = GetWindowScale(comp->windowId_);
-    if (!IsEqual(scale, FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
+    float scale = WindowInfoHelper::GetWindowScale(comp->windowId_);
+    if (!IsEqual(scale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
         AdjustSecCompRect(comp, scale);
     }
 
