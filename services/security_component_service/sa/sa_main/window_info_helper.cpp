@@ -24,6 +24,7 @@ namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "WindowInfoHelper"};
 constexpr int32_t INVALID_WINDOW_LAYER = -1;
+constexpr uint32_t UI_EXTENSION_MASK = 0x40000000;
 }
 
 float WindowInfoHelper::GetWindowScale(int32_t windowId)
@@ -61,6 +62,10 @@ static bool IsRectInWindRect(Rosen::Rect& windRect, const SecCompRect& secRect)
 
 bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect)
 {
+    if ((static_cast<uint32_t>(compWinId) & UI_EXTENSION_MASK) == UI_EXTENSION_MASK) {
+        SC_LOG_INFO(LABEL, "UI extension can not check");
+        return true;
+    }
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
     if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");

@@ -58,7 +58,6 @@ int32_t SecCompEntity::CheckPointEvent(const SecCompClickEvent& clickInfo) const
             clickInfo.point.touchX, clickInfo.point.touchY);
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
-
     return SC_OK;
 }
 
@@ -83,7 +82,7 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
 {
     if (!WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_,
         componentInfo_->rect_)) {
-        SC_LOG_ERROR(LABEL, "Component may be covered by other window");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: Component may be covered by other window");
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
