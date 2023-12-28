@@ -90,6 +90,6 @@ public:
 private:
     ~WindowManager() {};
 };
-} // namespace Security
+} // namespace Rosen
 } // namespace OHOS
 #endif // SECURITY_COMPONENT_MOCK_WINDOW_MANAGER_H
