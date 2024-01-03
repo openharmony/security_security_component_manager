@@ -119,7 +119,6 @@ SecCompClickEventParcel* SecCompClickEventParcel::Unmarshalling(Parcel& in)
 {
     SecCompClickEventParcel* clickInfoParcel = new (std::nothrow) SecCompClickEventParcel();
     if (clickInfoParcel == nullptr) {
-        SC_LOG_ERROR(LABEL, "Alloc policy parcel fail");
         return nullptr;
     }
 
