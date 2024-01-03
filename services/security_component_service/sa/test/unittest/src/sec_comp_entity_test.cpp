@@ -181,3 +181,31 @@ HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
     bool isRectCheck = true;
     ASSERT_FALSE(entity_->CompareComponentBasicInfo(other, isRectCheck));
 }
+
+/**
+ * @tc.name: CheckKeyEvent001
+ * @tc.desc: Test CheckKeyEvent
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level1)
+{
+    SecCompClickEvent clickInfo;
+    clickInfo.type = ClickEventType::KEY_EVENT_TYPE;
+    auto current = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / 1000;
+    clickInfo.key.timestamp = current - 1000000L - 1;
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo));
+
+    clickInfo.key.timestamp = current + 1;
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo));
+
+    clickInfo.key.timestamp = current - 1;
+    clickInfo.key.keyCode = 1;
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo));
+
+    clickInfo.key.keyCode = KEY_SPACE;
+    ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
+    clickInfo.key.keyCode = KEY_ENTER;
+    ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
+}
