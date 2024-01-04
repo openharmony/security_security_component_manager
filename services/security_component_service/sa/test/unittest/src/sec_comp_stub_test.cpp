@@ -198,3 +198,68 @@ HWTEST_F(SecCompStubTest, VerifySavePermissionInner001, TestSize.Level1)
     ASSERT_EQ(SC_OK, stub_->VerifySavePermissionInner(data, reply));
     ASSERT_NE(SC_OK, stub_->GetEnhanceRemoteObjectInner(data, reply));
 }
+
+/**
+ * @tc.name: Marshalling001
+ * @tc.desc: Test SecCompClickEventParcel::Marshalling
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
+{
+    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    Parcel out;
+    EXPECT_FALSE(clickParcel->Marshalling(out));
+    clickParcel->clickInfoParams_.type = ClickEventType::UNKNOWN_EVENT_TYPE;
+    EXPECT_FALSE(clickParcel->Marshalling(out));
+
+    clickParcel->clickInfoParams_.extraInfo.dataSize = 1;
+    clickParcel->clickInfoParams_.type = ClickEventType::POINT_EVENT_TYPE;
+    EXPECT_FALSE(clickParcel->Marshalling(out));
+    clickParcel->clickInfoParams_.type = ClickEventType::KEY_EVENT_TYPE;
+    EXPECT_FALSE(clickParcel->Marshalling(out));
+
+    uint8_t data[32] = {0};
+    clickParcel->clickInfoParams_.extraInfo.dataSize = 32;
+    clickParcel->clickInfoParams_.extraInfo.data = data;
+    EXPECT_TRUE(clickParcel->Marshalling(out));
+}
+
+/**
+ * @tc.name: Unmarshalling001
+ * @tc.desc: Test SecCompClickEventParcel::Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level1)
+{
+    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    Parcel in;
+    in.WriteInt32(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+    in.WriteInt32(2);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+    in.WriteInt32(0);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.WriteInt32(2);
+    in.WriteUint64(1);
+    in.WriteInt32(1);
+    int dataSize = MAX_EXTRA_SIZE + 1;
+    in.WriteUint32(dataSize);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.WriteInt32(2);
+    in.WriteUint64(1);
+    in.WriteInt32(1);
+    in.WriteUint32(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.WriteInt32(2);
+    in.WriteUint64(1);
+    in.WriteInt32(1);
+    in.WriteUint32(32);
+    uint8_t data[32] = {0};
+    in.WriteBuffer(data, 32);
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+}
