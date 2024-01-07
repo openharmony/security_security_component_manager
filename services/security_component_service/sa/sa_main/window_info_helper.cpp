@@ -49,11 +49,11 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
 static bool IsRectInWindRect(Rosen::Rect& windRect, const SecCompRect& secRect)
 {
     // left or right
-    if ((secRect.x_ + secRect.width_ < windRect.posX_) || (secRect.x_ > windRect.posX_ + windRect.width_)) {
+    if ((secRect.x_ + secRect.width_ <= windRect.posX_) || (secRect.x_ >= windRect.posX_ + windRect.width_)) {
         return false;
     }
     // top or bottom
-    if ((secRect.y_ + secRect.height_ < windRect.posY_) || (secRect.y_ > windRect.posY_ + windRect.height_)) {
+    if ((secRect.y_ + secRect.height_ <= windRect.posY_) || (secRect.y_ >= windRect.posY_ + windRect.height_)) {
         return false;
     }
 
