@@ -137,6 +137,11 @@ bool IsColorTransparent(const SecCompColor& color)
     SC_LOG_DEBUG(LABEL, "Color %{public}x alpha %{public}x", color.value, color.argb.alpha);
     return color.argb.alpha < MAX_TRANSPARENT;
 }
+
+bool IsColorFullTransparent(const SecCompColor& color)
+{
+    return color.argb.alpha == 0;
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

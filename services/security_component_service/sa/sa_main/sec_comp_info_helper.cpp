@@ -151,7 +151,7 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp)
         return false;
     }
 
-    if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) &&
+    if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) && !IsColorFullTransparent(comp->bgColor_) &&
         (((comp->text_ != NO_TEXT) && (IsColorSimilar(comp->fontColor_, comp->bgColor_))) ||
         ((comp->icon_ != NO_ICON) && (IsColorSimilar(comp->iconColor_, comp->bgColor_))))) {
         SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontColor or iconColor is similar with backgroundColor.");
@@ -183,10 +183,9 @@ static bool CheckSecCompBase(const SecCompBase* comp)
         return false;
     }
 
-    if (((comp->bg_ != SecCompBackground::NO_BG_TYPE) && (IsColorTransparent(comp->bgColor_))) ||
-        ((comp->text_ != NO_TEXT) && (IsColorTransparent(comp->fontColor_))) ||
+    if (((comp->text_ != NO_TEXT) && (IsColorTransparent(comp->fontColor_))) ||
         ((comp->icon_ != NO_ICON) && (IsColorTransparent(comp->iconColor_)))) {
-        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: fontColor, iconColor or backgroundColor is too transparent.");
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: fontColor or iconColor is too transparent.");
         return false;
     }
     if (!CheckSecCompBaseButton(comp)) {

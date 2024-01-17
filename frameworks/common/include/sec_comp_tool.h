@@ -22,6 +22,7 @@ namespace Security {
 namespace SecurityComponent {
     bool IsColorSimilar(const SecCompColor& color1, const SecCompColor& color2);
     bool IsColorTransparent(const SecCompColor& color);
+    bool IsColorFullTransparent(const SecCompColor& color);
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

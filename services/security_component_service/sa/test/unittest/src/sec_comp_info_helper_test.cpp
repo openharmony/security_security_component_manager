@@ -340,11 +340,6 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level1)
     colorJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_INVALID;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
     ASSERT_FALSE(comp->GetValid());
-
-    colorJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_BLUE;
-    colorJson[JsonTagConstants::JSON_BG_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_INVALID;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
-    ASSERT_FALSE(comp->GetValid());
 }
 
 /**
