@@ -133,6 +133,11 @@ sptr<IRemoteObject> SecCompKit::GetEnhanceRemoteObject(bool isLoad)
 {
     return SecCompClient::GetInstance().GetEnhanceRemoteObject(isLoad);
 }
+
+int32_t SecCompKit::PreRegisterSecCompProcess()
+{
+    return SecCompClient::GetInstance().PreRegisterSecCompProcess();
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

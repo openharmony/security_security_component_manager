@@ -33,6 +33,7 @@ public:
         const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken) override;
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override;
     sptr<IRemoteObject> GetEnhanceRemoteObject() override;
+    int32_t PreRegisterSecCompProcess() override;
 
 private:
     static inline BrokerDelegator<SecCompProxy> delegator_;

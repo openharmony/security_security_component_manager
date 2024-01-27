@@ -269,6 +269,36 @@ sptr<IRemoteObject> SecCompProxy::GetEnhanceRemoteObject()
     }
     return callback;
 }
+
+int32_t SecCompProxy::PreRegisterSecCompProcess()
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(SecCompProxy::GetDescriptor())) {
+        SC_LOG_ERROR(LABEL, "PreRegister write descriptor fail");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        SC_LOG_ERROR(LABEL, "PreRegister remote service is null");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    int32_t requestResult = remote->SendRequest(
+        static_cast<uint32_t>(SecurityComponentServiceInterfaceCode::PRE_REGISTER_PROCESS),
+        data, reply, option);
+    if (requestResult != SC_OK) {
+        SC_LOG_ERROR(LABEL, "PreRegister request fail, result: %{public}d", requestResult);
+        return requestResult;
+    }
+    int32_t res;
+    if (!reply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "PreRegister read int32 fail");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return res;
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

@@ -155,7 +155,7 @@ SecCompEntity* SecCompManager::GetSecurityComponentFromList(int32_t pid, int32_t
 bool SecCompManager::IsForegroundCompExist()
 {
     return std::any_of(componentMap_.begin(), componentMap_.end(), [](const auto & iter) {
-        return (iter.second.isForeground) && (iter.second.compList.size() > 0);
+        return iter.second.isForeground;
     });
 }
 
@@ -283,6 +283,29 @@ void SecCompManager::SendCheckInfoEnhanceSysEvent(int32_t scId,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_TYPE", type,
             "CALL_SCENE", scene, "REASON", TransformCallBackResult(static_cast<enum SCErrCode>(res)));
     }
+}
+
+int32_t SecCompManager::AddSecurityComponentProcess(const SecCompCallerInfo& caller)
+{
+    DelayExitTask::GetInstance().Stop();
+    {
+        OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
+        if (isSaExit_) {
+            SC_LOG_ERROR(LABEL, "SA is exiting, retry...");
+            return SC_SERVICE_ERROR_SERVICE_NOT_EXIST;
+        }
+
+        auto iter = componentMap_.find(caller.pid);
+        if (iter != componentMap_.end()) {
+            ProcessCompInfos newProcess;
+            newProcess.isForeground = true;
+            newProcess.tokenId = caller.tokenId;
+            componentMap_[caller.pid] = newProcess;
+        }
+        SecCompEnhanceAdapter::EnableInputEnhance();
+    }
+    SecCompEnhanceAdapter::AddSecurityComponentProcess(caller.pid);
+    return SC_OK;
 }
 
 int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,

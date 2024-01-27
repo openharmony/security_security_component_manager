@@ -84,8 +84,6 @@ void SecCompService::OnStop()
     SC_LOG_INFO(LABEL, "Stop service");
     state_ = ServiceRunningState::STATE_NOT_START;
     UnregisterAppStateObserver();
-    iAppMgr_ = nullptr;
-    appStateObserver_ = nullptr;
 }
 
 bool SecCompService::RegisterAppStateObserver()
@@ -234,6 +232,16 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(int32_t scId,
         SecCompManager::GetInstance().ReportSecurityComponentClickEvent(scId, jsonRes, caller, clickInfo, callerToken);
     FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
     return res;
+}
+
+int32_t SecCompService::PreRegisterSecCompProcess()
+{
+    SecCompCallerInfo caller;
+    if (!GetCallerInfo(caller)) {
+        SC_LOG_ERROR(LABEL, "Check caller failed");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    return SecCompManager::GetInstance().AddSecurityComponentProcess(caller);
 }
 
 bool SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId)

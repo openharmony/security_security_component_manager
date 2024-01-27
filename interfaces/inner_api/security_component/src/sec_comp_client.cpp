@@ -113,6 +113,17 @@ sptr<IRemoteObject> SecCompClient::GetEnhanceRemoteObject(bool doLoadSa)
     return proxy->GetEnhanceRemoteObject();
 }
 
+int32_t SecCompClient::PreRegisterSecCompProcess()
+{
+    auto proxy = GetProxy(true);
+    if (proxy == nullptr) {
+        SC_LOG_ERROR(LABEL, "Proxy is null");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+
+    return proxy->PreRegisterSecCompProcess();
+}
+
 bool SecCompClient::StartLoadSecCompSa()
 {
     {

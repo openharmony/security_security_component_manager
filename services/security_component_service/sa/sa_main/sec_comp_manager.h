@@ -65,6 +65,7 @@ public:
     bool Initialize();
     void ExitSaProcess();
     void ExitWhenAppMgrDied();
+    int32_t AddSecurityComponentProcess(const SecCompCallerInfo& caller);
 
 private:
     SecCompManager();
