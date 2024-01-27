@@ -47,6 +47,7 @@ public:
         const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken) override;
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override;
     sptr<IRemoteObject> GetEnhanceRemoteObject() override;
+    int32_t PreRegisterSecCompProcess() override;
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
 

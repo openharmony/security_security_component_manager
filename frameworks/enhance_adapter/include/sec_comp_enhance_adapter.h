@@ -68,6 +68,9 @@ public:
 
     // notify process died
     virtual void NotifyProcessDied(int32_t pid) = 0;
+
+    // notify process registered
+    virtual void AddSecurityComponentProcess(int32_t pid) = 0;
 };
 
 // for client
@@ -104,6 +107,8 @@ public:
     static bool EnhanceDataPreprocess(int32_t scId, std::string& componentInfo);
     static void RegisterScIdEnhance(int32_t scId);
     static void UnregisterScIdEnhance(int32_t scId);
+
+    static void AddSecurityComponentProcess(int32_t pid);
 
     static SecCompInputEnhanceInterface* inputHandler;
     static bool isEnhanceInputHandlerInit;

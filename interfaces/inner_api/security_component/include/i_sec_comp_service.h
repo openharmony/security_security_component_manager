@@ -38,6 +38,7 @@ public:
         const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken) = 0;
     virtual bool VerifySavePermission(AccessToken::AccessTokenID tokenId) = 0;
     virtual sptr<IRemoteObject> GetEnhanceRemoteObject() = 0;
+    virtual int32_t PreRegisterSecCompProcess() = 0;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

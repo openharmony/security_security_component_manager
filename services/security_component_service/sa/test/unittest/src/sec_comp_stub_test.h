@@ -52,12 +52,17 @@ public:
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override
     {
         return true;
-    }
+    };
 
     sptr<IRemoteObject> GetEnhanceRemoteObject() override
     {
         return nullptr;
-    }
+    };
+
+    int32_t PreRegisterSecCompProcess() override
+    {
+        return 0;
+    };
 };
 
 class SecCompStubTest : public testing::Test {
