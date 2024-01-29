@@ -105,6 +105,11 @@ sptr<IRemoteObject> SecCompEnhanceAdapter::GetEnhanceRemoteObject()
     SC_LOG_DEBUG(LABEL, "GetEnhanceRemoteObject success");
     return nullptr;
 }
+
+void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
+{
+    SC_LOG_DEBUG(LABEL, "AddSecurityComponentProcess success");
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

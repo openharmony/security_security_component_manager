@@ -570,14 +570,14 @@ HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
     std::shared_ptr<SystemAbilityManagerClient> saClient = std::make_shared<SystemAbilityManagerClient>();
     ASSERT_NE(nullptr, saClient);
     SystemAbilityManagerClient::clientInstance = saClient.get();
-    SystemAbilityManagerProxy proxy(nullptr);
-    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(&proxy));
+    sptr<SystemAbilityManagerProxy> proxy = new SystemAbilityManagerProxy(nullptr);
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(proxy));
     instance->ExitSaProcess();
     EXPECT_TRUE(instance->isSaExit_);
     instance->isSaExit_ = false;
 
-    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(&proxy));
-    EXPECT_CALL(proxy, UnloadSystemAbility(testing::_)).WillOnce(testing::Return(-1));
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(proxy));
+    EXPECT_CALL(*proxy, UnloadSystemAbility(testing::_)).WillOnce(testing::Return(-1));
     instance->ExitSaProcess();
     EXPECT_TRUE(instance->isSaExit_);
 }
@@ -608,17 +608,17 @@ HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level1)
     instance->ExitWhenAppMgrDied();
     EXPECT_TRUE(instance->isSaExit_);
 
-    SystemAbilityManagerProxy proxy(nullptr);
-    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(&proxy));
+    sptr<SystemAbilityManagerProxy> proxy = new SystemAbilityManagerProxy(nullptr);
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(proxy));
     instance->ExitWhenAppMgrDied();
     EXPECT_TRUE(instance->isSaExit_);
 
-    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(&proxy));
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(proxy));
     instance->ExitWhenAppMgrDied();
     EXPECT_TRUE(instance->isSaExit_);
 
-    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(&proxy));
-    EXPECT_CALL(proxy, UnloadSystemAbility(testing::_)).WillOnce(testing::Return(-1));
+    EXPECT_CALL(*saClient, GetSystemAbilityManager()).WillOnce(testing::Return(proxy));
+    EXPECT_CALL(*proxy, UnloadSystemAbility(testing::_)).WillOnce(testing::Return(-1));
     instance->ExitWhenAppMgrDied();
     EXPECT_TRUE(instance->isSaExit_);
 }
