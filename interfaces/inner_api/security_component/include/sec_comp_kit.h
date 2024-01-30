@@ -33,6 +33,7 @@ public:
         std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken = nullptr);
     static bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
     static sptr<IRemoteObject> GetEnhanceRemoteObject(bool isLoad);
+    static int32_t PreRegisterSecCompProcess();
 };
 }  // namespace SecurityComponent
 }  // namespace Security

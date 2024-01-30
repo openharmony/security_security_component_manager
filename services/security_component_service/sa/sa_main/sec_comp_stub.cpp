@@ -205,6 +205,16 @@ int32_t SecCompStub::GetEnhanceRemoteObjectInner(MessageParcel& data, MessagePar
     return SC_OK;
 }
 
+int32_t SecCompStub::PreRegisterSecCompProcessInner(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t res = this->PreRegisterSecCompProcess();
+    if (!reply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "preRegister write result fail");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
 bool SecCompStub::IsMediaLibraryCalling()
 {
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -236,6 +246,9 @@ SecCompStub::SecCompStub()
     requestFuncMap_[static_cast<uint32_t>(
         SecurityComponentServiceInterfaceCode::GET_SECURITY_COMPONENT_ENHANCE_OBJECT)] =
         &SecCompStub::GetEnhanceRemoteObjectInner;
+    requestFuncMap_[static_cast<uint32_t>(
+        SecurityComponentServiceInterfaceCode::PRE_REGISTER_PROCESS)] =
+        &SecCompStub::PreRegisterSecCompProcessInner;
 }
 
 SecCompStub::~SecCompStub()

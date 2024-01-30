@@ -27,6 +27,7 @@ enum SecurityComponentServiceInterfaceCode {
     REPORT_SECURITY_COMPONENT_CLICK_EVENT = 3,
     GET_SECURITY_COMPONENT_ENHANCE_OBJECT = 4,
     VERIFY_TEMP_SAVE_PERMISSION = 5,
+    PRE_REGISTER_PROCESS = 6,
 };
 
 enum EnhanceInterfaceCode {
@@ -41,4 +42,3 @@ enum EnhanceCallbackCheckCode {
 } // namespace Security
 } // namespace OHOS
 #endif // SECURITY_COMPONENT_IPC_INTERFACE_CODE_H
-

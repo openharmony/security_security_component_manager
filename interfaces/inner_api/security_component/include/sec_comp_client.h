@@ -37,6 +37,7 @@ public:
         const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
     sptr<IRemoteObject> GetEnhanceRemoteObject(bool doLoadSa);
+    int32_t PreRegisterSecCompProcess();
 
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();

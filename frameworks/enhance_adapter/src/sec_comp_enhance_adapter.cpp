@@ -105,6 +105,16 @@ int32_t SecCompEnhanceAdapter::CheckExtraInfo(const SecCompClickEvent& clickInfo
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
+void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
+{
+    if (!isEnhanceSrvHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
+    }
+    if (srvHandler != nullptr) {
+        srvHandler->AddSecurityComponentProcess(pid);
+    }
+}
+
 bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
 {
     if (!isEnhanceClientHandlerInit) {
