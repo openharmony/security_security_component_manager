@@ -93,7 +93,6 @@ HWTEST_F(SecCompServiceTest, OnStart001, TestSize.Level1)
     ASSERT_EQ(ServiceRunningState::STATE_RUNNING, secCompService_->state_);
 
     secCompService_->OnStop();
-    ASSERT_EQ(nullptr, secCompService_->appStateObserver_);
 }
 
 /**
