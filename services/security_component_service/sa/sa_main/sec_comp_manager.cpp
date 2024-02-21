@@ -101,6 +101,7 @@ int32_t SecCompManager::DeleteSecurityComponentFromList(int32_t pid, int32_t scI
             if (!IsForegroundCompExist()) {
                 SecCompEnhanceAdapter::DisableInputEnhance();
             }
+            DelayExitTask::GetInstance().Start();
             return SC_OK;
         }
     }
@@ -155,7 +156,14 @@ SecCompEntity* SecCompManager::GetSecurityComponentFromList(int32_t pid, int32_t
 bool SecCompManager::IsForegroundCompExist()
 {
     return std::any_of(componentMap_.begin(), componentMap_.end(), [](const auto & iter) {
-        return iter.second.isForeground;
+        return (iter.second.isForeground) && (iter.second.compList.size() > 0);
+    });
+}
+
+bool SecCompManager::IsCompExist()
+{
+    return std::any_of(componentMap_.begin(), componentMap_.end(), [](const auto & iter) {
+        return (iter.second.compList.size() > 0);
     });
 }
 
@@ -218,7 +226,7 @@ void SecCompManager::NotifyProcessDied(int32_t pid)
 void SecCompManager::ExitSaProcess()
 {
     OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
-    if (!componentMap_.empty() || !malicious_.IsMaliciousAppListEmpty()) {
+    if (IsCompExist()) {
         SC_LOG_INFO(LABEL, "Apps using security component still exist, no exit sa");
         return;
     }

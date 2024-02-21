@@ -544,12 +544,6 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level1)
  */
 HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
 {
-    std::shared_ptr<SecCompManager> instance = std::make_shared<SecCompManager>();
-    instance->malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_SC_ID_1);
-    instance->ExitSaProcess();
-    EXPECT_FALSE(instance->isSaExit_);
-
-    instance->malicious_.maliciousAppList_.clear();
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
     compPtr->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
@@ -557,6 +551,7 @@ HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
     SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompManager> instance = std::make_shared<SecCompManager>();
     ASSERT_EQ(SC_OK,
         instance->AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
     instance->ExitSaProcess();

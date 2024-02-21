@@ -210,10 +210,9 @@ int32_t SecCompService::UpdateSecurityComponent(int32_t scId, const std::string&
 int32_t SecCompService::UnregisterSecurityComponent(int32_t scId)
 {
     SecCompCallerInfo caller;
-    if (!GetCallerInfo(caller)) {
-        SC_LOG_ERROR(LABEL, "Check caller failed");
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
+    caller.tokenId = IPCSkeleton::GetCallingTokenID();
+    caller.pid = IPCSkeleton::GetCallingPid();
+    caller.uid = IPCSkeleton::GetCallingUid();
 
     return SecCompManager::GetInstance().UnregisterSecurityComponent(scId, caller);
 }
