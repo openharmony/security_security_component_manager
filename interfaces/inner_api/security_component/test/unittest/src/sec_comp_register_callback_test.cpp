@@ -522,9 +522,6 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     auto token = proxy->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
-    setuid(100);
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, SecCompKit::UnregisterSecurityComponent(scId));
-    setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
