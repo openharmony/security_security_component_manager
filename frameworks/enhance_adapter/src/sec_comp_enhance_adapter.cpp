@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,9 +30,9 @@ static const std::string LIB_PATH = "/system/lib64/";
 #else
 static const std::string LIB_PATH = "/system/lib/";
 #endif
-static const std::string ENHANCE_INPUT_INTERFACE_LIB = LIB_PATH + "libsec_comp_input_enhance.z.so";
-static const std::string ENHANCE_SRV_INTERFACE_LIB = LIB_PATH + "libsec_comp_service_enhance.z.so";
-static const std::string ENHANCE_CLIENT_INTERFACE_LIB = LIB_PATH + "libsec_comp_client_enhance.z.so";
+static const std::string ENHANCE_INPUT_INTERFACE_LIB = LIB_PATH + "libsecurity_component_client_enhance.z.so";
+static const std::string ENHANCE_SRV_INTERFACE_LIB = LIB_PATH + "libsecurity_component_service_enhance.z.so";
+static const std::string ENHANCE_CLIENT_INTERFACE_LIB = LIB_PATH + "libsecurity_component_client_enhance.z.so";
 }
 
 SecCompInputEnhanceInterface* SecCompEnhanceAdapter::inputHandler = nullptr;

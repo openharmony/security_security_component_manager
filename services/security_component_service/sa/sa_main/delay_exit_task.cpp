@@ -23,7 +23,7 @@ namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "DelayExitTask"};
 static const std::string DELAY_EXIT_TASK = "DelayExitTask";
-static const int32_t DELAY_EXIT_MILLISECONDS = 10 * 60 * 1000; // 10m
+static const int32_t DELAY_EXIT_MILLISECONDS = 120 * 1000; // 2m
 }
 
 DelayExitTask::DelayExitTask()

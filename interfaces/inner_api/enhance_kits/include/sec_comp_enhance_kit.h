@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-struct SecCompEnhanceKit {
+struct __attribute__((visibility("default"))) SecCompEnhanceKit {
     static void InitClientEnhance();
     static int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen);
     static int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen,

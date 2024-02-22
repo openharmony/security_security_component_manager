@@ -58,35 +58,6 @@
           }
         },
         {
-          "name": "//base/security/security_component_manager/interfaces/inner_api/enhance_kits:libsecurity_component_enhance_sdk",
-          "header": {
-            "header_files": [
-              "sec_comp_enhance_kit.h"
-            ],
-            "header_base": "//base/security/security_component_manager/interfaces/inner_api/enhance_kits/include"
-          }
-        },
-        {
-          "name": "//base/security/security_component_manager/frameworks:libsecurity_component_framework",
-          "header": {
-            "header_files": [
-               "location_button.h",
-               "paste_button.h",
-               "save_button.h"
-            ],
-            "header_base": "//base/security/security_component_manager/interfaces/inner_api/security_component/include"
-          }
-        },
-        {
-          "name": "//base/security/security_component_manager/frameworks:libsecurity_component_enhance_adapter",
-          "header": {
-            "header_files": [
-               "sec_comp_enhance_adapter.h"
-            ],
-            "header_base": "//base/security/security_component_manager/frameworks/enhance_adapter/include"
-          }
-        },
-        {
           "name": "//base/security/security_component_manager/services/security_component_service/sa:security_component_service",
           "header": {
             "header_files": [

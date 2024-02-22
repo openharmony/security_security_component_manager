@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ enum class SecCompBackground {
     MAX_BG_TYPE
 };
 
-class JsonTagConstants final {
+class __attribute__((visibility("default"))) JsonTagConstants final {
 public:
     static const std::string JSON_RECT;
     static const std::string JSON_SC_TYPE;
@@ -74,7 +74,7 @@ public:
     static const std::string JSON_WINDOW_ID;
 };
 
-class SecCompBase {
+class __attribute__((visibility("default"))) SecCompBase {
 public:
     SecCompBase() = default;
     virtual ~SecCompBase() = default;

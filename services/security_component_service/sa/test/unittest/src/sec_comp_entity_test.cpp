@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -134,11 +134,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_NE(entity_->CheckClickInfo(touch), SC_OK);
-#else
     ASSERT_EQ(entity_->CheckClickInfo(touch), SC_OK);
-#endif
 }
 
 /**

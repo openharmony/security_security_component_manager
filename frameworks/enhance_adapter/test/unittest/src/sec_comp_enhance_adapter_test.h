@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,22 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef INTERFACES_INNER_API_SECURITY_COMPONENT_UI_REGISTER_H
-#define INTERFACES_INNER_API_SECURITY_COMPONENT_UI_REGISTER_H
+#ifndef SECURITY_COMPONENT_ENHANCE_ADAPTER_TEST
+#define SECURITY_COMPONENT_ENHANCE_ADAPTER_TEST
 
-#include "i_sec_comp_probe.h"
+#include <gtest/gtest.h>
+#include "sec_comp_enhance_adapter.h"
 
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-class __attribute__((visibility("default"))) SecCompUiRegister {
+class SecCompEnhanceAdapterTest : public testing::Test {
 public:
-    SecCompUiRegister(std::vector<uintptr_t>& callerList, ISecCompProbe* probe);
-    virtual ~SecCompUiRegister() = default;
-    static ISecCompProbe* callbackProbe;
+    static void SetUpTestCase();
+
+    static void TearDownTestCase();
+
+    void SetUp() override;
+
+    void TearDown() override;
 };
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
-#endif  // INTERFACES_INNER_API_SECURITY_COMPONENT_UI_REGISTER_H
-
+#endif  // SECURITY_COMPONENT_ENHANCE_ADAPTER_TEST
