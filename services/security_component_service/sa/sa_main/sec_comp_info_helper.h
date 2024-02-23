@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ T* ConstructComponent(const nlohmann::json& jsonComponent)
     return componentPtr;
 }
 
-class SecCompInfoHelper {
+class __attribute__((visibility("default"))) SecCompInfoHelper {
 public:
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent);
     static int32_t GrantTempPermission(AccessToken::AccessTokenID tokenId,

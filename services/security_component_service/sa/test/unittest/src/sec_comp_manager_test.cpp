@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -324,14 +324,8 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level1)
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonValid);
 
-#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    // callback check failed
-    EXPECT_EQ(SC_ENHANCE_ERROR_CALLBACK_NOT_EXIST,
-        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonValid, caller, scId));
-#else
     EXPECT_EQ(SC_OK,
         SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonValid, caller, scId));
-#endif
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
 }
 
@@ -370,13 +364,8 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level1)
         SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonInvalid, caller));
 
     // no enhance data
-#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    EXPECT_NE(SC_OK,
-        SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
-#else
     EXPECT_EQ(SC_OK,
         SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
-#endif
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
 }
 

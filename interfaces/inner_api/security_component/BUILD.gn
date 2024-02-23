@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,6 +20,8 @@ config("sec_comp_config") {
   include_dirs = [
     "include",
     "${sec_comp_root_dir}/frameworks/common/include",
+    "${sec_comp_root_dir}/frameworks/enhance_adapter/include/",
+    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits/include",
     "//third_party/json/include",
   ]
 }
@@ -34,6 +36,8 @@ ohos_shared_library("libsecurity_component_sdk") {
   include_dirs = [
     "include",
     "${sec_comp_root_dir}/frameworks/common/include",
+    "${sec_comp_root_dir}/frameworks/enhance_adapter/include/",
+    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits/include",
     "${sec_comp_root_dir}/frameworks/security_component/include",
   ]
 
@@ -48,8 +52,9 @@ ohos_shared_library("libsecurity_component_sdk") {
   ]
 
   deps = [
-    "${sec_comp_root_dir}/frameworks:libsecurity_component_enhance_adapter",
-    "${sec_comp_root_dir}/frameworks:libsecurity_component_framework",
+    "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set",
+    "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
+    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits:security_component_enhance_sdk_src_set",
   ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
@@ -63,5 +68,8 @@ ohos_shared_library("libsecurity_component_sdk") {
     "samgr:samgr_proxy",
   ]
 
-  cflags_cc = [ "-DHILOG_ENABLE" ]
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-fvisibility=hidden",
+  ]
 }

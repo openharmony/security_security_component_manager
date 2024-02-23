@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,50 +11,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+import("//build/test.gni")
 
 sec_comp_root_dir = "../../.."
 
-config("sec_comp_enhance_config") {
-  visibility = [ ":*" ]
-  include_dirs = [
-    "include",
-    "${sec_comp_root_dir}/frameworks/common/include",
-    "${sec_comp_root_dir}/frameworks/enhance_adapter/include",
-  ]
-}
-
-ohos_source_set("security_component_enhance_sdk_src_set") {
+ohos_unittest("sec_comp_enhance_adapter_test") {
   subsystem_name = "security"
   part_name = "security_component_manager"
+  module_out_path = part_name + "/" + part_name
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
   branch_protector_ret = "pac_ret"
-  public_configs = [ ":sec_comp_enhance_config" ]
+  include_dirs = [ "unittest/src" ]
 
-  include_dirs = [
-    "include",
-    "${sec_comp_root_dir}/frameworks/common/include",
-    "${sec_comp_root_dir}/frameworks/enhance_adapter/include",
-  ]
-
-  sources = [ "src/sec_comp_enhance_kit.cpp" ]
-
-  deps = [ "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set" ]
+  sources = [ "unittest/src/sec_comp_enhance_adapter_test.cpp" ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  cflags_cc = [ "-DHILOG_ENABLE" ]
+
+  deps = [ "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set" ]
 
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+  if (current_cpu == "arm64") {
+    defines = [ "_ARM64_" ]
+  }
+}
 
-  cflags_cc = [
-    "-DHILOG_ENABLE",
-    "-fvisibility=hidden",
-  ]
+group("unittest") {
+  testonly = true
+  deps = [ ":sec_comp_enhance_adapter_test" ]
 }

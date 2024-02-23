@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-class SecCompKit {
+class __attribute__((visibility("default"))) SecCompKit {
 public:
     static int32_t RegisterSecurityComponent(SecCompType type, std::string& componentInfo, int32_t& scId);
     static int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo);

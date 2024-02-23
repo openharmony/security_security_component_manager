@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 group("security_component_build_module") {
   if (is_standard_system) {
     deps = [
-      "interfaces/inner_api/enhance_kits:libsecurity_component_enhance_sdk",
       "interfaces/inner_api/security_component:libsecurity_component_sdk",
       "services/security_component_service/sa:security_component_service",
       "services/security_component_service/sa/sa_profile:security_component_sa_profile_standard",
@@ -29,6 +28,7 @@ group("security_component_build_module_test") {
   deps = []
   if (is_standard_system) {
     deps += [
+      "frameworks/enhance_adapter/test:unittest",
       "interfaces/inner_api/enhance_kits/test:unittest",
       "interfaces/inner_api/security_component/test:unittest",
       "services/security_component_service/sa/test:unittest",

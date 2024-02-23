@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,23 +15,22 @@
 #include <gtest/gtest.h>
 #include "i_sec_comp_probe.h"
 #include "location_button.h"
-#define private public
-#include "sec_comp_caller_authorization.h"
-#include "sec_comp_client.h"
-#undef private
 #include "sec_comp_enhance_adapter.h"
+#include "sec_comp_enhance_kit.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_comp_kit.h"
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
 #include "sec_comp_ui_register.h"
+#include "system_ability_load_callback_stub.h"
 #include "test_common.h"
 #include "token_setproc.h"
 
 using namespace testing::ext;
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
+using namespace OHOS;
 
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
@@ -51,12 +50,36 @@ public:
 };
 
 static MockUiSecCompProbe g_probe;
+
+static __attribute__((noinline)) int32_t RegisterSecurityComponent(
+    SecCompType type, std::string& componentInfo, int32_t& scId)
+{
+    SC_LOG_INFO(LABEL, "RegisterSecurityComponent enter");
+    return SecCompKit::RegisterSecurityComponent(type, componentInfo, scId);
+}
+
+static __attribute__((noinline)) int32_t ReportSecurityComponentClickEvent(
+    int32_t scId, std::string& componentInfo,
+    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
+{
+    SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEvent enter");
+    return SecCompKit::ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken);
+}
+
+static __attribute__((noinline)) int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo)
+{
+    SC_LOG_INFO(LABEL, "UpdateSecurityComponent enter");
+    return SecCompKit::UpdateSecurityComponent(scId, componentInfo);
+}
+
 static void InitUiRegister()
 {
-    std::vector<uintptr_t> callerList;
+    std::vector<uintptr_t> callerList = {
+        reinterpret_cast<uintptr_t>(RegisterSecurityComponent),
+        reinterpret_cast<uintptr_t>(ReportSecurityComponentClickEvent),
+        reinterpret_cast<uintptr_t>(UpdateSecurityComponent)
+    };
     SecCompUiRegister registerCallback(callerList, &g_probe);
-    SecCompCallerAuthorization::GetInstance().kitCallerList_.clear();
-    SecCompCallerAuthorization::GetInstance().isInit_ = false;
 }
 }  // namespace
 
@@ -97,32 +120,6 @@ void SecCompRegisterCallbackTest::TearDown()
 }
 
 /**
- * @tc.name: RegisterWithoutPreprocess001
- * @tc.desc: test register without preprocess
- * @tc.type: FUNC
- * @tc.require: AR000HO9JM
- */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterWithoutPreprocess001, TestSize.Level1)
-{
-    nlohmann::json jsonRes;
-    TestCommon::BuildLocationComponentInfo(jsonRes);
-    std::string locationInfo = jsonRes.dump();
-
-    SecCompEnhanceAdapter::InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    int32_t scId;
-#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_EQ(SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL,
-        SecCompClient::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
-    ASSERT_EQ(-1, scId);
-#else
-    ASSERT_EQ(SC_OK,
-        SecCompClient::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
-    ASSERT_NE(-1, scId);
-    EXPECT_EQ(SC_OK, SecCompClient::GetInstance().UnregisterSecurityComponent(scId));
-#endif
-}
-
-/**
  * @tc.name: RegisterSecurityComponent001
  * @tc.desc: test register security component success.
  * @tc.type: FUNC
@@ -137,7 +134,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Lev
     g_probe.mockRes = 0;
 
     int32_t scId;
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_NE(-1, scId);
 
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
@@ -160,11 +157,11 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Lev
     int32_t scId;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
     ASSERT_EQ(SC_ENHANCE_ERROR_CALLBACK_OPER_FAIL,
-        SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+        RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_EQ(-1, scId);
 #else
     ASSERT_EQ(SC_OK,
-        SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+        RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_NE(-1, scId);
     ASSERT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 #endif
@@ -185,7 +182,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Lev
     g_probe.mockRes = 0;
 
     int32_t scId;
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -203,7 +200,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -215,11 +212,11 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
 
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -238,7 +235,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -249,11 +246,11 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     };
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -271,7 +268,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Lev
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
     setuid(100);
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
 }
 
 /**
@@ -288,7 +285,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -300,11 +297,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
 
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     uint32_t selfTokenId = GetSelfTokenID();
     ASSERT_FALSE(SecCompKit::VerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
@@ -326,7 +323,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -339,11 +336,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     clickInfo.extraInfo.data = data;
 
     setuid(100);
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -363,7 +360,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
 
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -372,11 +369,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
         .point.timestamp = static_cast<uint64_t>(
             std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
     };
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -396,7 +393,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     g_probe.mockRes = 0;
 
     int32_t scId;
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_NE(-1, scId);
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
@@ -408,11 +405,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     };
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -432,7 +429,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -443,11 +440,11 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
     };
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     setuid(100);
     ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
     // mediaLibraryTokenId_ != 0
@@ -471,7 +468,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -482,11 +479,11 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
     };
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     ASSERT_FALSE(SecCompKit::VerifySavePermission(0));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -506,7 +503,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -517,11 +514,11 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     };
     clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     clickInfo.extraInfo.data = data;
-    auto proxy = SecCompClient::GetInstance().GetProxy(true);
-    ASSERT_NE(proxy, nullptr);
-    auto token = proxy->AsObject();
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -538,9 +535,9 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level
     TestCommon::BuildSaveComponentInfo(jsonRes);
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     ASSERT_NE(-1, scId);
-    ASSERT_EQ(SC_OK, SecCompKit::UpdateSecurityComponent(scId, saveInfo));
+    ASSERT_EQ(SC_OK, UpdateSecurityComponent(scId, saveInfo));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -558,10 +555,10 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level
     int32_t scId;
 
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
-    ASSERT_EQ(SC_OK, SecCompKit::RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     ASSERT_NE(-1, scId);
     setuid(100);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, SecCompKit::UpdateSecurityComponent(scId, saveInfo));
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, UpdateSecurityComponent(scId, saveInfo));
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
