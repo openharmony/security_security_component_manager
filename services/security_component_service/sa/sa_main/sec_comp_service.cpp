@@ -186,8 +186,18 @@ int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentRegister");
     SecCompCallerInfo caller;
-    nlohmann::json jsonRes;
-    if (ParseParams(componentInfo, caller, jsonRes) != SC_OK) {
+    caller.tokenId = IPCSkeleton::GetCallingTokenID();
+    caller.pid = IPCSkeleton::GetCallingPid();
+    caller.uid = IPCSkeleton::GetCallingUid();
+    if ((caller.uid != ROOT_UID)
+        && (AccessToken::AccessTokenKit::GetTokenTypeFlag(caller.tokenId) != AccessToken::TOKEN_HAP)) {
+        SC_LOG_ERROR(LABEL, "Get caller tokenId invalid");
+        FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    nlohmann::json jsonRes = nlohmann::json::parse(componentInfo, nullptr, false);
+    if (jsonRes.is_discarded()) {
+        SC_LOG_ERROR(LABEL, "component info invalid %{public}s", componentInfo.c_str());
         FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
