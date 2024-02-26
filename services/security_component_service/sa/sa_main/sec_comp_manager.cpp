@@ -74,6 +74,7 @@ int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
         iter->second.isForeground = true;
         iter->second.compList.emplace_back(newEntity);
         SecCompEnhanceAdapter::EnableInputEnhance();
+        DelayExitTask::GetInstance().Stop();
         return SC_OK;
     }
 
@@ -83,6 +84,7 @@ int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
     newProcess.compList.emplace_back(newEntity);
     componentMap_[pid] = newProcess;
     SecCompEnhanceAdapter::EnableInputEnhance();
+    DelayExitTask::GetInstance().Stop();
     return SC_OK;
 }
 
@@ -319,7 +321,6 @@ int32_t SecCompManager::AddSecurityComponentProcess(const SecCompCallerInfo& cal
 int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller, int32_t& scId)
 {
-    DelayExitTask::GetInstance().Stop();
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, register security component", caller.pid);
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
