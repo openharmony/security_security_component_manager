@@ -32,7 +32,9 @@ static const std::string LIB_PATH = "/system/lib64/";
 #else
 static const std::string LIB_PATH = "/system/lib/";
 #endif
-static const std::string ENHANCE_INPUT_INTERFACE_LIB = LIB_PATH + "libsecurity_component_client_enhance.z.so";
+static const std::string INNER_PATH = "platformsdk/";
+static const std::string ENHANCE_INPUT_INTERFACE_LIB =
+    LIB_PATH + INNER_PATH + "libsecurity_component_client_enhance.z.so";
 static const std::string ENHANCE_SRV_INTERFACE_LIB = LIB_PATH + "libsecurity_component_service_enhance.z.so";
 static constexpr uint32_t MAX_HMAC_SIZE = 64;
 }  // namespace
