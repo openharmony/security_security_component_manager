@@ -304,7 +304,7 @@ int32_t SecCompManager::AddSecurityComponentProcess(const SecCompCallerInfo& cal
         }
 
         auto iter = componentMap_.find(caller.pid);
-        if (iter != componentMap_.end()) {
+        if (iter == componentMap_.end()) {
             ProcessCompInfos newProcess;
             newProcess.isForeground = true;
             newProcess.tokenId = caller.tokenId;
@@ -515,6 +515,7 @@ bool SecCompManager::Initialize()
     secHandler_ = std::make_shared<SecEventHandler>(secRunner_);
     DelayExitTask::GetInstance().Init(secHandler_);
     firstUseDialog_.Init(secHandler_);
+    SecCompEnhanceAdapter::EnableInputEnhance();
 
     return SecCompPermManager::GetInstance().InitEventHandler(secHandler_);
 }

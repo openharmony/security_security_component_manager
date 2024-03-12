@@ -138,6 +138,16 @@ int32_t SecCompKit::PreRegisterSecCompProcess()
 {
     return SecCompClient::GetInstance().PreRegisterSecCompProcess();
 }
+
+bool SecCompKit::IsServiceExist()
+{
+    return SecCompClient::GetInstance().IsServiceExist();
+}
+
+bool SecCompKit::LoadService()
+{
+    return SecCompClient::GetInstance().LoadService();
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
