@@ -34,6 +34,7 @@
         "hitrace",
         "graphic_2d",
         "ipc",
+        "json",
         "safwk",
         "samgr",
         "window_manager"

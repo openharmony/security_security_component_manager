@@ -24,8 +24,6 @@ ohos_fuzztest("RegisterSecurityComponentFuzzTest") {
   include_dirs = [
     "${sec_comp_dir}/frameworks/common/include",
     "${sec_comp_dir}/interfaces/inner_api/security_component/include",
-    "//third_party/json/include",
-    "//third_party/json/test/thirdparty/fifo_map",
   ]
   cflags = [
     "-g",
@@ -46,5 +44,6 @@ ohos_fuzztest("RegisterSecurityComponentFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "hilog:libhilog",
+    "json:nlohmann_json_static",
   ]
 }
