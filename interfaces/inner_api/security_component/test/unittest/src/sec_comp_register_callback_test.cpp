@@ -17,8 +17,8 @@
 #include "location_button.h"
 #define private public
 #include "sec_comp_caller_authorization.h"
-#undef private
 #include "sec_comp_client.h"
+#undef private
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
@@ -213,8 +213,11 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     };
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -243,7 +246,10 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     };
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
-    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
+    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -289,7 +295,10 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
 
-    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
+    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     uint32_t selfTokenId = GetSelfTokenID();
     ASSERT_TRUE(SecCompKit::ReduceAfterVerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
@@ -323,8 +332,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     touchInfo.extraInfo.data = data;
 
     setuid(100);
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
     ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -352,12 +364,16 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
         .timestamp = static_cast<uint64_t>(
             std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
     };
+
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
 #else
     ASSERT_EQ(SC_OK,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+        SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
 #endif
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
@@ -389,8 +405,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     };
     touch.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touch.extraInfo.data = data;
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
-        SecCompKit::ReportSecurityComponentClickEvent(scId, locationInfo, touch, nullptr));
+        SecCompKit::ReportSecurityComponentClickEvent(scId, locationInfo, touch, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -421,7 +440,10 @@ HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission001, TestSi
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
 
-    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
+    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     setuid(100);
     ASSERT_FALSE(SecCompKit::ReduceAfterVerifySavePermission(TestCommon::HAP_TOKEN_ID));
     // mediaLibraryTokenId_ != 0
@@ -456,7 +478,10 @@ HWTEST_F(SecCompRegisterCallbackTest, ReduceAfterVerifySavePermission002, TestSi
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
 
-    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
+    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     ASSERT_FALSE(SecCompKit::ReduceAfterVerifySavePermission(0));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -486,7 +511,10 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     };
     touchInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
     touchInfo.extraInfo.data = data;
-    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, nullptr));
+    auto proxy = SecCompClient::GetInstance().GetProxy(true);
+    ASSERT_NE(proxy, nullptr);
+    auto token = proxy->AsObject();
+    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     setuid(100);
     EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, SecCompKit::UnregisterSecurityComponent(scId));
     setuid(g_selfUid);
