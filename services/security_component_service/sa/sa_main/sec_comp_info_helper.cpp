@@ -122,7 +122,8 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
     }
 
     if (GreatNotEqual(windowRect.x_, rect.x_) || GreatNotEqual(windowRect.y_, rect.y_) ||
-        GreatNotEqual(rect.width_, windowRect.width_) || GreatNotEqual(rect.height_, windowRect.height_)) {
+        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_) ||
+        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         return false;
     }
