@@ -249,7 +249,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     auto proxy = SecCompClient::GetInstance().GetProxy(true);
     ASSERT_NE(proxy, nullptr);
     auto token = proxy->AsObject();
-    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    EXPECT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -298,7 +298,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     auto proxy = SecCompClient::GetInstance().GetProxy(true);
     ASSERT_NE(proxy, nullptr);
     auto token = proxy->AsObject();
-    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    ASSERT_EQ(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, saveInfo, touchInfo, token));
     uint32_t selfTokenId = GetSelfTokenID();
     ASSERT_TRUE(SecCompKit::ReduceAfterVerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
