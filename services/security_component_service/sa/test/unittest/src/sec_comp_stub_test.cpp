@@ -173,5 +173,7 @@ HWTEST_F(SecCompStubTest, ReportSecurityComponentClickEventInner001, TestSize.Le
     sptr<SecCompClickEventParcel> parcel = new (std::nothrow) SecCompClickEventParcel();
     parcel->touchInfoParams_ = touchInfo;
     data.WriteParcelable(parcel);
+    auto token = std::make_shared<SecCompStubMock>();
+    data.WriteRemoteObject(token->AsObject());
     ASSERT_EQ(SC_OK, stub_->ReportSecurityComponentClickEventInner(data, reply));
 }

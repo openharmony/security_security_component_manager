@@ -157,6 +157,10 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
     }
 
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        SC_LOG_ERROR(LABEL, "callerToken is nullptr");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     int32_t res =
         this->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfoParcel->touchInfoParams_, callerToken);
     if (!reply.WriteInt32(res)) {
