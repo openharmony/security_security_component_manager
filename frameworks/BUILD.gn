@@ -35,7 +35,6 @@ ohos_source_set("security_component_framework_src_set") {
     "common/include",
     "security_component/include",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
-    "//third_party/json/include",
   ]
 
   sources = [
@@ -53,6 +52,7 @@ ohos_source_set("security_component_framework_src_set") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "json:nlohmann_json_static",
   ]
 
   cflags_cc = [
@@ -66,7 +66,6 @@ config("security_component_enhance_adapter_src_set_config") {
     "common/include",
     "enhance_adapter/include",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
-    "//third_party/json/include",
   ]
 }
 
@@ -83,7 +82,6 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
     "common/include",
     "enhance_adapter/include",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
-    "//third_party/json/include",
   ]
 
   sources = [ "enhance_adapter/src/sec_comp_enhance_adapter.cpp" ]
@@ -96,6 +94,8 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
+
+  public_external_deps = [ "json:nlohmann_json_static" ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",
