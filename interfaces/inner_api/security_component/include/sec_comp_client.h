@@ -38,6 +38,8 @@ public:
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
     sptr<IRemoteObject> GetEnhanceRemoteObject(bool doLoadSa);
     int32_t PreRegisterSecCompProcess();
+    bool IsServiceExist();
+    bool LoadService();
 
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();

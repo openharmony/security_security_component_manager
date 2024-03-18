@@ -124,6 +124,16 @@ int32_t SecCompClient::PreRegisterSecCompProcess()
     return proxy->PreRegisterSecCompProcess();
 }
 
+bool SecCompClient::IsServiceExist()
+{
+    return GetProxy(false) != nullptr;
+}
+
+bool SecCompClient::LoadService()
+{
+    return GetProxy(true) != nullptr;
+}
+
 bool SecCompClient::StartLoadSecCompSa()
 {
     {

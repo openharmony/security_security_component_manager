@@ -96,6 +96,11 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
         return res;
     }
 
+    if (clickInfo.extraInfo.dataSize == 0 || clickInfo.extraInfo.data == nullptr) {
+        SC_LOG_ERROR(LABEL, "HMAC info is invalid");
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    }
+
     res = SecCompEnhanceAdapter::CheckExtraInfo(clickInfo);
     if ((res != SC_OK) && (res != SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE)) {
         SC_LOG_ERROR(LABEL, "HMAC checkout failed");
