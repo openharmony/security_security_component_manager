@@ -38,7 +38,7 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
     auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
         return windowId == info->wid_;
     });
-    if (iter == infos.end()) {
+    if ((iter == infos.end()) || (*iter == nullptr)) {
         return scale;
     }
     scale = (*iter)->scaleVal_;
@@ -80,7 +80,7 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         }
 
         if (info->wid_ == compWinId) {
-            compLayer = info->layer_;
+            compLayer = static_cast<int32_t>(info->layer_);
             continue;
         }
         if (info->scaleVal_ != 0.0) {
