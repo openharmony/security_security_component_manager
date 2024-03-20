@@ -100,13 +100,18 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
     // register security component ok
     EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     EXPECT_EQ(SC_OK, secCompService_->UpdateSecurityComponent(scId, saveInfo));
+    uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
         .point.touchX = 100,
         .point.touchY = 100,
         .point.timestamp =
             static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
-            ServiceTestCommon::TIME_CONVERSION_UNIT
+            ServiceTestCommon::TIME_CONVERSION_UNIT,
+        .extraInfo = {
+            .data = buffer,
+            .dataSize = 1
+        },
     };
 
     EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
@@ -171,13 +176,18 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
     EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
         .point.touchX = 100,
         .point.touchY = 100,
         .point.timestamp =
             static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
-            ServiceTestCommon::TIME_CONVERSION_UNIT
+            ServiceTestCommon::TIME_CONVERSION_UNIT,
+        .extraInfo = {
+            .data = buffer,
+            .dataSize = 1
+        },
     };
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
         secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
@@ -207,13 +217,18 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
     EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
         .point.touchX = 100,
         .point.touchY = 100,
         .point.timestamp =
             static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
-            ServiceTestCommon::TIME_CONVERSION_UNIT
+            ServiceTestCommon::TIME_CONVERSION_UNIT,
+        .extraInfo = {
+            .data = buffer,
+            .dataSize = 1
+        },
     };
 
     ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr));
@@ -261,13 +276,18 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
     EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent clickInfo1 = {
         .type = ClickEventType::POINT_EVENT_TYPE,
         .point.touchX = 100,
         .point.touchY = 100,
         .point.timestamp =
             static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
-            ServiceTestCommon::TIME_CONVERSION_UNIT
+            ServiceTestCommon::TIME_CONVERSION_UNIT,
+        .extraInfo = {
+            .data = buffer,
+            .dataSize = 1
+        },
     };
 
     ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo1, nullptr));
