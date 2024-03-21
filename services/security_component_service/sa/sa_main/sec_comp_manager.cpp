@@ -235,7 +235,7 @@ void SecCompManager::ExitSaProcess()
 
     isSaExit_ = true;
     SecCompEnhanceAdapter::DisableInputEnhance();
-    SecCompEnhanceAdapter::ExistEnhanceService();
+    SecCompEnhanceAdapter::ExitEnhanceService();
 
     SC_LOG_INFO(LABEL, "All processes using security component died, start sa exit");
     auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -338,7 +338,7 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     }
 
     int32_t enhanceRes =
-        SecCompEnhanceAdapter::CheckComponentInfoEnhnace(caller.pid, component, jsonComponent);
+        SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, component, jsonComponent);
     if (enhanceRes != SC_OK) {
         SendCheckInfoEnhanceSysEvent(INVALID_SC_ID, type, "REGISTER", enhanceRes);
         SC_LOG_ERROR(LABEL, "enhance check failed");
@@ -385,7 +385,7 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
     }
 
     int32_t enhanceRes =
-        SecCompEnhanceAdapter::CheckComponentInfoEnhnace(caller.pid, reportComponentInfo, jsonComponent);
+        SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, reportComponentInfo, jsonComponent);
     if (enhanceRes != SC_OK) {
         SendCheckInfoEnhanceSysEvent(scId, sc->GetType(), "UPDATE", enhanceRes);
         SC_LOG_ERROR(LABEL, "enhance check failed");
@@ -430,7 +430,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(SecCompEntity* sc, int32
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
     int32_t enhanceRes =
-        SecCompEnhanceAdapter::CheckComponentInfoEnhnace(caller.pid, reportComponentInfo, jsonComponent);
+        SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, reportComponentInfo, jsonComponent);
     if (enhanceRes != SC_OK) {
         SendCheckInfoEnhanceSysEvent(scId, sc->GetType(), "CLICK", enhanceRes);
         SC_LOG_ERROR(LABEL, "enhance check failed");

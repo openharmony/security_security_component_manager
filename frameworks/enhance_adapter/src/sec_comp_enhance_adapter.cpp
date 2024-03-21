@@ -15,8 +15,13 @@
 #include "sec_comp_enhance_adapter.h"
 
 #include <dlfcn.h>
+#include <sys/types.h>
+
+#include "ipc_skeleton.h"
+#include "parcel.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Security {
@@ -69,8 +74,24 @@ void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
         default:
             break;
     }
-    if (dlopen(libPath.c_str(), RTLD_LAZY) == nullptr) {
+
+    void* handler = dlopen(libPath.c_str(), RTLD_LAZY);
+    if (handler == nullptr) {
         SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed, error %{public}s", libPath.c_str(), dlerror());
+        return;
+    }
+    if (type == SEC_COMP_ENHANCE_CLIENT_INTERFACE) {
+        SecCompClientEnhanceInterface* (*getClientInstance)(void) =
+            (SecCompClientEnhanceInterface* (*)(void))dlsym(handler, "GetClientInstance");
+        if (getClientInstance == nullptr) {
+            SC_LOG_ERROR(LABEL, "GetClientInstance failed.");
+            return;
+        }
+        SecCompClientEnhanceInterface* instance = getClientInstance();
+        if (instance != nullptr) {
+            SC_LOG_DEBUG(LABEL, "Dlopen client enhance successful.");
+            clientHandler = instance;
+        }
     }
 }
 
@@ -148,6 +169,110 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
     return true;
 }
 
+static bool WriteMessageParcel(MessageParcel& tmpData, MessageParcel& data)
+{
+    size_t bufferLength = tmpData.GetDataSize();
+    if (bufferLength < 0) {
+        SC_LOG_ERROR(LABEL, "TmpData is invalid.");
+        return false;
+    }
+    if (bufferLength == 0) {
+        SC_LOG_INFO(LABEL, "TmpData is empty.");
+        return true;
+    }
+
+    char* buffer = reinterpret_cast<char *>(tmpData.GetData());
+    if (buffer == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get tmpData data failed.");
+        return false;
+    }
+
+    if (!data.WriteInt32(bufferLength)) {
+        SC_LOG_ERROR(LABEL, "Write bufferLength failed.");
+        return false;
+    }
+
+    if (!data.WriteRawData(reinterpret_cast<void *>(buffer), bufferLength)) {
+        SC_LOG_ERROR(LABEL, "Write data failed.");
+        return false;
+    }
+    return true;
+}
+
+static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
+{
+    int32_t size;
+    if (!tmpData.ReadInt32(size)) {
+        SC_LOG_ERROR(LABEL, "Read size failed.");
+        return false;
+    }
+
+    char* ptr = reinterpret_cast<char *>(const_cast<void *>(tmpData.ReadRawData(size)));
+    if (ptr == nullptr) {
+        SC_LOG_ERROR(LABEL, "Read rawData failed.");
+        return false;
+    }
+
+    if (!data.WriteBuffer(reinterpret_cast<void *>(ptr), size)) {
+        SC_LOG_ERROR(LABEL, "Write rawData failed.");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data)
+{
+    if (!isEnhanceClientHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
+    }
+
+    uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
+    if (clientHandler != nullptr) {
+        return clientHandler->EnhanceSerializeSessionInfo(enhanceCallerAddr, tmpData, data);
+    }
+
+    return WriteMessageParcel(tmpData, data);
+}
+
+bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData)
+{
+    if (!isEnhanceClientHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
+    }
+
+    uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
+    if (clientHandler != nullptr) {
+        return clientHandler->EnhanceDeserializeSessionInfo(enhanceCallerAddr, oldData, newData);
+    }
+
+    return ReadMessageParcel(oldData, newData);
+}
+
+bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply)
+{
+    if (!isEnhanceSrvHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
+    }
+    if (srvHandler != nullptr) {
+        return srvHandler->SerializeSessionInfoEnhance(tmpReply, reply);
+    }
+
+    return WriteMessageParcel(tmpReply, reply);
+}
+
+bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
+    MessageParcel& reply)
+{
+    if (!isEnhanceSrvHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
+    }
+    if (srvHandler != nullptr) {
+        return srvHandler->DeserializeSessionInfoEnhance(oldData, newData, reply);
+    }
+
+    return ReadMessageParcel(oldData, newData);
+}
+
 void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
 {
     if (!isEnhanceClientHandlerInit) {
@@ -204,7 +329,7 @@ void SecCompEnhanceAdapter::StartEnhanceService()
     }
 }
 
-void SecCompEnhanceAdapter::ExistEnhanceService()
+void SecCompEnhanceAdapter::ExitEnhanceService()
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
@@ -224,14 +349,14 @@ void SecCompEnhanceAdapter::NotifyProcessDied(int32_t pid)
     }
 }
 
-int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhnace(int32_t pid,
+int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhance(int32_t pid,
     std::shared_ptr<SecCompBase>& compInfo, const nlohmann::json& jsonComponent)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->CheckComponentInfoEnhnace(pid, compInfo, jsonComponent);
+        return srvHandler->CheckComponentInfoEnhance(pid, compInfo, jsonComponent);
     }
     return SC_OK;
 }

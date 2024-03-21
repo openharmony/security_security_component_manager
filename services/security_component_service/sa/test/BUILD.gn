@@ -127,6 +127,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/sec_comp_enhance_adapter.cpp",
     "unittest/src/first_use_dialog_test.cpp",
     "unittest/src/sec_comp_service_mock_test.cpp",
+    "unittest/src/sec_comp_stub_mock_test.cpp",
     "unittest/src/service_test_common.cpp",
   ]
 
