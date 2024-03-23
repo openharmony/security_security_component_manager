@@ -36,6 +36,7 @@ public:
     int32_t PreRegisterSecCompProcess() override;
 
 private:
+    int32_t SendReportClickEventRequest(MessageParcel& data);
     static inline BrokerDelegator<SecCompProxy> delegator_;
 };
 }  // namespace SecurityComponent

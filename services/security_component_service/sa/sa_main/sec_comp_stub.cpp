@@ -17,6 +17,7 @@
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "sec_comp_click_event_parcel.h"
+#include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
 
@@ -35,7 +36,7 @@ int32_t SecCompStub::OnRemoteRequest(
     std::u16string descripter = SecCompStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        SC_LOG_ERROR(LABEL, "Deal remote request fail, descriptor is not matched");
+        SC_LOG_ERROR(LABEL, "Deal remote request failed, descriptor is not matched");
         return SC_SERVICE_ERROR_IPC_REQUEST_FAIL;
     }
 
@@ -51,9 +52,14 @@ int32_t SecCompStub::OnRemoteRequest(
 
 int32_t SecCompStub::RegisterSecurityComponentInner(MessageParcel& data, MessageParcel& reply)
 {
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Register deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     uint32_t type;
-    if (!data.ReadUint32(type)) {
-        SC_LOG_ERROR(LABEL, "Register read component type fail");
+    if (!newData.ReadUint32(type)) {
+        SC_LOG_ERROR(LABEL, "Register read component type failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -63,20 +69,26 @@ int32_t SecCompStub::RegisterSecurityComponentInner(MessageParcel& data, Message
     }
 
     std::string componentInfo;
-    if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Register read component info fail");
+    if (!newData.ReadString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Register read component info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     int32_t scId = INVALID_SC_ID;
     int32_t res = this->RegisterSecurityComponent(static_cast<SecCompType>(type), componentInfo, scId);
-    if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Register security component result fail");
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Register security component result failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!reply.WriteInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Register security component result fail");
+    if (!tmpReply.WriteInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Register security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Register serialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -85,9 +97,14 @@ int32_t SecCompStub::RegisterSecurityComponentInner(MessageParcel& data, Message
 
 int32_t SecCompStub::UpdateSecurityComponentInner(MessageParcel& data, MessageParcel& reply)
 {
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Update deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     int32_t scId;
-    if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Update read component id fail");
+    if (!newData.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Update read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -97,14 +114,20 @@ int32_t SecCompStub::UpdateSecurityComponentInner(MessageParcel& data, MessagePa
     }
 
     std::string componentInfo;
-    if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Update read component info fail");
+    if (!newData.ReadString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Update read component info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     int32_t res = this->UpdateSecurityComponent(scId, componentInfo);
-    if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Update security component result fail");
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Update security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Update serialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -113,9 +136,14 @@ int32_t SecCompStub::UpdateSecurityComponentInner(MessageParcel& data, MessagePa
 
 int32_t SecCompStub::UnregisterSecurityComponentInner(MessageParcel& data, MessageParcel& reply)
 {
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Unreigster deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     int32_t scId;
-    if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Unreigster read component id fail");
+    if (!newData.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Unreigster read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -125,18 +153,36 @@ int32_t SecCompStub::UnregisterSecurityComponentInner(MessageParcel& data, Messa
     }
 
     int32_t res = this->UnregisterSecurityComponent(scId);
-    if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Unregister security component result fail");
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Unregister security component result failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Unreigster serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     return SC_OK;
 }
 
 int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data, MessageParcel& reply)
 {
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        SC_LOG_ERROR(LABEL, "callerToken is nullptr");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+ 
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Report deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     int32_t scId;
-    if (!data.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Report read component id fail");
+    if (!newData.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Report read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -146,27 +192,29 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
     }
 
     std::string componentInfo;
-    if (!data.ReadString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Report read component info fail");
+    if (!newData.ReadString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Report read component info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    sptr<SecCompClickEventParcel> clickInfoParcel = data.ReadParcelable<SecCompClickEventParcel>();
+    sptr<SecCompClickEventParcel> clickInfoParcel = newData.ReadParcelable<SecCompClickEventParcel>();
     if (clickInfoParcel == nullptr) {
-        SC_LOG_ERROR(LABEL, "Report read clickInfo info fail");
+        SC_LOG_ERROR(LABEL, "Report read clickInfo info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
-    if (callerToken == nullptr) {
-        SC_LOG_ERROR(LABEL, "callerToken is nullptr");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
     int32_t res =
         this->ReportSecurityComponentClickEvent(scId, componentInfo, clickInfoParcel->clickInfoParams_, callerToken);
-    if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Report security component result fail");
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Report security component result failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Report serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     return SC_OK;
 }
 
@@ -176,9 +224,14 @@ int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParce
         SC_LOG_ERROR(LABEL, "Not medialibrary called");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Verify deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     uint32_t tokenId;
-    if (!data.ReadUint32(tokenId)) {
-        SC_LOG_ERROR(LABEL, "Verify read component id fail");
+    if (!newData.ReadUint32(tokenId)) {
+        SC_LOG_ERROR(LABEL, "Verify read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -188,30 +241,61 @@ int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParce
     }
 
     bool res = this->VerifySavePermission(tokenId);
-    if (!reply.WriteBool(res)) {
-        SC_LOG_ERROR(LABEL, "Verify temp save permission result fail");
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteBool(res)) {
+        SC_LOG_ERROR(LABEL, "Verify temp save permission result failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Verify serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     return SC_OK;
 }
 
 int32_t SecCompStub::GetEnhanceRemoteObjectInner(MessageParcel& data, MessageParcel& reply)
 {
-    auto res = this->GetEnhanceRemoteObject();
-    if (!reply.WriteRemoteObject(res)) {
-        SC_LOG_ERROR(LABEL, "Security component enhance remote object fail");
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "Get remote obj deserialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+    auto res = this->GetEnhanceRemoteObject();
+    MessageParcel tmpReply;
+    if (!reply.WriteRemoteObject(res)) {
+        SC_LOG_ERROR(LABEL, "Security component enhance remote object failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Get remote obj serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     return SC_OK;
 }
 
 int32_t SecCompStub::PreRegisterSecCompProcessInner(MessageParcel& data, MessageParcel& reply)
 {
-    int32_t res = this->PreRegisterSecCompProcess();
-    if (!reply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "preRegister write result fail");
+    MessageParcel newData;
+    if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
+        SC_LOG_ERROR(LABEL, "preRegister deserialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+    int32_t res = this->PreRegisterSecCompProcess();
+    MessageParcel tmpReply;
+    if (!tmpReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "preRegister write result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpReply, reply)) {
+        SC_LOG_ERROR(LABEL, "preRegister serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     return SC_OK;
 }
 

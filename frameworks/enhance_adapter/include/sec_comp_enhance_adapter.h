@@ -54,7 +54,7 @@ public:
     virtual int32_t CheckExtraInfo(const SecCompClickEvent& clickInfo) = 0;
 
     // send component info to enhance service for checking its validity
-    virtual int32_t CheckComponentInfoEnhnace(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
+    virtual int32_t CheckComponentInfoEnhance(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
         const nlohmann::json& jsonComponent) = 0;
 
     // get RemoteObject of enhance service to connect it
@@ -71,6 +71,10 @@ public:
 
     // notify process registered
     virtual void AddSecurityComponentProcess(int32_t pid) = 0;
+
+    virtual bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply) = 0;
+    virtual bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
+        MessageParcel& reply) = 0;
 };
 
 // for client
@@ -79,6 +83,11 @@ public:
     // preprocess component info which is send to security component service, e.g. RegisterSecurityComponent
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, std::string& componentInfo) = 0;
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, int32_t scId, std::string& componentInfo) = 0;
+
+    virtual bool EnhanceSerializeSessionInfo(const uintptr_t caller,
+        MessageParcel& tmpData, MessageParcel& data) = 0;
+    virtual bool EnhanceDeserializeSessionInfo(const uintptr_t caller, MessageParcel& oldData,
+        MessageParcel& newData) = 0;
 
     // regiter scid to enhance client
     virtual void RegisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
@@ -96,20 +105,25 @@ public:
     static int32_t CheckExtraInfo(const SecCompClickEvent& clickInfo);
     static int32_t EnableInputEnhance();
     static int32_t DisableInputEnhance();
-    static int32_t CheckComponentInfoEnhnace(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
+    static int32_t CheckComponentInfoEnhance(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
         const nlohmann::json& jsonComponent);
     static sptr<IRemoteObject> GetEnhanceRemoteObject();
     static void StartEnhanceService();
-    static void ExistEnhanceService();
+    static void ExitEnhanceService();
     static void NotifyProcessDied(int32_t pid);
 
     static bool EnhanceDataPreprocess(std::string& componentInfo);
     static bool EnhanceDataPreprocess(int32_t scId, std::string& componentInfo);
+    static bool EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data);
+    static bool EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData);
     static void RegisterScIdEnhance(int32_t scId);
     static void UnregisterScIdEnhance(int32_t scId);
 
     static void AddSecurityComponentProcess(int32_t pid);
 
+    static bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply);
+    static bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
+        MessageParcel& reply);
     static __attribute__((visibility("default"))) SecCompInputEnhanceInterface* inputHandler;
     static bool isEnhanceInputHandlerInit;
 

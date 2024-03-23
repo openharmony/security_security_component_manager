@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sec_comp_stub_test.h"
+#include "sec_comp_stub_mock_test.h"
 
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
@@ -26,16 +26,16 @@ using namespace OHOS::Security::SecurityComponent;
 
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
-    LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompStubTest"};
+    LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompStubMockTest"};
 }
 
-void SecCompStubTest::SetUpTestCase()
+void SecCompStubMockTest::SetUpTestCase()
 {}
 
-void SecCompStubTest::TearDownTestCase()
+void SecCompStubMockTest::TearDownTestCase()
 {}
 
-void SecCompStubTest::SetUp()
+void SecCompStubMockTest::SetUp()
 {
     SC_LOG_INFO(LABEL, "setup");
     if (stub_ != nullptr) {
@@ -46,18 +46,18 @@ void SecCompStubTest::SetUp()
     ASSERT_NE(nullptr, stub_);
 }
 
-void SecCompStubTest::TearDown()
+void SecCompStubMockTest::TearDown()
 {
     stub_ = nullptr;
 }
 
 /**
- * @tc.name: OnRemoteRequest001
+ * @tc.name: OnRemoteRequestMock001
  * @tc.desc: Test on remote request
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, OnRemoteRequestMock001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -74,53 +74,124 @@ HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterSecurityComponentInner001
+ * @tc.name: RegisterSecurityComponentInnerMock001
  * @tc.desc: Test register security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, RegisterSecurityComponentInnerMock001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
 
     ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->RegisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteUint32(UNKNOWN_SC_TYPE);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->RegisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteUint32(MAX_SC_TYPE);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->RegisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteUint32(LOCATION_COMPONENT);
+    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->RegisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteUint32(LOCATION_COMPONENT);
+    data.WriteString("");
+    ASSERT_EQ(SC_OK, stub_->RegisterSecurityComponentInner(data, reply));
 }
 
 /**
- * @tc.name: UpdateSecurityComponentInner001
+ * @tc.name: UpdateSecurityComponentInnerMock001
  * @tc.desc: Test update security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, UpdateSecurityComponentInnerMock001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
 
     ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UpdateSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteInt32(-1);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->UpdateSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteInt32(1);
+    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UpdateSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteInt32(1);
+    data.WriteString("");
+    ASSERT_EQ(SC_OK, stub_->UpdateSecurityComponentInner(data, reply));
 }
 
 /**
- * @tc.name: UnregisterSecurityComponentInner001
+ * @tc.name: UnregisterSecurityComponentInnerMock001
  * @tc.desc: Test unregister security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, UnregisterSecurityComponentInnerMock001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
     ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UnregisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteInt32(-1);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->UnregisterSecurityComponentInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+
+    data.WriteInt32(1);
+    ASSERT_EQ(SC_OK, stub_->UnregisterSecurityComponentInner(data, reply));
 }
 
 /**
- * @tc.name: Marshalling001
+ * @tc.name: VerifySavePermissionInnerMock001
+ * @tc.desc: Test VerifySavePermissionInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompStubMockTest, VerifySavePermissionInnerMock001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    setuid(0);
+    ASSERT_TRUE(stub_->IsMediaLibraryCalling());
+    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->VerifySavePermissionInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+    data.WriteInt32(0);
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->VerifySavePermissionInner(data, reply));
+    data.FlushBuffer();
+    reply.FlushBuffer();
+    data.WriteInt32(1);
+    ASSERT_EQ(SC_OK, stub_->VerifySavePermissionInner(data, reply));
+    ASSERT_NE(SC_OK, stub_->GetEnhanceRemoteObjectInner(data, reply));
+}
+
+/**
+ * @tc.name: MarshallingMock001
  * @tc.desc: Test SecCompClickEventParcel::Marshalling
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, MarshallingMock001, TestSize.Level1)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
     Parcel out;
@@ -141,12 +212,12 @@ HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
 }
 
 /**
- * @tc.name: Unmarshalling001
+ * @tc.name: UnmarshallingMock001
  * @tc.desc: Test SecCompClickEventParcel::Unmarshalling
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
-HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, UnmarshallingMock001, TestSize.Level1)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
     Parcel in;

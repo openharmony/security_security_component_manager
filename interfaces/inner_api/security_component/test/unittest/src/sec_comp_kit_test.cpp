@@ -189,9 +189,9 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
 
     int32_t scId;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_EQ(SC_ENHANCE_ERROR_CALLBACK_NOT_EXIST,
+    ASSERT_EQ(SC_ENHANCE_ERROR_VALUE_INVALID,
         SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
-    ASSERT_EQ(-1, scId);
+    ASSERT_EQ(0, scId);
 #else
     ASSERT_EQ(SC_OK,
         SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));

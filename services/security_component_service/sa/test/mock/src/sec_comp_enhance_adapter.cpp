@@ -68,6 +68,56 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
     return true;
 }
 
+static bool CopyMessageParcel(MessageParcel& oldData, MessageParcel& newData)
+{
+    size_t bufferLength = oldData.GetDataSize();
+    if (bufferLength < 0) {
+        SC_LOG_ERROR(LABEL, "TmpData is invalid.");
+        return false;
+    }
+    if (bufferLength == 0) {
+        SC_LOG_INFO(LABEL, "TmpData is empty.");
+        return true;
+    }
+
+    char* buffer = reinterpret_cast<char *>(oldData.GetData());
+    if (buffer == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get tmpData data failed.");
+        return false;
+    }
+
+    if (!newData.WriteBuffer(reinterpret_cast<void *>(buffer), bufferLength)) {
+        SC_LOG_ERROR(LABEL, "Write rawData failed.");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceSerializeSessionInfo successful.");
+    return CopyMessageParcel(tmpData, data);
+}
+
+bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceDeserializeSessionInfo successful.");
+    return CopyMessageParcel(oldData, newData);
+}
+
+bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply)
+{
+    SC_LOG_DEBUG(LABEL, "SerializeSessionInfoEnhance successful.");
+    return CopyMessageParcel(tmpReply, reply);
+}
+
+bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
+    MessageParcel& reply)
+{
+    SC_LOG_DEBUG(LABEL, "DeserializeSessionInfoEnhance successful.");
+    return CopyMessageParcel(oldData, newData);
+}
+
 void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
 {
     SC_LOG_DEBUG(LABEL, "RegisterScIdEnhance success");
@@ -83,9 +133,9 @@ void SecCompEnhanceAdapter::StartEnhanceService()
     SC_LOG_DEBUG(LABEL, "StartEnhanceService success");
 }
 
-void SecCompEnhanceAdapter::ExistEnhanceService()
+void SecCompEnhanceAdapter::ExitEnhanceService()
 {
-    SC_LOG_DEBUG(LABEL, "ExistEnhanceService success");
+    SC_LOG_DEBUG(LABEL, "ExitEnhanceService success");
 }
 
 void SecCompEnhanceAdapter::NotifyProcessDied(int32_t pid)
@@ -93,10 +143,10 @@ void SecCompEnhanceAdapter::NotifyProcessDied(int32_t pid)
     SC_LOG_DEBUG(LABEL, "NotifyProcessDied success");
 }
 
-int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhnace(int32_t pid,
+int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhance(int32_t pid,
     std::shared_ptr<SecCompBase>& compInfo, const nlohmann::json& jsonComponent)
 {
-    SC_LOG_DEBUG(LABEL, "CheckComponentInfoEnhnace success");
+    SC_LOG_DEBUG(LABEL, "CheckComponentInfoEnhance success");
     return SC_OK;
 }
 
