@@ -39,9 +39,6 @@ ohos_unittest("sec_comp_enhance_sdk_test") {
     "hilog:libhilog",
     "ipc:ipc_single",
   ]
-  if (current_cpu == "arm64") {
-    defines = [ "_ARM64_" ]
-  }
 }
 
 group("unittest") {

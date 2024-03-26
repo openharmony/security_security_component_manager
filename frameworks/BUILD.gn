@@ -101,8 +101,4 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
     "-DHILOG_ENABLE",
     "-fvisibility=hidden",
   ]
-
-  if (current_cpu == "arm64") {
-    defines = [ "_ARM64_" ]
-  }
 }
