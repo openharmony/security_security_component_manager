@@ -34,6 +34,8 @@ static constexpr double ONE_HUNDRED_EIGHTY_ANGLE = 180.0;
 static constexpr double TWO_HUNDREDS_FORTY_ANGLE = 240.0;
 static constexpr double THREE_HUNDREDS_SIXTY_ANGLE = 360.0;
 static constexpr double DEFAULT_R = 100.0;
+static const uint8_t MAX_ALPHA = 0xFF;
+static const double MIN_CONTRACST_ALPHA = 0.5;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompTool"};
 }
@@ -121,6 +123,20 @@ static double HsvDistance(const HsvColor& hsv1, const HsvColor& hsv2)
     return sqrt((dx * dx) + (dy * dy) + (dz * dz));
 }
 
+static bool IsColorAplhaSimilar(const SecCompColor& fgColor, const SecCompColor& bgColor)
+{
+    double fgAlpha = static_cast<double>(fgColor.argb.alpha) / MAX_ALPHA;
+    double bgAlpha = static_cast<double>(bgColor.argb.alpha) / MAX_ALPHA;
+
+    double mixAlpha = fgAlpha + bgAlpha - fgAlpha * bgAlpha;
+    if (GreatNotEqual(bgAlpha / mixAlpha, MIN_CONTRACST_ALPHA)) {
+        SC_LOG_ERROR(LABEL, "FgAlpha=%{public}x BgAlpha=%{public}x is similar, check failed",
+            fgColor.argb.alpha, bgColor.argb.alpha);
+        return true;
+    }
+    return false;
+}
+
 bool IsColorSimilar(const SecCompColor& color1, const SecCompColor& color2)
 {
     HsvColor hsv1 = RgbToHsv(color1.argb.red, color1.argb.green, color1.argb.blue);
@@ -129,7 +145,7 @@ bool IsColorSimilar(const SecCompColor& color1, const SecCompColor& color2)
     double distance = HsvDistance(hsv1, hsv2);
     SC_LOG_DEBUG(LABEL, "Compare color %{public}x %{public}x distance %{public}f",
         color1.value, color2.value, distance);
-    return (distance < MIN_HSV_DISTANCE);
+    return (distance < MIN_HSV_DISTANCE) && IsColorAplhaSimilar(color1, color2);
 }
 
 bool IsColorTransparent(const SecCompColor& color)
