@@ -143,9 +143,18 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp)
         SC_LOG_INFO(LABEL, "both text and icon do not exist.");
         return false;
     }
-    if ((comp->text_ >= 0) && comp->fontSize_ < MIN_FONT_SIZE) {
-        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontSize is too small.");
-        return false;
+    if (comp->text_ >= 0) {
+        DimensionT minFontSize;
+        if (comp->icon_ >= 0) {
+            minFontSize = MIN_FONT_SIZE_WITH_ICON;
+        } else {
+            minFontSize = MIN_FONT_SIZE_WITHOUT_ICON;
+        }
+
+        if (comp->fontSize_ < minFontSize) {
+            SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontSize is too small.");
+            return false;
+        }
     }
     if ((comp->icon_ >= 0) && comp->iconSize_ < MIN_ICON_SIZE) {
         SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconSize is too small.");

@@ -24,7 +24,8 @@ namespace SecurityComponent {
 static constexpr int32_t INVALID_SC_ID = -1;
 using DimensionT = double; // unit is vp
 static constexpr DimensionT DEFAULT_DIMENSION = 0.0;
-static constexpr DimensionT MIN_FONT_SIZE = 12.0;
+static constexpr DimensionT MIN_FONT_SIZE_WITHOUT_ICON = 12.0;
+static constexpr DimensionT MIN_FONT_SIZE_WITH_ICON = 10.0;
 static constexpr DimensionT MIN_ICON_SIZE = 12.0;
 static constexpr DimensionT MIN_PADDING_SIZE = 0.0;
 static constexpr DimensionT MIN_PADDING_WITHOUT_BG = 4.0;
