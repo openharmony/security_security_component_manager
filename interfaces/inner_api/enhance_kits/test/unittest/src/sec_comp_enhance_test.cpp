@@ -27,7 +27,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static bool g_inputEnhanceExist = false;
 static bool g_srvEnhanceExist = false;
 static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 76;
-#ifdef _ARM64_
+#if defined(__LP64__)
 static const std::string LIB_PATH = "/system/lib64/";
 #else
 static const std::string LIB_PATH = "/system/lib/";

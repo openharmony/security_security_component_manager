@@ -30,7 +30,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEnhanceAdapter"};
 
-#ifdef _ARM64_
+#if defined(__LP64__)
 static const std::string LIB_PATH = "/system/lib64/";
 #else
 static const std::string LIB_PATH = "/system/lib/";
