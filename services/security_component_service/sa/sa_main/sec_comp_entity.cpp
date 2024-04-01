@@ -80,12 +80,6 @@ int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
 
 int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
 {
-    if (!WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_,
-        componentInfo_->rect_)) {
-        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: Component may be covered by other window");
-        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
-    }
-
     int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
         res = CheckPointEvent(clickInfo);
