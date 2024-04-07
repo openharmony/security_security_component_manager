@@ -207,7 +207,12 @@ static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
         return false;
     }
 
-    char* ptr = reinterpret_cast<char *>(const_cast<void *>(tmpData.ReadRawData(size)));
+    const void *iter = tmpData.ReadRawData(size);
+    if(iter = nullptr) {
+        SC_LOG_ERROR(LABEL, "Read const void failed.");
+        return false;
+    }
+    char* ptr = reinterpret_cast<char *>(const_cast<void *>(iter));
     if (ptr == nullptr) {
         SC_LOG_ERROR(LABEL, "Read rawData failed.");
         return false;
