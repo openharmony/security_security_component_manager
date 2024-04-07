@@ -208,7 +208,7 @@ static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
     }
 
     const void *iter = tmpData.ReadRawData(size);
-    if (iter = nullptr) {
+    if (iter == nullptr) {
         SC_LOG_ERROR(LABEL, "Read const void failed.");
         return false;
     }
