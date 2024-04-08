@@ -152,3 +152,19 @@ HWTEST_F(SecCompPermManagerTest, RevokeAppPermission001, TestSize.Level1)
     AccessTokenID id = 0;
     ASSERT_EQ(permMgr.RevokeAppPermission(id, "test"), 0);
 }
+
+/**
+ * @tc.name: VerifyPermission001
+ * @tc.desc: Test VerifyPermission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompPermManagerTest, VerifyPermission001, TestSize.Level1)
+{
+    SecCompPermManager permMgr;
+    AccessTokenID id = 1000;
+    ASSERT_FALSE(permMgr.VerifyPermission(id, LOCATION_COMPONENT));
+    ASSERT_FALSE(permMgr.VerifyPermission(id, PASTE_COMPONENT));
+    ASSERT_FALSE(permMgr.VerifyPermission(id, SAVE_COMPONENT));
+    ASSERT_FALSE(permMgr.VerifyPermission(id, static_cast<SecCompType>(-1)));
+}

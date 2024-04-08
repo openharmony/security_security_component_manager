@@ -27,16 +27,11 @@ namespace SecurityComponent {
 class SecCompEntity {
 public:
     SecCompEntity(std::shared_ptr<SecCompBase> component,
-        AccessToken::AccessTokenID token, int32_t scId) : componentInfo_(component),
-        tokenId_(token), scId_(scId) {};
+        AccessToken::AccessTokenID token, int32_t scId, int32_t pid, int32_t uid)
+        : componentInfo_(component), tokenId_(token), scId_(scId), pid_(pid), uid_(uid) {};
     ~SecCompEntity() = default;
     int32_t RevokeTempPermission();
     int32_t GrantTempPermission();
-    int32_t GetScId() const
-    {
-        return scId_;
-    };
-
     SecCompType GetType() const
     {
         if (componentInfo_ == nullptr) {
@@ -50,31 +45,19 @@ public:
         return isGrant_;
     }
 
-    std::shared_ptr<SecCompBase> GetComponentInfo() const
-    {
-        return componentInfo_;
-    };
-
-    void SetComponentInfo(const std::shared_ptr<SecCompBase>& com)
-    {
-        componentInfo_ = com;
-    };
-
-    std::shared_ptr<SecCompBase> GetComponentInfo()
-    {
-        return componentInfo_;
-    };
-
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
     int32_t CheckClickInfo(const SecCompClickEvent& clickInfo) const;
+
+    std::shared_ptr<SecCompBase> componentInfo_;
+    AccessToken::AccessTokenID tokenId_;
+    int32_t scId_;
+    int32_t pid_;
+    int32_t uid_;
 
 private:
     int32_t CheckKeyEvent(const SecCompClickEvent& clickInfo) const;
     int32_t CheckPointEvent(const SecCompClickEvent& clickInfo) const;
-    std::shared_ptr<SecCompBase> componentInfo_;
     bool isGrant_ = false;
-    AccessToken::AccessTokenID tokenId_;
-    int32_t scId_;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

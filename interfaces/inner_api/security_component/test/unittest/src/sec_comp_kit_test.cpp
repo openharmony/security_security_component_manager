@@ -40,7 +40,8 @@ static void TestInCallerNotCheckList()
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr);
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr, std::move(func));
 
     EXPECT_EQ(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -54,7 +55,8 @@ static void TestInCallerCheckList()
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr);
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr, std::move(func));
 
     EXPECT_NE(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_NE(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -123,7 +125,8 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
         .point.touchY = TestCommon::TEST_COORDINATE,
         .point.timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count())
     };
-    EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, jsonStr, touch, nullptr));
+    OnFirstUseDialogCloseFunc func = nullptr;
+    EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, jsonStr, touch, nullptr, std::move(func)));
     EXPECT_NE(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 

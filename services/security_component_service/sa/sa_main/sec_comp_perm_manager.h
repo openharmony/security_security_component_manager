@@ -35,6 +35,7 @@ public:
     int32_t GrantTempSavePermission(AccessToken::AccessTokenID tokenId);
     void RevokeTempSavePermission(AccessToken::AccessTokenID tokenId);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
+    bool VerifyPermission(AccessToken::AccessTokenID tokenId, SecCompType type);
 
     int32_t GrantAppPermission(AccessToken::AccessTokenID tokenId, const std::string& permissionName);
     int32_t RevokeAppPermission(AccessToken::AccessTokenID tokenId, const std::string& permissionName);

@@ -48,7 +48,7 @@ void SecCompEnhanceTest::SetUpTestCase()
     if (access(ENHANCE_SRV_INTERFACE_LIB.c_str(), F_OK) == 0) {
         g_srvEnhanceExist = true;
     }
-    system("kill -9 `pidof security_compon`");
+    system("kill -9 `pidof security_component_service`");
     SC_LOG_INFO(LABEL, "SetUpTestCase.");
 }
 

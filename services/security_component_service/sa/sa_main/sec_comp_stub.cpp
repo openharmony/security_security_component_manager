@@ -174,7 +174,13 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
         SC_LOG_ERROR(LABEL, "callerToken is nullptr");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
- 
+
+    sptr<IRemoteObject> dialogCallback = data.ReadRemoteObject();
+    if (dialogCallback == nullptr) {
+        SC_LOG_ERROR(LABEL, "dialogCallback is nullptr");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
     MessageParcel newData;
     if (!SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(data, newData, reply)) {
         SC_LOG_ERROR(LABEL, "Report deserialize session info failed");
@@ -203,7 +209,9 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
     }
 
     int32_t res =
-        this->ReportSecurityComponentClickEvent(scId, componentInfo, clickInfoParcel->clickInfoParams_, callerToken);
+        this->ReportSecurityComponentClickEvent(scId,
+        componentInfo, clickInfoParcel->clickInfoParams_,
+        callerToken, dialogCallback);
     MessageParcel tmpReply;
     if (!tmpReply.WriteInt32(res)) {
         SC_LOG_ERROR(LABEL, "Report security component result failed");

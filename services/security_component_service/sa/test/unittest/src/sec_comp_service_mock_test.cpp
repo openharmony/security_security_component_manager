@@ -114,7 +114,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
         },
     };
 
-    EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
+    EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
@@ -149,7 +149,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
             std::chrono::high_resolution_clock::now().time_since_epoch().count())
     };
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
+        secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
@@ -190,7 +190,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
         },
     };
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
-        secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr));
+        secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, touch, nullptr, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
@@ -231,7 +231,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
         },
     };
 
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr, nullptr));
 
     // test 10s valid
     ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
@@ -242,11 +242,11 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
     // test 10s multiple clicks
     clickInfo.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr, nullptr));
     sleep(3);
     clickInfo.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, nullptr, nullptr));
     sleep(8);
     ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
     sleep(2);
@@ -290,7 +290,8 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
         },
     };
 
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo1, nullptr));
+    ASSERT_EQ(SC_OK,
+        secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo1, nullptr, nullptr));
 
     // test 10s valid
     ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);

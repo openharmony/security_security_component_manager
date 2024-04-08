@@ -37,6 +37,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompRegisterCallbackTest"};
 static AccessTokenID g_selfTokenId = 0;
 static int32_t g_selfUid = 0;
+static uint32_t g_token_sum = 0;
 
 class MockUiSecCompProbe : public ISecCompProbe {
 public:
@@ -60,10 +61,11 @@ static __attribute__((noinline)) int32_t RegisterSecurityComponent(
 
 static __attribute__((noinline)) int32_t ReportSecurityComponentClickEvent(
     int32_t scId, std::string& componentInfo,
-    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
+    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc dialogCall)
 {
     SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEvent enter");
-    return SecCompKit::ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken);
+    return SecCompKit::ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken,
+        std::move(dialogCall));
 }
 
 static __attribute__((noinline)) int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo)
@@ -96,6 +98,7 @@ public:
 
 void SecCompRegisterCallbackTest::SetUpTestCase()
 {
+    system("kill -9 `pidof security_component_service`");
     InitUiRegister();
     SC_LOG_INFO(LABEL, "SecCompRegisterCallbackTest.");
 }
@@ -215,8 +218,9 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -249,8 +253,9 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
-    EXPECT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    EXPECT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -300,8 +305,9 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     ASSERT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     uint32_t selfTokenId = GetSelfTokenID();
     ASSERT_TRUE(SecCompKit::VerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
@@ -321,7 +327,8 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     TestCommon::BuildSaveComponentInfo(jsonRes);
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
-    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
+    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
+    g_token_sum ++;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
@@ -339,8 +346,9 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -348,7 +356,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
 
 /**
  * @tc.name: ReportSecurityComponentClickEvent003
- * @tc.desc: Test report security component data is empty
+ * @tc.desc: Test report security component enhance data is empty
  * @tc.type: FUNC
  * @tc.require: AR000HO9J7
  */
@@ -358,7 +366,8 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     TestCommon::BuildSaveComponentInfo(jsonRes);
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
-    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
+    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
+    g_token_sum ++;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
 
@@ -372,13 +381,47 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_NE(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
 #else
-    ASSERT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    ASSERT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
 #endif
+    EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEvent004
+ * @tc.desc: Test report security component dialog callback is nullptr
+ * @tc.type: FUNC
+ * @tc.require: AR000HO9J7
+ */
+HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent004, TestSize.Level1)
+{
+    nlohmann::json jsonRes;
+    TestCommon::BuildSaveComponentInfo(jsonRes);
+    std::string saveInfo = jsonRes.dump();
+    int32_t scId;
+    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
+    g_token_sum ++;
+
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+
+    struct SecCompClickEvent clickInfo = {
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = TestCommon::TEST_COORDINATE,
+        .point.touchY = TestCommon::TEST_COORDINATE,
+        .point.timestamp = static_cast<uint64_t>(
+            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
+    };
+    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
+    ASSERT_NE(callback, nullptr);
+    auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = nullptr;
+    ASSERT_EQ(SC_ENHANCE_ERROR_VALUE_INVALID,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -413,8 +456,9 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
-    EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
-        ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo, token));
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    EXPECT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
+        ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -432,7 +476,8 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
     TestCommon::BuildSaveComponentInfo(jsonRes);
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
-    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
+    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
+    g_token_sum ++;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
@@ -448,8 +493,9 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
-    ASSERT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    ASSERT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     setuid(100);
     ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
     // mediaLibraryTokenId_ != 0
@@ -487,8 +533,9 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     ASSERT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     ASSERT_FALSE(SecCompKit::VerifySavePermission(0));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
@@ -522,8 +569,9 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     EXPECT_EQ(SC_OK,
-        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -559,7 +607,8 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level
     std::string saveInfo = jsonRes.dump();
     int32_t scId;
 
-    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID));
+    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
+    g_token_sum ++;
     ASSERT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
     ASSERT_NE(-1, scId);
     setuid(100);
