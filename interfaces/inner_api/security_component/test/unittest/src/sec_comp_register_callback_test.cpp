@@ -303,7 +303,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     ASSERT_EQ(SC_OK,
         ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
     uint32_t selfTokenId = GetSelfTokenID();
-    ASSERT_FALSE(SecCompKit::VerifySavePermission(selfTokenId));
+    ASSERT_TRUE(SecCompKit::VerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -372,8 +372,13 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
+#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
+    ASSERT_NE(SC_OK,
+        ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+#else
     ASSERT_EQ(SC_OK,
         ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token));
+#endif
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -408,7 +413,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
-    EXPECT_EQ(SC_OK,
+    EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
         ReportSecurityComponentClickEvent(scId, locationInfo, clickInfo, token));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
