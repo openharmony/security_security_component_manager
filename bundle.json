@@ -1,5 +1,5 @@
 {
-  "name": "@openharmony/security_component_manager",
+  "name": "@ohos/security_component_manager",
   "description": "security_component_manager",
   "version": "4.0.0",
   "license": "Apache License 2.0",
