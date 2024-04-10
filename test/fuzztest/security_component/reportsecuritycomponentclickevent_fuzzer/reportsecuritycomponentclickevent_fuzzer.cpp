@@ -39,7 +39,8 @@ static void ReportSecurityComponentClickEventFuzzTest(const uint8_t *data, size_
     clickInfo.point.timestamp = timesStamp;
     clickInfo.extraInfo.data = data1;
     clickInfo.extraInfo.dataSize = size;
-    SecCompKit::ReportSecurityComponentClickEvent(size, componentInfo, clickInfo);
+    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
+    SecCompKit::ReportSecurityComponentClickEvent(size, componentInfo, clickInfo, nullptr, std::move(func));
 }
 } // namespace OHOS
 

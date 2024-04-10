@@ -52,6 +52,7 @@ ohos_source_set("security_component_framework_src_set") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "json:nlohmann_json_static",
   ]
 

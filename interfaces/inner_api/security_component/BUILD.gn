@@ -44,6 +44,8 @@ ohos_shared_library("libsecurity_component_sdk") {
     "src/sec_comp_caller_authorization.cpp",
     "src/sec_comp_client.cpp",
     "src/sec_comp_death_recipient.cpp",
+    "src/sec_comp_dialog_callback.cpp",
+    "src/sec_comp_dialog_callback_stub.cpp",
     "src/sec_comp_kit.cpp",
     "src/sec_comp_load_callback.cpp",
     "src/sec_comp_proxy.cpp",

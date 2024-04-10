@@ -50,10 +50,12 @@ ohos_source_set("security_component_service_src_set") {
   ]
 
   sources = [
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
     "sa_main/app_mgr_death_recipient.cpp",
     "sa_main/app_state_observer.cpp",
     "sa_main/delay_exit_task.cpp",
     "sa_main/first_use_dialog.cpp",
+    "sa_main/sec_comp_dialog_callback_proxy.cpp",
     "sa_main/sec_comp_entity.cpp",
     "sa_main/sec_comp_info_helper.cpp",
     "sa_main/sec_comp_malicious_apps.cpp",

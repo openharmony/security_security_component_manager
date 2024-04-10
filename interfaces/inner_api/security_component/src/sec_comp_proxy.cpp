@@ -68,7 +68,7 @@ int32_t SecCompProxy::RegisterSecurityComponent(SecCompType type,
     int32_t requestResult = remote->SendRequest(
         static_cast<uint32_t>(SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT),
         data, reply, option);
-        
+
     if (!SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(reply, newReply)) {
         SC_LOG_ERROR(LABEL, "Register deserialize session info failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
@@ -226,7 +226,8 @@ int32_t SecCompProxy::SendReportClickEventRequest(MessageParcel& data)
 }
 
 int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
+    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
 {
     MessageParcel tmpData;
     MessageParcel data;
@@ -257,6 +258,11 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
     }
 
     if ((callerToken != nullptr) && !data.WriteRemoteObject(callerToken)) {
+        SC_LOG_ERROR(LABEL, "Report write caller token failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if ((dialogCallback != nullptr) && !data.WriteRemoteObject(dialogCallback)) {
         SC_LOG_ERROR(LABEL, "Report write caller token failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
@@ -353,11 +359,11 @@ sptr<IRemoteObject> SecCompProxy::GetEnhanceRemoteObject()
     } else {
         SC_LOG_ERROR(LABEL, "Get enhance request failed, result: %{public}d.", requestResult);
     }
-     
+
     if (!SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(reply, newReply)) {
         SC_LOG_ERROR(LABEL, "Get enhance deserialize session info failed.");
     }
-    
+
     return callback;
 }
 
@@ -391,7 +397,7 @@ int32_t SecCompProxy::PreRegisterSecCompProcess()
         SC_LOG_ERROR(LABEL, "PreRegister deserialize session info failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    
+
     if (requestResult != SC_OK) {
         SC_LOG_ERROR(LABEL, "PreRegister request failed, result: %{public}d.", requestResult);
         return requestResult;

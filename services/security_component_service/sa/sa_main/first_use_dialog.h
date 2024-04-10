@@ -22,6 +22,8 @@
 #include "access_token.h"
 #include "iremote_object.h"
 #include "nlohmann/json.hpp"
+#include "sec_comp_dialog_callback_stub.h"
+#include "sec_comp_entity.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_event_handler.h"
@@ -29,14 +31,38 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
+class SecCompDialogSrvCallback : public SecCompDialogCallbackStub {
+public:
+    explicit SecCompDialogSrvCallback(int32_t scId, sptr<IRemoteObject> dialogCallback)
+    {
+        scId_ = scId;
+        dialogCallback_ = dialogCallback;
+    };
+
+    ~SecCompDialogSrvCallback() override
+    {
+        dialogCallback_ = nullptr;
+    };
+
+    void OnDialogClosed(int32_t result) override;
+private:
+    int32_t scId_;
+    sptr<IRemoteObject> dialogCallback_;
+};
+
 class FirstUseDialog final {
 public:
-    FirstUseDialog() = default;
+    static FirstUseDialog& GetInstance();
+
     ~FirstUseDialog() = default;
-    bool NotifyFirstUseDialog(AccessToken::AccessTokenID tokenId, SecCompType type, sptr<IRemoteObject> callerToken);
+    int32_t NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
     void Init(std::shared_ptr<SecEventHandler> secHandler);
+    int32_t GrantDialogWaitEntity(int32_t scId);
+    void RemoveDialogWaitEntitys(int32_t pid);
 
 private:
+    FirstUseDialog() {};
     bool IsCfgDirExist(void);
     bool IsCfgFileExist(void);
     bool IsCfgFileValid(void);
@@ -47,11 +73,13 @@ private:
     void ParseRecords(nlohmann::json& jsonRes);
     void LoadFirstUseRecord(void);
     void SaveFirstUseRecord(void);
-    void StartDialogAbility(SecCompType type, sptr<IRemoteObject> callerToken);
+    void StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
     void SendSaveEventHandler(void);
 
     std::mutex useMapMutex_;
     std::unordered_map<AccessToken::AccessTokenID, uint64_t> firstUseMap_;
+    std::unordered_map<int32_t, std::shared_ptr<SecCompEntity>> dialogWaitMap_;
     std::shared_ptr<SecEventHandler> secHandler_;
 };
 }  // namespace SecurityComponentEnhance

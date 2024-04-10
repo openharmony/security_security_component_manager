@@ -17,6 +17,7 @@
 #define SECURITY_COMPONENT_INFO_H
 
 #include <cstdint>
+#include <functional>
 
 namespace OHOS {
 namespace Security {
@@ -33,6 +34,7 @@ static constexpr uint32_t MAX_EXTRA_SIZE = 0x1000;
 
 static constexpr int32_t KEY_SPACE = 2050;
 static constexpr int32_t KEY_ENTER = 2054;
+using OnFirstUseDialogCloseFunc = std::function<void(int32_t)>;
 
 struct PaddingSize {
     DimensionT top = DEFAULT_DIMENSION;

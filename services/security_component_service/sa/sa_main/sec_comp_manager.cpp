@@ -32,6 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURIT
 static constexpr int32_t SC_ID_START = 1000;
 static constexpr int32_t MAX_INT_NUM = 0x7fffffff;
 static constexpr int32_t MAX_SINGLE_PROC_COMP_SIZE = 500;
+static constexpr unsigned long REPORT_REMOTE_OBJECT_SIZE = 2UL;
 }
 
 SecCompManager::SecCompManager()
@@ -57,7 +58,7 @@ int32_t SecCompManager::CreateScId()
 }
 
 int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
-    AccessToken::AccessTokenID tokenId, const SecCompEntity& newEntity)
+    AccessToken::AccessTokenID tokenId, std::shared_ptr<SecCompEntity> newEntity)
 {
     OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     if (isSaExit_) {
@@ -96,9 +97,14 @@ int32_t SecCompManager::DeleteSecurityComponentFromList(int32_t pid, int32_t scI
         SC_LOG_ERROR(LABEL, "Can not find registered process");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
-    std::vector<SecCompEntity>& list = iter->second.compList;
+    auto& list = iter->second.compList;
     for (auto it = list.begin(); it != list.end(); ++it) {
-        if (it->GetScId() == scId) {
+        std::shared_ptr<SecCompEntity> sc = *it;
+        if (sc == nullptr) {
+            SC_LOG_ERROR(LABEL, "Secomp entity is nullptr");
+            continue;
+        }
+        if (sc->scId_ == scId) {
             list.erase(it);
             if (!IsForegroundCompExist()) {
                 SecCompEnhanceAdapter::DisableInputEnhance();
@@ -140,16 +146,21 @@ static std::string TransformCallBackResult(enum SCErrCode error)
     return errMsg;
 }
 
-SecCompEntity* SecCompManager::GetSecurityComponentFromList(int32_t pid, int32_t scId)
+std::shared_ptr<SecCompEntity> SecCompManager::GetSecurityComponentFromList(int32_t pid, int32_t scId)
 {
     auto iter = componentMap_.find(pid);
     if (iter == componentMap_.end()) {
         return nullptr;
     }
-    std::vector<SecCompEntity>& list = iter->second.compList;
+    auto& list = iter->second.compList;
     for (auto it = list.begin(); it != list.end(); ++it) {
-        if (it->GetScId() == scId) {
-            return std::addressof(*it);
+        std::shared_ptr<SecCompEntity> sc = *it;
+        if (sc == nullptr) {
+            SC_LOG_ERROR(LABEL, "Secomp entity is nullptr");
+            continue;
+        }
+        if (sc->scId_ == scId) {
+            return *it;
         }
     }
     return nullptr;
@@ -193,6 +204,8 @@ void SecCompManager::NotifyProcessBackground(int32_t pid)
         return;
     }
 
+    FirstUseDialog::GetInstance().RemoveDialogWaitEntitys(pid);
+
     SecCompPermManager::GetInstance().RevokeAppPermisionsDelayed(iter->second.tokenId);
     iter->second.isForeground = false;
     if (!IsForegroundCompExist()) {
@@ -212,6 +225,9 @@ void SecCompManager::NotifyProcessDied(int32_t pid)
     if (iter == componentMap_.end()) {
         return;
     }
+
+    FirstUseDialog::GetInstance().RemoveDialogWaitEntitys(pid);
+
     SC_LOG_INFO(LABEL, "App pid %{public}d died", pid);
     iter->second.compList.clear();
     SecCompPermManager::GetInstance().RevokeAppPermissions(iter->second.tokenId);
@@ -347,7 +363,8 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     }
 
     int32_t registerId = CreateScId();
-    SecCompEntity entity(component, caller.tokenId, registerId);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(component, caller.tokenId, registerId, caller.pid, caller.uid);
     int32_t ret = AddSecurityComponentToList(caller.pid, caller.tokenId, entity);
     if (ret == SC_OK) {
         scId = registerId;
@@ -368,7 +385,7 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
     }
 
     OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
-    SecCompEntity* sc = GetSecurityComponentFromList(caller.pid, scId);
+    std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, scId);
     if (sc == nullptr) {
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
@@ -393,7 +410,7 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
         return enhanceRes;
     }
 
-    sc->SetComponentInfo(reportComponentInfo);
+    sc->componentInfo_ = reportComponentInfo;
     return SC_OK;
 }
 
@@ -407,7 +424,7 @@ int32_t SecCompManager::UnregisterSecurityComponent(int32_t scId, const SecCompC
     return DeleteSecurityComponentFromList(caller.pid, scId);
 }
 
-int32_t SecCompManager::CheckClickSecurityComponentInfo(SecCompEntity* sc, int32_t scId,
+int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompEntity> sc, int32_t scId,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller)
 {
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, Check security component", caller.pid);
@@ -438,21 +455,27 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(SecCompEntity* sc, int32
         return enhanceRes;
     }
 
-    sc->SetComponentInfo(reportComponentInfo);
+    sc->componentInfo_ = reportComponentInfo;
     return SC_OK;
 }
 
 int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller,
-    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
+    const SecCompClickEvent& clickInfo, const std::vector<sptr<IRemoteObject>>& remote)
 {
+    if (remote.size() < REPORT_REMOTE_OBJECT_SIZE) {
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    auto callerToken = remote[0];
+    auto dialogCallback = remote[1];
+
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
         return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
     }
 
     OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
-    SecCompEntity* sc = GetSecurityComponentFromList(caller.pid, scId);
+    std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, scId);
     if (sc == nullptr) {
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
@@ -474,6 +497,13 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
 
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
+
+    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, callerToken, dialogCallback) ==
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
+        SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
+        return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
+    }
+
     res = sc->GrantTempPermission();
     if (res != SC_OK) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_FAILED",
@@ -484,7 +514,6 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", sc->GetType());
-    firstUseDialog_.NotifyFirstUseDialog(caller.tokenId, sc->GetType(), callerToken);
     return res;
 }
 
@@ -492,12 +521,23 @@ void SecCompManager::DumpSecComp(std::string& dumpStr)
 {
     OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     for (auto iter = componentMap_.begin(); iter != componentMap_.end(); ++iter) {
-        dumpStr.append("pid:" + std::to_string(iter->first) + "\n");
-        for (auto compIter = iter->second.compList.begin(); compIter != iter->second.compList.end(); compIter ++) {
+        AccessToken::AccessTokenID tokenId = iter->second.tokenId;
+        bool locationPerm = SecCompPermManager::GetInstance().VerifyPermission(tokenId, LOCATION_COMPONENT);
+        bool pastePerm = SecCompPermManager::GetInstance().VerifyPermission(tokenId, PASTE_COMPONENT);
+        bool savePerm = SecCompPermManager::GetInstance().VerifyPermission(tokenId, SAVE_COMPONENT);
+        dumpStr.append("pid:" + std::to_string(iter->first) + ", tokenId:" + std::to_string(pastePerm) +
+            ", locationPerm:" + std::to_string(locationPerm) + ", pastePerm:" + std::to_string(pastePerm) +
+            ", savePerm:" + std::to_string(savePerm) + " \n");
+        for (auto compIter = iter->second.compList.begin(); compIter != iter->second.compList.end(); ++compIter) {
             nlohmann::json json;
-            compIter->GetComponentInfo()->ToJson(json);
-            dumpStr.append("    scId:" + std::to_string(compIter->GetScId()) +
-                ", isGrant:" + std::to_string(compIter->IsGrant()) + ", " + json.dump() + "\n");
+            std::shared_ptr<SecCompEntity> sc = *compIter;
+            if (sc == nullptr || sc->componentInfo_ == nullptr) {
+                continue;
+            }
+
+            sc->componentInfo_->ToJson(json);
+            dumpStr.append("    scId:" + std::to_string(sc->scId_) +
+                ", isGrant:" + std::to_string(sc->IsGrant()) + ", " + json.dump() + "\n");
         }
     }
 }
@@ -515,7 +555,7 @@ bool SecCompManager::Initialize()
 
     secHandler_ = std::make_shared<SecEventHandler>(secRunner_);
     DelayExitTask::GetInstance().Init(secHandler_);
-    firstUseDialog_.Init(secHandler_);
+    FirstUseDialog::GetInstance().Init(secHandler_);
     SecCompEnhanceAdapter::EnableInputEnhance();
 
     return SecCompPermManager::GetInstance().InitEventHandler(secHandler_);

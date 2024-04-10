@@ -228,7 +228,7 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
     const std::shared_ptr<SecCompBase>& componentInfo)
 {
     if ((tokenId <= 0) || (componentInfo == nullptr)) {
-        SC_LOG_ERROR(LABEL, "revoke component is null");
+        SC_LOG_ERROR(LABEL, "Grant component is null");
         return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
     }
 

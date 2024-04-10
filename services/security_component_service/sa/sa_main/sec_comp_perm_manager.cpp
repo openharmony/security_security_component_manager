@@ -129,6 +129,29 @@ bool SecCompPermManager::VerifySavePermission(AccessToken::AccessTokenID tokenId
     return true;
 }
 
+bool SecCompPermManager::VerifyPermission(AccessToken::AccessTokenID tokenId, SecCompType type)
+{
+    int32_t res;
+    switch (type) {
+        case LOCATION_COMPONENT:
+            res = AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, "ohos.permission.LOCATION");
+            if (res != AccessToken::TypePermissionState::PERMISSION_GRANTED) {
+                return false;
+            }
+            res = AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
+            return (res == AccessToken::TypePermissionState::PERMISSION_GRANTED);
+        case PASTE_COMPONENT:
+            res = AccessToken::AccessTokenKit::VerifyAccessToken(tokenId,
+                "ohos.permission.SECURE_PASTE");
+            return (res == AccessToken::TypePermissionState::PERMISSION_GRANTED);
+        case SAVE_COMPONENT:
+            return VerifySavePermission(tokenId);
+        default:
+            SC_LOG_ERROR(LABEL, "Unknown component type.");
+    }
+    return false;
+}
+
 void SecCompPermManager::AddAppGrantPermissionRecord(AccessToken::AccessTokenID tokenId,
     const std::string& permissionName)
 {

@@ -15,8 +15,11 @@
 #include "first_use_dialog_test.h"
 
 #include "accesstoken_kit.h"
+#include "location_button.h"
+#include "save_button.h"
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
+#include "sec_event_handler.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -342,34 +345,126 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level1)
 {
     FirstUseDialog diag;
     diag.secHandler_ = nullptr;
+
+    // no entity
+    EXPECT_EQ(diag.NotifyFirstUseDialog(nullptr, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
     // no handler
-    ASSERT_FALSE(diag.NotifyFirstUseDialog(0, LOCATION_COMPONENT, nullptr));
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
 
     // no calltoken
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_NE(nullptr, runner);
     std::shared_ptr<SecEventHandler> handler = std::make_shared<SecEventHandler>(runner);
     diag.secHandler_ = handler;
-    ASSERT_FALSE(diag.NotifyFirstUseDialog(0, LOCATION_COMPONENT, nullptr));
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+
+    // no dialogCallback
+    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
 
     // type invalid
-    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
-    ASSERT_FALSE(diag.NotifyFirstUseDialog(0, PASTE_COMPONENT, testRemoteObject));
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject), SC_OK);
 
     // first use location button
-    ASSERT_TRUE(diag.NotifyFirstUseDialog(0, LOCATION_COMPONENT, testRemoteObject));
-    ASSERT_EQ(LOCATION_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    entity->componentInfo_ = std::make_shared<LocationButton>();
+    entity->componentInfo_->type_ = LOCATION_COMPONENT;
+    entity->tokenId_ = 0;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // first use save button
-    ASSERT_TRUE(diag.NotifyFirstUseDialog(0, SAVE_COMPONENT, testRemoteObject));
-    ASSERT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // second use save button
-    ASSERT_TRUE(diag.NotifyFirstUseDialog(0, SAVE_COMPONENT, testRemoteObject));
-    ASSERT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject), SC_OK);
+    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
-    diag.StartDialogAbility(PASTE_COMPONENT, nullptr);
+    diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject);
 
     // wait for event handler done
     sleep(3);
+}
+
+/*
+ * @tc.name: GrantDialogWaitEntity001
+ * @tc.desc: Test GrantDialogWaitEntity
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level1)
+{
+    FirstUseDialog diag;
+    EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_COMPONENT_NOT_EXIST);
+
+    diag.dialogWaitMap_[0] = nullptr;
+    EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_COMPONENT_NOT_EXIST);
+
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 1, 0, 0, 0);
+    diag.dialogWaitMap_[0] = entity;
+    EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_PERMISSION_OPER_FAIL);
+
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(runner, nullptr);
+
+    std::shared_ptr<SecEventHandler> handler = std::make_shared<SecEventHandler>(runner);
+    SecCompPermManager::GetInstance().InitEventHandler(handler);
+    entity->componentInfo_ = std::make_shared<SaveButton>();
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    diag.dialogWaitMap_[1] = entity;
+    EXPECT_EQ(diag.GrantDialogWaitEntity(1), SC_OK);
+}
+
+/*
+ * @tc.name: RemoveDialogWaitEntitys001
+ * @tc.desc: Test RemoveDialogWaitEntitys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, RemoveDialogWaitEntitys001, TestSize.Level1)
+{
+    FirstUseDialog diag;
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity1 = std::make_shared<SecCompEntity>(nullptr, 0, 0, 1, 0);
+    diag.dialogWaitMap_[0] = entity;
+    diag.dialogWaitMap_[1] = entity1;
+    diag.RemoveDialogWaitEntitys(1);
+    EXPECT_EQ(diag.dialogWaitMap_.count(1), 0);
+}
+
+/*
+ * @tc.name: SecCompDialogSrvCallback001
+ * @tc.desc: Test SecCompDialogSrvCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, SecCompDialogSrvCallback001, TestSize.Level1)
+{
+    SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(0, nullptr);
+    sptr<SecCompDialogSrvCallback> srvCallback = call;
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data, reply, option),
+        SC_SERVICE_ERROR_IPC_REQUEST_FAIL);
+
+    data.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data, reply, option),
+        SC_SERVICE_ERROR_IPC_REQUEST_FAIL);
+
+    MessageParcel data1;
+    data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    data1.WriteInt32(0);
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data1, reply, option),
+        0);
+
+    MessageParcel data2;
+    data2.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    EXPECT_NE(srvCallback->OnRemoteRequest(-1, data2, reply, option), 0);
 }

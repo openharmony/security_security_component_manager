@@ -50,7 +50,7 @@ void SecCompEntityTest::SetUp()
     std::shared_ptr<LocationButton> component = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, component);
 
-    entity_ = std::make_shared<SecCompEntity>(component, 1, 1);
+    entity_ = std::make_shared<SecCompEntity>(component, 1, 1, 1, 1);
     ASSERT_NE(nullptr, entity_);
 
     Rosen::WindowManager::GetInstance().SetDefaultSecCompScene();
@@ -96,7 +96,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
     std::shared_ptr<PasteButton> pasteComponent = std::make_shared<PasteButton>();
     ASSERT_NE(nullptr, pasteComponent);
 
-    entity_ = std::make_shared<SecCompEntity>(pasteComponent, 0, 1);
+    entity_ = std::make_shared<SecCompEntity>(pasteComponent, 0, 1, 1, 1);
     ASSERT_NE(nullptr, entity_);
 
     ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, entity_->GrantTempPermission());

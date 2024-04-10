@@ -142,7 +142,9 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
 
     ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(1, 0, entity));
 
@@ -152,7 +154,9 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level1)
     compPtrNew->rect_.y_ = ServiceTestCommon::TEST_COORDINATE * 2; // not overlap
     compPtrNew->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtrNew->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entityNew(compPtrNew, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_2);
+    std::shared_ptr<SecCompEntity> entityNew =
+        std::make_shared<SecCompEntity>(
+        compPtrNew, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_2, 1, 1);
     ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(1, 0, entityNew));
 }
 
@@ -167,7 +171,9 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList002, TestSize.Level1)
     bool isSaExit = SecCompManager::GetInstance().isSaExit_;
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
 
     ASSERT_NE(SC_SERVICE_ERROR_SERVICE_NOT_EXIST,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
@@ -191,7 +197,9 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList001, TestSize.Level1
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
@@ -219,7 +227,9 @@ HWTEST_F(SecCompManagerTest, GetSecurityComponentFromList001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
     ASSERT_EQ(nullptr, SecCompManager::GetInstance().GetSecurityComponentFromList(
@@ -244,7 +254,9 @@ HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
     auto component = SecCompManager::GetInstance().GetSecurityComponentFromList(
@@ -272,7 +284,9 @@ HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
@@ -282,7 +296,9 @@ HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level1)
     compPtr2->rect_.y_ = ServiceTestCommon::TEST_COORDINATE * 2; // not overlap
     compPtr2->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr2->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity2(compPtr2, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_2);
+    std::shared_ptr<SecCompEntity> entity2 =
+        std::make_shared<SecCompEntity>(
+        compPtr2, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_2, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_2, 0, entity2));
 
@@ -352,7 +368,9 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level1)
 
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     compPtr->type_ = LOCATION_COMPONENT;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     EXPECT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
@@ -402,8 +420,10 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     nlohmann::json jsonVaild;
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
     ASSERT_NE(SC_OK,
-        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1, jsonVaild, caller, clickInfo, nullptr));
+        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1,
+        jsonVaild, caller, clickInfo, remote));
 }
 
 /**
@@ -417,7 +437,9 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level1)
     std::shared_ptr<SecCompManager> managerInstance = std::make_shared<SecCompManager>();
     managerInstance->isSaExit_ = false;
     int pid = 1;
-    SecCompEntity entity(nullptr, 0, 0);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        nullptr, 0, 0, 1, 1);
     const int MAX_COMPONENT_SIZE = 500;
     for (int i = 0; i < MAX_COMPONENT_SIZE; i++) {
         managerInstance->componentMap_[pid].compList.emplace_back(entity);
@@ -441,7 +463,9 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
 
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
@@ -450,17 +474,18 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
 
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
 
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, nullptr));
+        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
 }
 
 /**
@@ -473,7 +498,9 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList003, TestSize.Level1)
 {
     SecCompManager::GetInstance().isSaExit_ = true;
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_SERVICE_ERROR_SERVICE_NOT_EXIST,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
     SecCompManager::GetInstance().isSaExit_ = false;
@@ -493,7 +520,9 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
@@ -539,7 +568,9 @@ HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     std::shared_ptr<SecCompManager> instance = std::make_shared<SecCompManager>();
     ASSERT_EQ(SC_OK,
         instance->AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
@@ -580,7 +611,9 @@ HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
 
     std::shared_ptr<SystemAbilityManagerClient> saClient = std::make_shared<SystemAbilityManagerClient>();
     ASSERT_NE(nullptr, saClient);
@@ -637,7 +670,9 @@ HWTEST_F(SecCompManagerTest, DumpSecComp001, TestSize.Level1)
     compPtr->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
     compPtr->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
-    SecCompEntity entity(compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1);
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
     SecCompManager::GetInstance().isSaExit_ = false;
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));

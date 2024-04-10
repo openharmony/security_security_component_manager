@@ -18,6 +18,7 @@
 #include "ipc_skeleton.h"
 #include "sec_comp_caller_authorization.h"
 #include "sec_comp_client.h"
+#include "sec_comp_dialog_callback.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_log.h"
 
@@ -95,7 +96,8 @@ int32_t SecCompKit::UnregisterSecurityComponent(int32_t scId)
 }
 
 int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
-    std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken)
+    std::string& componentInfo, const SecCompClickEvent& clickInfo,
+    sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback)
 {
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
         reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
@@ -106,13 +108,25 @@ int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
 
+    if (callback == nullptr) {
+        SC_LOG_ERROR(LABEL, "DialogCloseCallback is null");
+        return SC_ENHANCE_ERROR_VALUE_INVALID;
+    }
+
+    sptr<IRemoteObject> callbackRemote = new (std::nothrow) SecCompDialogCallback(std::move(callback));
+    if (callbackRemote == nullptr) {
+        SC_LOG_ERROR(LABEL, "New SecCompDialogCallback fail");
+        return SC_SERVICE_ERROR_MEMORY_OPERATE_FAIL;
+    }
+
     if (!SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo)) {
         SC_LOG_ERROR(LABEL, "Preprocess security component fail");
         return SC_ENHANCE_ERROR_VALUE_INVALID;
     }
 
     int32_t res =
-        SecCompClient::GetInstance().ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken);
+        SecCompClient::GetInstance().ReportSecurityComponentClickEvent(scId, componentInfo,
+        clickInfo, callerToken, callbackRemote);
     if (res != SC_OK) {
         SC_LOG_ERROR(LABEL, "report click event fail, error: %{public}d", res);
     }

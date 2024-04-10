@@ -27,6 +27,11 @@ namespace AccessToken {
 struct HapTokenInfo {
 };
 
+typedef enum TypePermissionState {
+    PERMISSION_DENIED = -1,
+    PERMISSION_GRANTED = 0,
+} PermissionState;
+
 class AccessTokenKit {
 public:
     static int RevokePermission(AccessTokenID tokenID, const std::string& permissionName, int flag);

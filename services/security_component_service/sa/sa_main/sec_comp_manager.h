@@ -41,7 +41,7 @@ struct SecCompCallerInfo {
 };
 
 struct ProcessCompInfos {
-    std::vector<SecCompEntity> compList;
+    std::vector<std::shared_ptr<SecCompEntity>> compList;
     bool isForeground = false;
     AccessToken::AccessTokenID tokenId;
 };
@@ -57,7 +57,8 @@ public:
         const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& jsonComponent,
-        const SecCompCallerInfo& caller, const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken);
+        const SecCompCallerInfo& caller, const SecCompClickEvent& clickInfo,
+        const std::vector<sptr<IRemoteObject>>& remote);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
     void NotifyProcessDied(int32_t pid);
@@ -72,10 +73,10 @@ private:
     bool IsForegroundCompExist();
     bool IsCompExist();
     int32_t AddSecurityComponentToList(int32_t pid,
-        AccessToken::AccessTokenID tokenId, const SecCompEntity& newEntity);
+        AccessToken::AccessTokenID tokenId, std::shared_ptr<SecCompEntity> newEntity);
     int32_t DeleteSecurityComponentFromList(int32_t pid, int32_t scId);
-    SecCompEntity* GetSecurityComponentFromList(int32_t pid, int32_t scId);
-    int32_t CheckClickSecurityComponentInfo(SecCompEntity* sc, int32_t scId,
+    std::shared_ptr<SecCompEntity> GetSecurityComponentFromList(int32_t pid, int32_t scId);
+    int32_t CheckClickSecurityComponentInfo(std::shared_ptr<SecCompEntity> sc, int32_t scId,
         const nlohmann::json& jsonComponent,  const SecCompCallerInfo& caller);
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
@@ -89,7 +90,6 @@ private:
 
     std::shared_ptr<AppExecFwk::EventRunner> secRunner_;
     std::shared_ptr<SecEventHandler> secHandler_;
-    FirstUseDialog firstUseDialog_;
     SecCompMaliciousApps malicious_;
 
     DISALLOW_COPY_AND_MOVE(SecCompManager);
