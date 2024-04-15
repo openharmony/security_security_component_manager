@@ -82,7 +82,7 @@ void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
     }
     if (type == SEC_COMP_ENHANCE_CLIENT_INTERFACE) {
         SecCompClientEnhanceInterface* (*getClientInstance)(void) =
-            (SecCompClientEnhanceInterface* (*)(void))dlsym(handler, "GetClientInstance");
+            reinterpret_cast<ENHANCE_INTERFACE>(dlsym(handler, "GetClientInstance"));
         if (getClientInstance == nullptr) {
             SC_LOG_ERROR(LABEL, "GetClientInstance failed.");
             return;
@@ -172,10 +172,6 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
 static bool WriteMessageParcel(MessageParcel& tmpData, MessageParcel& data)
 {
     size_t bufferLength = tmpData.GetDataSize();
-    if (bufferLength < 0) {
-        SC_LOG_ERROR(LABEL, "TmpData is invalid.");
-        return false;
-    }
     if (bufferLength == 0) {
         SC_LOG_INFO(LABEL, "TmpData is empty.");
         return true;
@@ -213,10 +209,6 @@ static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
         return false;
     }
     char* ptr = reinterpret_cast<char *>(const_cast<void *>(iter));
-    if (ptr == nullptr) {
-        SC_LOG_ERROR(LABEL, "Read rawData failed.");
-        return false;
-    }
 
     if (!data.WriteBuffer(reinterpret_cast<void *>(ptr), size)) {
         SC_LOG_ERROR(LABEL, "Write rawData failed.");

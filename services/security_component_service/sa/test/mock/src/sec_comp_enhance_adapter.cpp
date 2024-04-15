@@ -71,10 +71,6 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
 static bool CopyMessageParcel(MessageParcel& oldData, MessageParcel& newData)
 {
     size_t bufferLength = oldData.GetDataSize();
-    if (bufferLength < 0) {
-        SC_LOG_ERROR(LABEL, "TmpData is invalid.");
-        return false;
-    }
     if (bufferLength == 0) {
         SC_LOG_INFO(LABEL, "TmpData is empty.");
         return true;
