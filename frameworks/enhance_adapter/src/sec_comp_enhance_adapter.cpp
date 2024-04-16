@@ -81,8 +81,7 @@ void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
         return;
     }
     if (type == SEC_COMP_ENHANCE_CLIENT_INTERFACE) {
-        SecCompClientEnhanceInterface* (*getClientInstance)(void) =
-            reinterpret_cast<ENHANCE_INTERFACE>(dlsym(handler, "GetClientInstance"));
+        EnhanceInterface getClientInstance = reinterpret_cast<EnhanceInterface>(dlsym(handler, "GetClientInstance"));
         if (getClientInstance == nullptr) {
             SC_LOG_ERROR(LABEL, "GetClientInstance failed.");
             return;
