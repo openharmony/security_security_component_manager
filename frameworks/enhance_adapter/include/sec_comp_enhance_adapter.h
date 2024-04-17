@@ -135,6 +135,7 @@ public:
 
     static std::mutex initMtx;
 };
+typedef SecCompClientEnhanceInterface* (*EnhanceInterface) (void);
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
