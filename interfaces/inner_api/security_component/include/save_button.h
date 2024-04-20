@@ -32,6 +32,7 @@ enum class SaveDesc : int32_t {
     DOWNLOAD_AND_SHARE = 5,
     RECEIVE = 6,
     CONTINUE_TO_RECEIVE = 7,
+    SAVE_TO_GALLERY = 8,
     MAX_LABEL_TYPE
 };
 
