@@ -72,9 +72,9 @@ public:
     // notify process registered
     virtual void AddSecurityComponentProcess(int32_t pid) = 0;
 
-    virtual bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply) = 0;
+    virtual bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid) = 0;
     virtual bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-        MessageParcel& reply) = 0;
+        MessageParcel& reply, int32_t pid) = 0;
 };
 
 // for client
@@ -121,9 +121,9 @@ public:
 
     static void AddSecurityComponentProcess(int32_t pid);
 
-    static bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply);
+    static bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid);
     static bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-        MessageParcel& reply);
+        MessageParcel& reply, int32_t pid);
     static __attribute__((visibility("default"))) SecCompInputEnhanceInterface* inputHandler;
     static bool isEnhanceInputHandlerInit;
 

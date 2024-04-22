@@ -101,14 +101,14 @@ bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData
     return CopyMessageParcel(oldData, newData);
 }
 
-bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply)
+bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid)
 {
     SC_LOG_DEBUG(LABEL, "SerializeSessionInfoEnhance successful.");
     return CopyMessageParcel(tmpReply, reply);
 }
 
 bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-    MessageParcel& reply)
+    MessageParcel& reply, int32_t pid)
 {
     SC_LOG_DEBUG(LABEL, "DeserializeSessionInfoEnhance successful.");
     return CopyMessageParcel(oldData, newData);
