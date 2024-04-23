@@ -244,26 +244,26 @@ bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData
     return ReadMessageParcel(oldData, newData);
 }
 
-bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply)
+bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->SerializeSessionInfoEnhance(tmpReply, reply);
+        return srvHandler->SerializeSessionInfoEnhance(tmpReply, reply, pid);
     }
 
     return WriteMessageParcel(tmpReply, reply);
 }
 
 bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-    MessageParcel& reply)
+    MessageParcel& reply, int32_t pid)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->DeserializeSessionInfoEnhance(oldData, newData, reply);
+        return srvHandler->DeserializeSessionInfoEnhance(oldData, newData, reply, pid);
     }
 
     return ReadMessageParcel(oldData, newData);
