@@ -1,0 +1,49 @@
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../../../security_component.gni")
+
+module_output_path = "security_component_manager/security_component_manager"
+
+ohos_fuzztest("SetEnhanceCfgFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "${sec_comp_dir}/test/fuzztest/security_component/innerkits/setenhancecfg_fuzzer"
+
+  include_dirs = [
+    "${sec_comp_dir}/frameworks/common/include",
+    "${sec_comp_dir}/interfaces/inner_api/enhance_kits/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  configs = [ "${sec_comp_dir}/config:coverage_flags" ]
+
+  cflags_cc = [ "-DHILOG_ENABLE" ]
+  sources = [ "setenhancecfg_fuzzer.cpp" ]
+
+  deps = [ "${sec_comp_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk" ]
+
+  external_deps = [
+    "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "hilog:libhilog",
+  ]
+}
