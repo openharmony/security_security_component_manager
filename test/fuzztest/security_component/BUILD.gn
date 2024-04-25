@@ -16,19 +16,19 @@ group("fuzztest") {
   deps = []
 
   deps += [
-    "getenhanceremoteobjectInner_fuzzer:GetEnhanceRemoteObjectInnerFuzzTest",
-    "getenhanceremoteobject_fuzzer:GetEnhanceRemoteObjectFuzzTest",
-    "getpointereventenhancedata_fuzzer:GetPointerEventEnhanceDataFuzzTest",
-    "registersecuritycomponentInner_fuzzer:RegisterSecurityComponentInnerFuzzTest",
-    "registersecuritycomponent_fuzzer:RegisterSecurityComponentFuzzTest",
-    "reportsecuritycomponentclickeventInner_fuzzer:ReportSecurityComponentClickEventInnerFuzzTest",
-    "reportsecuritycomponentclickevent_fuzzer:ReportSecurityComponentClickEventFuzzTest",
-    "setenhancecfg_fuzzer:SetEnhanceCfgFuzzTest",
-    "unregistersecuritycomponentInner_fuzzer:UnregisterSecurityComponentInnerFuzzTest",
-    "unregistersecuritycomponent_fuzzer:UnregisterSecurityComponentFuzzTest",
-    "updatesecuritycomponentInner_fuzzer:UpdateSecurityComponentInnerFuzzTest",
-    "updatesecuritycomponent_fuzzer:UpdateSecurityComponentFuzzTest",
-    "verifysavepermissionInner_fuzzer:VerifySavePermissionInnerFuzzTest",
-    "verifysavepermission_fuzzer:VerifySavePermissionFuzzTest",
+    "innerkits/getenhanceremoteobject_fuzzer:GetEnhanceRemoteObjectFuzzTest",
+    "innerkits/getpointereventenhancedata_fuzzer:GetPointerEventEnhanceDataFuzzTest",
+    "innerkits/registersecuritycomponent_fuzzer:RegisterSecurityComponentFuzzTest",
+    "innerkits/reportsecuritycomponentclickevent_fuzzer:ReportSecurityComponentClickEventFuzzTest",
+    "innerkits/setenhancecfg_fuzzer:SetEnhanceCfgFuzzTest",
+    "innerkits/unregistersecuritycomponent_fuzzer:UnregisterSecurityComponentFuzzTest",
+    "innerkits/updatesecuritycomponent_fuzzer:UpdateSecurityComponentFuzzTest",
+    "innerkits/verifysavepermission_fuzzer:VerifySavePermissionFuzzTest",
+    "service/getenhanceremoteobjectstub_fuzzer:GetEnhanceRemoteObjectStubFuzzTest",
+    "service/registersecuritycomponentstub_fuzzer:RegisterSecurityComponentStubFuzzTest",
+    "service/reportsecuritycomponentclickeventstub_fuzzer:ReportSecurityComponentClickEventStubFuzzTest",
+    "service/unregistersecuritycomponentstub_fuzzer:UnregisterSecurityComponentStubFuzzTest",
+    "service/updatesecuritycomponentstub_fuzzer:UpdateSecurityComponentStubFuzzTest",
+    "service/verifysavepermissionstub_fuzzer:VerifySavePermissionStubFuzzTest",
   ]
 }
