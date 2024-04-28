@@ -37,7 +37,7 @@ int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
         SC_LOG_ERROR(LABEL, "register security component fail, caller invalid");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "CALL_SCENE", "REGITSTER");
+            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "REGITSTER");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
 
@@ -54,7 +54,7 @@ int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
     SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", type);
+        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "SC_ID", scId, "SC_TYPE", type);
     return res;
 }
 
@@ -65,7 +65,7 @@ int32_t SecCompKit::UpdateSecurityComponent(int32_t scId, std::string& component
         SC_LOG_ERROR(LABEL, "update security component fail, caller invalid");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "CALL_SCENE", "UPDATE");
+            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "UPDATE");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
 
@@ -91,7 +91,7 @@ int32_t SecCompKit::UnregisterSecurityComponent(int32_t scId)
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "UNREGISTER_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId);
+        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "SC_ID", scId);
     return res;
 }
 
@@ -104,7 +104,7 @@ int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
         SC_LOG_ERROR(LABEL, "report click event fail, caller invalid");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "CALL_SCENE", "CLICK");
+            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "CLICK");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
 
