@@ -28,7 +28,7 @@
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
-const uint8_t *g_baseFuzzData = nullptr;
+const uint8_t *BASE_FUZZ_DATA = nullptr;
 size_t g_baseFuzzSize = 0;
 size_t g_baseFuzzPos;
 
@@ -36,10 +36,10 @@ template <class T> T GetData()
 {
     T object{};
     size_t objectSize = sizeof(object);
-    if (g_baseFuzzData == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
+    if (BASE_FUZZ_DATA == nullptr || objectSize > g_baseFuzzSize - g_baseFuzzPos) {
         return object;
     }
-    errno_t ret = memcpy_s(&object, objectSize, g_baseFuzzData + g_baseFuzzPos, objectSize);
+    errno_t ret = memcpy_s(&object, objectSize, BASE_FUZZ_DATA + g_baseFuzzPos, objectSize);
     if (ret != EOK) {
         return {};
     }
@@ -102,7 +102,7 @@ void BuildLocationComponentInfo(std::string& componentInfo)
 
 static void ReportSecurityComponentClickEventFuzzTest(const uint8_t *data, size_t size)
 {
-    g_baseFuzzData = data;
+    BASE_FUZZ_DATA = data;
     g_baseFuzzSize = size;
     g_baseFuzzPos = 0;
     int32_t scId = GetData<int32_t>();
