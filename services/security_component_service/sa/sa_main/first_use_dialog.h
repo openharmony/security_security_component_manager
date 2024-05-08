@@ -34,10 +34,7 @@ namespace SecurityComponent {
 class SecCompDialogSrvCallback : public SecCompDialogCallbackStub {
 public:
     explicit SecCompDialogSrvCallback(int32_t scId, sptr<IRemoteObject> dialogCallback)
-    {
-        scId_ = scId;
-        dialogCallback_ = dialogCallback;
-    };
+        : scId_(scId), dialogCallback_(dialogCallback) {};
 
     ~SecCompDialogSrvCallback() override
     {
