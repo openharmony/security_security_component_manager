@@ -46,6 +46,7 @@ public:
 private:
     static float GetWindowScale(int32_t windowId);
     static void AdjustSecCompRect(SecCompBase* comp, float scale);
+    static bool IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

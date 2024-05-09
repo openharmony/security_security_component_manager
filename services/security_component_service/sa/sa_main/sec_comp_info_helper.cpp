@@ -14,6 +14,7 @@
  */
 #include "sec_comp_info_helper.h"
 
+#include "accesstoken_kit.h"
 #include "display.h"
 #include "display_info.h"
 #include "display_manager.h"
@@ -258,6 +259,10 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
             SC_LOG_DEBUG(LABEL, "grant paste permission");
             return SC_OK;
         case SAVE_COMPONENT:
+            if (IsDlpSandboxCalling(tokenId)) {
+                SC_LOG_INFO(LABEL, "Dlp sandbox app are not allowed to use save component.");
+                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+            }
             SC_LOG_DEBUG(LABEL, "grant save permission");
             return SecCompPermManager::GetInstance().GrantTempSavePermission(tokenId);
         default:
@@ -265,6 +270,11 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
             break;
     }
     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+}
+
+inline bool SecCompInfoHelper::IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
+{
+    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

@@ -56,6 +56,12 @@ public:
         return static_cast<ATokenTypeEnum>(idInner->type);
     };
 
+    static int32_t GetHapDlpFlag(AccessTokenID tokenID)
+    {
+        AccessTokenIDInner *idInner = reinterpret_cast<AccessTokenIDInner *>(&tokenID);
+        return static_cast<int32_t>(idInner->dlpFlag);
+    }
+
     static std::mutex mutex_;
     static std::map<AccessTokenID, std::set<std::string>> permMap_;
     static int getHapTokenInfoRes;
