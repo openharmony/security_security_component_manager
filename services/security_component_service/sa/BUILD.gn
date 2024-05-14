@@ -121,4 +121,5 @@ ohos_shared_library("security_component_service") {
   ]
   external_deps = [ "hilog:libhilog" ]
   public_configs = [ ":security_component_service_config" ]
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
 }
