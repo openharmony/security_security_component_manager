@@ -98,18 +98,17 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level1)
     SecCompEnhanceAdapter::AddSecurityComponentProcess(0);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
 
-    OHOS::MessageParcel tmpData;
-    OHOS::MessageParcel data;
+    OHOS::MessageParcel input;
+    OHOS::MessageParcel output;
     OHOS::MessageParcel reply;
-
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(tmpData, data);
+    SecCompEnhanceAdapter::EnhanceClientSerialize(input, output);
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(tmpData, data);
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(input, output);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
-    SecCompEnhanceAdapter::SerializeSessionInfoEnhance(tmpData, data, 0);
+    SecCompEnhanceAdapter::EnhanceSrvSerialize(input, output);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
-    SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(tmpData, data, reply, 0);
+    SecCompEnhanceAdapter::EnhanceSrvDeserialize(input, output, reply);
     std::shared_ptr<SecCompBase> compInfo;
     const nlohmann::json jsonComponent;
     ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::CheckComponentInfoEnhance(0, compInfo, jsonComponent));

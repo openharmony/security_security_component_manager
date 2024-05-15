@@ -72,9 +72,9 @@ public:
     // notify process registered
     virtual void AddSecurityComponentProcess(int32_t pid) = 0;
 
-    virtual bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid) = 0;
-    virtual bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-        MessageParcel& reply, int32_t pid) = 0;
+    virtual bool EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output) = 0;
+    virtual bool EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
+        MessageParcel& reply) = 0;
 };
 
 // for client
@@ -84,10 +84,10 @@ public:
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, std::string& componentInfo) = 0;
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, int32_t scId, std::string& componentInfo) = 0;
 
-    virtual bool EnhanceSerializeSessionInfo(const uintptr_t caller,
-        MessageParcel& tmpData, MessageParcel& data) = 0;
-    virtual bool EnhanceDeserializeSessionInfo(const uintptr_t caller, MessageParcel& oldData,
-        MessageParcel& newData) = 0;
+    virtual bool EnhanceClientSerialize(const uintptr_t caller,
+        MessageParcel& input, MessageParcel& output) = 0;
+    virtual bool EnhanceClientDeserialize(const uintptr_t caller, MessageParcel& input,
+        MessageParcel& output) = 0;
 
     // regiter scid to enhance client
     virtual void RegisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
@@ -114,16 +114,16 @@ public:
 
     static bool EnhanceDataPreprocess(std::string& componentInfo);
     static bool EnhanceDataPreprocess(int32_t scId, std::string& componentInfo);
-    static bool EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data);
-    static bool EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData);
+    static bool EnhanceClientSerialize(MessageParcel& input, MessageParcel& output);
+    static bool EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output);
     static void RegisterScIdEnhance(int32_t scId);
     static void UnregisterScIdEnhance(int32_t scId);
 
     static void AddSecurityComponentProcess(int32_t pid);
 
-    static bool SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid);
-    static bool DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-        MessageParcel& reply, int32_t pid);
+    static bool EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output);
+    static bool EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
+        MessageParcel& reply);
     static __attribute__((visibility("default"))) SecCompInputEnhanceInterface* inputHandler;
     static bool isEnhanceInputHandlerInit;
 

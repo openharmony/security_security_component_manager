@@ -39,6 +39,7 @@ public:
 private:
     int32_t SendReportClickEventRequest(MessageParcel& data);
     static inline BrokerDelegator<SecCompProxy> delegator_;
+    std::mutex useIPCMutex_;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

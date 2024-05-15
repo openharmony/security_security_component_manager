@@ -216,7 +216,7 @@ static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
     return true;
 }
 
-bool SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data)
+bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, MessageParcel& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -224,13 +224,13 @@ bool SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(MessageParcel& tmpData, 
 
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
     if (clientHandler != nullptr) {
-        return clientHandler->EnhanceSerializeSessionInfo(enhanceCallerAddr, tmpData, data);
+        return clientHandler->EnhanceClientSerialize(enhanceCallerAddr, input, output);
     }
 
-    return WriteMessageParcel(tmpData, data);
+    return WriteMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData)
+bool SecCompEnhanceAdapter::EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -238,35 +238,35 @@ bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData
 
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
     if (clientHandler != nullptr) {
-        return clientHandler->EnhanceDeserializeSessionInfo(enhanceCallerAddr, oldData, newData);
+        return clientHandler->EnhanceClientDeserialize(enhanceCallerAddr, input, output);
     }
 
-    return ReadMessageParcel(oldData, newData);
+    return ReadMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid)
+bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->SerializeSessionInfoEnhance(tmpReply, reply, pid);
+        return srvHandler->EnhanceSrvSerialize(input, output);
     }
 
-    return WriteMessageParcel(tmpReply, reply);
+    return WriteMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-    MessageParcel& reply, int32_t pid)
+bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
+    MessageParcel& reply)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->DeserializeSessionInfoEnhance(oldData, newData, reply, pid);
+        return srvHandler->EnhanceSrvDeserialize(input, output, reply);
     }
 
-    return ReadMessageParcel(oldData, newData);
+    return ReadMessageParcel(input, output);
 }
 
 void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)

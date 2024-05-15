@@ -89,29 +89,29 @@ static bool CopyMessageParcel(MessageParcel& oldData, MessageParcel& newData)
     return true;
 }
 
-bool SecCompEnhanceAdapter::EnhanceSerializeSessionInfo(MessageParcel& tmpData, MessageParcel& data)
+bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, MessageParcel& output)
 {
-    SC_LOG_DEBUG(LABEL, "EnhanceSerializeSessionInfo successful.");
-    return CopyMessageParcel(tmpData, data);
+    SC_LOG_DEBUG(LABEL, "EnhanceClientSerialize successful.");
+    return CopyMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceDeserializeSessionInfo(MessageParcel& oldData, MessageParcel& newData)
+bool SecCompEnhanceAdapter::EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output)
 {
-    SC_LOG_DEBUG(LABEL, "EnhanceDeserializeSessionInfo successful.");
-    return CopyMessageParcel(oldData, newData);
+    SC_LOG_DEBUG(LABEL, "EnhanceClientDeserialize successful.");
+    return CopyMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::SerializeSessionInfoEnhance(MessageParcel& tmpReply, MessageParcel& reply, int32_t pid)
+bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output)
 {
-    SC_LOG_DEBUG(LABEL, "SerializeSessionInfoEnhance successful.");
-    return CopyMessageParcel(tmpReply, reply);
+    SC_LOG_DEBUG(LABEL, "EnhanceSrvSerialize successful.");
+    return CopyMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::DeserializeSessionInfoEnhance(MessageParcel& oldData, MessageParcel& newData,
-    MessageParcel& reply, int32_t pid)
+bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
+    MessageParcel& reply)
 {
-    SC_LOG_DEBUG(LABEL, "DeserializeSessionInfoEnhance successful.");
-    return CopyMessageParcel(oldData, newData);
+    SC_LOG_DEBUG(LABEL, "EnhanceSrvDeserialize successful.");
+    return CopyMessageParcel(input, output);
 }
 
 void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
