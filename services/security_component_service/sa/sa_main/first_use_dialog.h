@@ -33,8 +33,8 @@ namespace Security {
 namespace SecurityComponent {
 class SecCompDialogSrvCallback : public SecCompDialogCallbackStub {
 public:
-    explicit SecCompDialogSrvCallback(int32_t scId, sptr<IRemoteObject> dialogCallback)
-        : scId_(scId), dialogCallback_(dialogCallback) {};
+    explicit SecCompDialogSrvCallback(int32_t scId, std::shared_ptr<SecCompEntity> sc,
+        sptr<IRemoteObject> dialogCallback) : scId_(scId), sc_(sc), dialogCallback_(dialogCallback) {};
 
     ~SecCompDialogSrvCallback() override
     {
@@ -44,6 +44,7 @@ public:
     void OnDialogClosed(int32_t result) override;
 private:
     int32_t scId_;
+    std::shared_ptr<SecCompEntity> sc_;
     sptr<IRemoteObject> dialogCallback_;
 };
 
@@ -57,6 +58,7 @@ public:
     void Init(std::shared_ptr<SecEventHandler> secHandler);
     int32_t GrantDialogWaitEntity(int32_t scId);
     void RemoveDialogWaitEntitys(int32_t pid);
+    bool SetFirstUseMap(std::shared_ptr<SecCompEntity> entity);
 
 private:
     FirstUseDialog() {};
