@@ -345,15 +345,25 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
 
 bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
 {
+    SC_LOG_ERROR(LABEL, "1111");
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
         SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     auto jsonStyle = json.at(tag);
-    if (!(jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).is_number() &&
-        jsonStyle.at(JsonTagConstants::JSON_ICON_TAG).is_number() &&
-        jsonStyle.at(JsonTagConstants::JSON_BG_TAG).is_number())) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+    if (jsonStyle.find(JsonTagConstants::JSON_TEXT_TAG) == jsonStyle.end() ||
+        !jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).is_number()) {
+        SC_LOG_ERROR(LABEL, "Json=%{public}s tag is invalid.", tag.c_str());
+        return false;
+    }
+    if (jsonStyle.find(JsonTagConstants::JSON_ICON_TAG) == jsonStyle.end() ||
+        !jsonStyle.at(JsonTagConstants::JSON_ICON_TAG).is_number()) {
+        SC_LOG_ERROR(LABEL, "Json=%{public}s tag is invalid.", tag.c_str());
+        return false;
+    }
+    if (jsonStyle.find(JsonTagConstants::JSON_BG_TAG) == jsonStyle.end() ||
+        !jsonStyle.at(JsonTagConstants::JSON_BG_TAG).is_number()) {
+        SC_LOG_ERROR(LABEL, "Json=%{public}s tag is invalid.", tag.c_str());
         return false;
     }
     text_ = jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).get<int32_t>();
@@ -362,13 +372,12 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
         SC_LOG_ERROR(LABEL, "text or icon is invalid.");
         return false;
     }
-
     bg_ = static_cast<SecCompBackground>(jsonStyle.at(JsonTagConstants::JSON_BG_TAG).get<int32_t>());
     if ((bg_ <= SecCompBackground::UNKNOWN_BG) || (bg_ >= SecCompBackground::MAX_BG_TYPE)) {
         SC_LOG_ERROR(LABEL, "bg is invalid.");
         return false;
     }
-
+    SC_LOG_ERROR(LABEL, "2222");
     return true;
 }
 }  // namespace base
