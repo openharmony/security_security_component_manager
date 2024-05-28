@@ -58,6 +58,9 @@ void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
         SC_LOG_ERROR(LABEL, "Call dialog close callback scId_ %{public}d is not exist", scId_);
         return;
     }
+    if (!grantRes && !FirstUseDialog::GetInstance().SetFirstUseMap(sc_)) {
+        return;
+    }
     auto callback = iface_cast<ISecCompDialogCallback>(dialogCallback_);
     if (callback != nullptr) {
         callback->OnDialogClosed(grantRes);
@@ -293,7 +296,7 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
         return;
     }
     int32_t scId = entity->scId_;
-    SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(scId, dialogCallback);
+    SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(scId, entity, dialogCallback);
     sptr<IRemoteObject> srvCallback = call;
     if (srvCallback == nullptr) {
         SC_LOG_ERROR(LABEL, "New SecCompDialogCallback fail");
@@ -320,6 +323,38 @@ void FirstUseDialog::SendSaveEventHandler(void)
 
     SC_LOG_INFO(LABEL, "Delay first_use_record json");
     secHandler_->ProxyPostTask(delayed);
+}
+
+bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
+{
+    uint64_t typeMask;
+    if (entity == nullptr) {
+        SC_LOG_ERROR(LABEL, "Entity is invalid.");
+        return false;
+    }
+
+    SecCompType type = entity->GetType();
+    if (type == LOCATION_COMPONENT) {
+        typeMask = LOCATION_BUTTON_FIRST_USE;
+    } else if (type == SAVE_COMPONENT) {
+        typeMask = SAVE_BUTTON_FIRST_USE;
+    } else {
+        SC_LOG_INFO(LABEL, "This type need not notify dialog to user.");
+        return false;
+    }
+
+    std::unique_lock<std::mutex> lock(useMapMutex_);
+    AccessToken::AccessTokenID tokenId = entity->tokenId_;
+    auto iter = firstUseMap_.find(tokenId);
+    if (iter == firstUseMap_.end()) {
+        firstUseMap_[tokenId] = typeMask;
+        SendSaveEventHandler();
+        return true;
+    }
+
+    firstUseMap_[tokenId] |= typeMask;
+    SendSaveEventHandler();
+    return true;
 }
 
 int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
@@ -360,8 +395,6 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     if (iter == firstUseMap_.end()) {
         SC_LOG_INFO(LABEL, "has not use record, start dialog");
         StartDialogAbility(entity, callerToken, dialogCallback);
-        firstUseMap_[tokenId] = typeMask;
-        SendSaveEventHandler();
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
 
@@ -371,8 +404,6 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
         return SC_OK;
     }
     StartDialogAbility(entity, callerToken, dialogCallback);
-    firstUseMap_[tokenId] |= typeMask;
-    SendSaveEventHandler();
     return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
 }
 

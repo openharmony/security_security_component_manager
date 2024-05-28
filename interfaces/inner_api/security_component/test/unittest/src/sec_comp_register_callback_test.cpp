@@ -306,10 +306,8 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    ASSERT_EQ(SC_OK,
+    ASSERT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
         ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
-    uint32_t selfTokenId = GetSelfTokenID();
-    ASSERT_TRUE(SecCompKit::VerifySavePermission(selfTokenId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -534,9 +532,8 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    ASSERT_EQ(SC_OK,
+    ASSERT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
         ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
-    ASSERT_FALSE(SecCompKit::VerifySavePermission(0));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -570,7 +567,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    EXPECT_EQ(SC_OK,
+    EXPECT_EQ(SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE,
         ReportSecurityComponentClickEvent(scId, saveInfo, clickInfo, token, std::move(func)));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
