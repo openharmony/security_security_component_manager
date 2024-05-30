@@ -613,3 +613,24 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level
     setuid(g_selfUid);
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
+
+/**
+ * @tc.name: CheckCipherPrint001
+ * @tc.desc: Test cipher info print
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompRegisterCallbackTest, CheckCipherPrint001, TestSize.Level1)
+{
+    nlohmann::json jsonRes;
+    TestCommon::BuildLocationComponentInfo(jsonRes);
+    std::string locationInfo = jsonRes.dump();
+    g_probe.mockComponentInfo = locationInfo;
+    g_probe.mockRes = 0;
+    int32_t scId;
+
+    system("param set sec.comp.enhance 3");
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    system("param set sec.comp.enhance -1");
+}
