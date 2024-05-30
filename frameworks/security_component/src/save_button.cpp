@@ -16,6 +16,8 @@
 
 #include <tuple>
 #include "sec_comp_log.h"
+#include "tokenid_kit.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace Security {
@@ -31,7 +33,18 @@ bool SaveButton::IsTextIconTypeValid()
         return false;
     }
 
+    if ((static_cast<SaveIcon>(icon_) == SaveIcon::PICTURE_ICON) && !IsSystemAppCalling()) {
+        SC_LOG_ERROR(LABEL, "Picture icon only for system application.");
+        return false;
+    }
+
     return true;
+}
+
+bool SaveButton::IsSystemAppCalling() const
+{
+    uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
+    return AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
 
 bool SaveButton::IsCorrespondenceType()

@@ -137,7 +137,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
     touch.extraInfo.data = buffer;
     touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(entity_->CheckClickInfo(touch), SC_OK);
+    ASSERT_EQ(entity_->CheckClickInfo(touch), SC_SERVICE_ERROR_CLICK_EVENT_INVALID);
 }
 
 /**
