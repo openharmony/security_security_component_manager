@@ -57,6 +57,22 @@ public:
     float scaleVal_;
 };
 
+class UnreliableWindowInfo : public Parcelable {
+public:
+    UnreliableWindowInfo() = default;
+    ~UnreliableWindowInfo() = default;
+    virtual bool Marshalling(Parcel& parcel) const override
+    {
+        return true;
+    };
+    int32_t windowId_ { 0 };
+    Rect windowRect_;
+    uint32_t zOrder_ { 0 };
+    float floatingScale_ { 1.0f };
+    float scaleX_ { 1.0f };
+    float scaleY_ { 1.0f };
+};
+
 class WindowManager {
 public:
     static WindowManager& GetInstance()
@@ -70,6 +86,10 @@ public:
         list = list_;
         return result_;
     };
+    WMError GetUnreliableWindowInfo(int32_t windowId, std::vector<sptr<UnreliableWindowInfo>>& infos) const
+    {
+        return result_;
+    }
 
     WindowManager() {};
 

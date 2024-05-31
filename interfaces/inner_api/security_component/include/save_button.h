@@ -39,6 +39,7 @@ enum class SaveDesc : int32_t {
 enum class SaveIcon : int32_t {
     FILLED_ICON = 0,
     LINE_ICON = 1,
+    PICTURE_ICON = 2,
     MAX_ICON_TYPE
 };
 
@@ -49,6 +50,7 @@ public:
     virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const override;
 private:
     bool ParseStyle(const nlohmann::json& json, const std::string& tag);
+    bool IsSystemAppCalling() const;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

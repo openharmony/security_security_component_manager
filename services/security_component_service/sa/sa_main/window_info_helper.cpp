@@ -66,8 +66,8 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         SC_LOG_INFO(LABEL, "UI extension can not check");
         return true;
     }
-    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
+    std::vector<sptr<Rosen::UnreliableWindowInfo>> infos;
+    if (Rosen::WindowManager::GetInstance().GetUnreliableWindowInfo(compWinId, infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }
@@ -79,16 +79,16 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
             continue;
         }
 
-        if (info->wid_ == compWinId) {
-            compLayer = static_cast<int32_t>(info->layer_);
+        if (info->windowId_ == compWinId) {
+            compLayer = static_cast<int32_t>(info->zOrder_);
             continue;
         }
-        if (info->scaleVal_ != 0.0) {
-            info->windowRect_.width_ *= info->scaleVal_;
-            info->windowRect_.height_ *= info->scaleVal_;
+        if (info->floatingScale_ != 0.0) {
+            info->windowRect_.width_ *= info->floatingScale_;
+            info->windowRect_.height_ *= info->floatingScale_;
         }
         if (IsRectInWindRect(info->windowRect_, secRect)) {
-            layerList.emplace_back(info->layer_);
+            layerList.emplace_back(info->zOrder_);
         }
     }
 

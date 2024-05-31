@@ -50,6 +50,7 @@ ohos_source_set("security_component_framework_src_set") {
   public_configs = [ ":security_component_framework_src_set_config" ]
 
   external_deps = [
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
