@@ -26,6 +26,11 @@ config("sec_comp_config") {
 }
 
 ohos_shared_library("libsecurity_component_sdk") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dos = true
+    debug = false
+  }
   subsystem_name = "security"
   part_name = "security_component_manager"
   output_name = "libsecurity_component_sdk"
