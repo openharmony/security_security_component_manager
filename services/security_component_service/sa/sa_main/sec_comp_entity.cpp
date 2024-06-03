@@ -70,7 +70,8 @@ int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
             static_cast<unsigned long long>(clickInfo.key.timestamp), static_cast<unsigned long long>(current));
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
-    if ((clickInfo.key.keyCode != KEY_SPACE) && (clickInfo.key.keyCode != KEY_ENTER)) {
+    if ((clickInfo.key.keyCode != KEY_SPACE) && (clickInfo.key.keyCode != KEY_ENTER) &&
+        (clickInfo.key.keyCode != KEY_NUMPAD_ENTER)) {
         SC_LOG_ERROR(LABEL, "keyboard keyCode invalid. keyCode: %{public}d", clickInfo.key.keyCode);
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
