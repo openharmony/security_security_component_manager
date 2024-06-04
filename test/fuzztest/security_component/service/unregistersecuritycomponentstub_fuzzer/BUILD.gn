@@ -14,6 +14,7 @@
 import("//build/config/features.gni")
 import("//build/test.gni")
 import("../../../../../security_component.gni")
+import("../security_component_fuzz.gni")
 
 module_output_path = "security_component_manager/security_component_manager"
 
@@ -21,10 +22,8 @@ ohos_fuzztest("UnregisterSecurityComponentStubFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "${sec_comp_dir}/test/fuzztest/security_component/service/unregistersecuritycomponentstub_fuzzer"
 
-  include_dirs = [
-    "${sec_comp_dir}/frameworks/common/include",
-    "${sec_comp_dir}/services/security_component_service/sa/sa_main",
-  ]
+  include_dirs = sc_include_dirs
+
   cflags = [
     "-g",
     "-O0",
@@ -34,16 +33,13 @@ ohos_fuzztest("UnregisterSecurityComponentStubFuzzTest") {
   configs = [ "${sec_comp_dir}/config:coverage_flags" ]
 
   cflags_cc = [ "-DHILOG_ENABLE" ]
+  cflags_cc += sc_cflags_cc
+
   sources = [ "unregistersecuritycomponentstub_fuzzer.cpp" ]
+  sources += sc_service_sources
+  sources += sc_mock_sources
 
-  deps = [ "${sec_comp_dir}/services/security_component_service/sa:security_component_service_src_set" ]
+  deps = sc_deps
 
-  external_deps = [
-    "ability_runtime:app_manager",
-    "access_token:libaccesstoken_sdk",
-    "access_token:libtoken_setproc",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-  ]
+  external_deps = sc_external_deps
 }

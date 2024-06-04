@@ -25,6 +25,7 @@ group("fuzztest") {
     "innerkits/updatesecuritycomponent_fuzzer:UpdateSecurityComponentFuzzTest",
     "innerkits/verifysavepermission_fuzzer:VerifySavePermissionFuzzTest",
     "service/getenhanceremoteobjectstub_fuzzer:GetEnhanceRemoteObjectStubFuzzTest",
+    "service/preregisterseccompprocessstub_fuzzer:PreRegisterSecCompProcessStubFuzzTest",
     "service/registersecuritycomponentstub_fuzzer:RegisterSecurityComponentStubFuzzTest",
     "service/reportsecuritycomponentclickeventstub_fuzzer:ReportSecurityComponentClickEventStubFuzzTest",
     "service/unregistersecuritycomponentstub_fuzzer:UnregisterSecurityComponentStubFuzzTest",

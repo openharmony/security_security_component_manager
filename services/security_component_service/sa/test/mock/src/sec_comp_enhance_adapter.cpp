@@ -68,6 +68,7 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
     return true;
 }
 
+#ifndef FUZZ_ENABLE
 static bool CopyMessageParcel(MessageParcel& oldData, MessageParcel& newData)
 {
     size_t bufferLength = oldData.GetDataSize();
@@ -113,6 +114,83 @@ bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(MessageParcel& input, MessageP
     SC_LOG_DEBUG(LABEL, "EnhanceSrvDeserialize successful.");
     return CopyMessageParcel(input, output);
 }
+#else
+bool WriteMessageParcel(MessageParcel& input, MessageParcel& output)
+{
+    size_t bufLen = input.GetDataSize();
+    if (!output.WriteInt32(bufLen)) {
+        SC_LOG_ERROR(LABEL, "Write buf len fail.");
+        return false;
+    }
+
+    if (bufLen == 0) {
+        SC_LOG_INFO(LABEL, "Input data empty.");
+        return true;
+    }
+
+    char* buf = reinterpret_cast<char*>(input.GetData());
+    if (buf == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get buf err.");
+        return false;
+    }
+
+    if (!output.WriteRawData(reinterpret_cast<void*>(buf), bufLen)) {
+        SC_LOG_ERROR(LABEL, "Write buf fail.");
+        return false;
+    }
+    return true;
+}
+
+bool ReadMessageParcel(MessageParcel& input, MessageParcel& output)
+{
+    int32_t size;
+    if (!input.ReadInt32(size)) {
+        SC_LOG_ERROR(LABEL, "Read buf len fail.");
+        return false;
+    }
+    if (size == 0) {
+        SC_LOG_INFO(LABEL, "Read buf len empty.");
+        return true;
+    }
+
+    const void* it = input.ReadRawData(size);
+    if (it == nullptr) {
+        SC_LOG_ERROR(LABEL, "Read buf fail.");
+        return false;
+    }
+    char* ptr = reinterpret_cast<char*>(const_cast<void*>(it));
+    if (!output.WriteBuffer(reinterpret_cast<void*>(ptr), size)) {
+        SC_LOG_ERROR(LABEL, "Write output buf fail.");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, MessageParcel& output)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceClientSerialize successful.");
+    return WriteMessageParcel(input, output);
+}
+
+bool SecCompEnhanceAdapter::EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceClientDeserialize successful.");
+    return ReadMessageParcel(input, output);
+}
+
+bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceSrvSerialize successful.");
+    return WriteMessageParcel(input, output);
+}
+
+bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
+    MessageParcel& reply)
+{
+    SC_LOG_DEBUG(LABEL, "EnhanceSrvDeserialize successful.");
+    return ReadMessageParcel(input, output);
+}
+#endif // FUZZ_ENABLE
 
 void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
 {

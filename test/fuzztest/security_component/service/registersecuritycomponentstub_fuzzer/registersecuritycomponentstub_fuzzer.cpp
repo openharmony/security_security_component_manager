@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,14 @@
 #include <thread>
 #include <vector>
 #include "accesstoken_kit.h"
+#include "fuzz_common.h"
+#include "i_sec_comp_service.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_info.h"
 #include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include "sec_comp_log.h"
 
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
@@ -30,15 +35,28 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
 {
     uint32_t code =
         SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT;
-    MessageParcel datas;
-    datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
+    MessageParcel rawData;
+    MessageParcel input;
     MessageParcel reply;
-    MessageOption option;
+    CompoRandomGenerator generator(data, size);
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+    uint32_t type = generator.GetScType();
+    if (!rawData.WriteUint32(type)) {
+        return;
+    }
+
+    std::string compoInfo = generator.GenerateRandomCompoStr(type);
+    if (!rawData.WriteString(compoInfo)) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    MessageOption option(MessageOption::TF_SYNC);
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
-    service->OnRemoteRequest(code, datas, reply, option);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 

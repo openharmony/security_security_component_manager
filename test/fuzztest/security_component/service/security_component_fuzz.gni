@@ -1,0 +1,81 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/features.gni")
+import("../../../../security_component.gni")
+
+sc_include_dirs = [
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main",
+  "${sec_comp_dir}/frameworks/common/include",
+  "${sec_comp_dir}/frameworks/enhance_adapter/include",
+  "${sec_comp_dir}/frameworks/security_component/include",
+  "${sec_comp_dir}/interfaces/inner_api/security_component/include",
+  "${sec_comp_dir}/services/security_component_service/sa/test/mock/include",
+  "${sec_comp_dir}/test/fuzztest/security_component/common",
+]
+
+sc_deps = []
+
+sc_cflags_cc = [ "-DFUZZ_ENABLE" ]
+
+sc_external_deps = [
+  "ability_base:base",
+  "ability_base:want",
+  "ability_runtime:ability_manager",
+  "ability_runtime:app_manager",
+  "ability_runtime:runtime",
+  "access_token:libtoken_setproc",
+  "access_token:libtokenid_sdk",
+  "c_utils:utils",
+  "eventhandler:libeventhandler",
+  "graphic_2d:librender_service_client",
+  "hilog:libhilog",
+  "hisysevent:libhisysevent",
+  "hitrace:hitrace_meter",
+  "ipc:ipc_core",
+  "safwk:system_ability_fwk",
+  "samgr:samgr_proxy",
+  "window_manager:libdm",
+  "window_manager:libwm",
+]
+
+sc_service_sources = [
+  "${sec_comp_dir}/frameworks/common/src/sec_comp_tool.cpp",
+  "${sec_comp_dir}/frameworks/security_component/src/location_button.cpp",
+  "${sec_comp_dir}/frameworks/security_component/src/paste_button.cpp",
+  "${sec_comp_dir}/frameworks/security_component/src/save_button.cpp",
+  "${sec_comp_dir}/frameworks/security_component/src/sec_comp_base.cpp",
+  "${sec_comp_dir}/frameworks/security_component/src/sec_comp_click_event_parcel.cpp",
+  "${sec_comp_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_mgr_death_recipient.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_state_observer.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/delay_exit_task.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/first_use_dialog.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_dialog_callback_proxy.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_entity.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_info_helper.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_malicious_apps.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_manager.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_perm_manager.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
+]
+
+sc_mock_sources = [
+  "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/sec_comp_enhance_adapter.cpp",
+  "${sec_comp_dir}/test/fuzztest/security_component/common/fuzz_common.cpp",
+]
