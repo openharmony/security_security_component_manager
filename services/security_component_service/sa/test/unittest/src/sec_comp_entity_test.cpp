@@ -207,4 +207,6 @@ HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level1)
     ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
     clickInfo.key.keyCode = KEY_ENTER;
     ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
+    clickInfo.key.keyCode = KEY_NUMPAD_ENTER;
+    ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
 }
