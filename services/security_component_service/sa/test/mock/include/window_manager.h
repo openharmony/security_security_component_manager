@@ -103,9 +103,18 @@ public:
         compWin->scaleVal_ = 0.0;
         list.emplace_back(compWin);
         list_ = list;
+
+        std::vector<sptr<UnreliableWindowInfo>> info;
+        sptr<UnreliableWindowInfo> unreliableWinInfo = new UnreliableWindowInfo();
+        unreliableWinInfo->windowId_ = 0;
+        unreliableWinInfo->zOrder_ = 0;
+        unreliableWinInfo->floatingScale_ = 0.0;
+        info.emplace_back(unreliableWinInfo);
+        info_ = info;
     };
 
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> list_;
+    std::vector<sptr<Rosen::UnreliableWindowInfo>> info_;
     WMError result_ = OHOS::Rosen::WMError::WM_OK;
 private:
     ~WindowManager() {};
