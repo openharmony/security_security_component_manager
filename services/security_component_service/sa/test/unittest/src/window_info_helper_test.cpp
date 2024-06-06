@@ -60,41 +60,41 @@ public:
 HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level1)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
-    std::vector<sptr<AccessibilityWindowInfo>> list;
-    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
-    compWin->wid_ = 0;
-    compWin->layer_ = 1;
-    compWin->scaleVal_ = 1.0; // window did not scale
+    std::vector<sptr<UnreliableWindowInfo>> list;
+    sptr<UnreliableWindowInfo> compWin = new UnreliableWindowInfo();
+    compWin->windowId_ = 0;
+    compWin->zOrder_ = 1;
+    compWin->floatingScale_ = 1.0; // window did not scale
     list.emplace_back(compWin);
     list.emplace_back(nullptr);
 
-    sptr<AccessibilityWindowInfo> downNotCrossWin = new AccessibilityWindowInfo();
-    downNotCrossWin->wid_ = 1;
-    downNotCrossWin->layer_ = 0;
-    downNotCrossWin->scaleVal_ = 0.0;
+    sptr<UnreliableWindowInfo> downNotCrossWin = new UnreliableWindowInfo();
+    downNotCrossWin->windowId_ = 1;
+    downNotCrossWin->zOrder_ = 0;
+    downNotCrossWin->floatingScale_ = 0.0;
     downNotCrossWin->windowRect_ = Rosen::Rect{ 0, 0, 0, 0 };
     list.emplace_back(downNotCrossWin);
 
-    sptr<AccessibilityWindowInfo> downCrossWin = new AccessibilityWindowInfo();
-    downCrossWin->wid_ = 1;
-    downCrossWin->layer_ = 0;
-    downCrossWin->scaleVal_ = 0.9; // window is scaled to 90%
+    sptr<UnreliableWindowInfo> downCrossWin = new UnreliableWindowInfo();
+    downCrossWin->windowId_ = 1;
+    downCrossWin->zOrder_ = 0;
+    downCrossWin->floatingScale_ = 0.9; // window is scaled to 90%
     downCrossWin->windowRect_ = Rosen::Rect {
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
     list.emplace_back(downCrossWin);
 
-    sptr<AccessibilityWindowInfo> upWin = new AccessibilityWindowInfo();
-    upWin->wid_ = 1;
-    upWin->layer_ = 2; // layer larger than comp window
-    upWin->scaleVal_ = 1.0; // window did not scale
+    sptr<UnreliableWindowInfo> upWin = new UnreliableWindowInfo();
+    upWin->windowId_ = 1;
+    upWin->zOrder_ = 2; // layer larger than comp window
+    upWin->floatingScale_ = 1.0; // window did not scale
     upWin->windowRect_ = Rosen::Rect {
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
     list.emplace_back(upWin);
-    WindowManager::GetInstance().list_ = list;
+    WindowManager::GetInstance().info_ = list;
 
     SecCompRect compRect = {
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
@@ -113,13 +113,13 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level1)
 HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level1)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
-    std::vector<sptr<AccessibilityWindowInfo>> list;
-    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
-    compWin->wid_ = 1;
-    compWin->layer_ = 1;
-    compWin->scaleVal_ = 1.0;
+    std::vector<sptr<UnreliableWindowInfo>> list;
+    sptr<UnreliableWindowInfo> compWin = new UnreliableWindowInfo();
+    compWin->windowId_ = 1;
+    compWin->zOrder_ = 1;
+    compWin->floatingScale_ = 1.0;
     list.emplace_back(compWin);
-    WindowManager::GetInstance().list_ = list;
+    WindowManager::GetInstance().info_ = list;
 
     SecCompRect compRect = {
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
@@ -137,13 +137,13 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level1)
 HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level1)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
-    std::vector<sptr<AccessibilityWindowInfo>> list;
-    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
-    compWin->wid_ = 0;
-    compWin->layer_ = 1;
-    compWin->scaleVal_ = 1.0;
+    std::vector<sptr<UnreliableWindowInfo>> list;
+    sptr<UnreliableWindowInfo> compWin = new UnreliableWindowInfo();
+    compWin->windowId_ = 0;
+    compWin->zOrder_ = 1;
+    compWin->floatingScale_ = 1.0;
     list.emplace_back(compWin);
-    WindowManager::GetInstance().list_ = list;
+    WindowManager::GetInstance().info_ = list;
 
     SecCompRect compRect = {
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
