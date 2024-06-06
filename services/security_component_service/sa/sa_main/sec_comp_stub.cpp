@@ -315,7 +315,7 @@ bool SecCompStub::IsMediaLibraryCalling()
     }
     int32_t userId = uid / BASE_USER_RANGE;
     uint32_t tokenCaller = IPCSkeleton::GetCallingTokenID();
-    if (mediaLibraryTokenId_ == tokenCaller) {
+    if (mediaLibraryTokenId_ != tokenCaller) {
         mediaLibraryTokenId_ = AccessToken::AccessTokenKit::GetHapTokenID(
             userId, "com.ohos.medialibrary.medialibrarydata", 0);
     }
