@@ -15,7 +15,9 @@
 #ifndef SECURITY_COMPONENT_MOCK_SYSTEM_ABILITY_MANAGER_PROXY
 #define SECURITY_COMPONENT_MOCK_SYSTEM_ABILITY_MANAGER_PROXY
 #include <string>
+#ifndef FUZZ_ENABLE
 #include <gmock/gmock.h>
+#endif // FUZZ_ENABLE
 #include "if_system_ability_manager.h"
 
 namespace OHOS {
@@ -24,9 +26,21 @@ public:
     explicit SystemAbilityManagerProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<ISystemAbilityManager>(impl) {}
     ~SystemAbilityManagerProxy() = default;
-
+#ifndef FUZZ_ENABLE
     MOCK_METHOD1(GetSystemAbility, sptr<MockIRemoteObject>(int32_t));
     MOCK_METHOD1(UnloadSystemAbility, int32_t(int32_t));
+#else
+    sptr<MockIRemoteObject> GetSystemAbility(int32_t saId)
+    {
+        sptr<MockIRemoteObject> object = new MockIRemoteObject();
+        return object;
+    }
+
+    int32_t UnloadSystemAbility(int32_t saId)
+    {
+        return 0;
+    }
+#endif // FUZZ_ENABLE
 };
 } // namespace OHOS
 #endif

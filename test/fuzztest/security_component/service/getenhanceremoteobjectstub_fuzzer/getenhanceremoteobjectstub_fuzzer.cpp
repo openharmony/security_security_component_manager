@@ -19,7 +19,10 @@
 #include <vector>
 #include <thread>
 #include "accesstoken_kit.h"
+#include "i_sec_comp_service.h"
 #include "securec.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_service.h"
 #include "token_setproc.h"
 #include "getenhanceremoteobjectstub_fuzzer.h"
 
@@ -28,15 +31,18 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void GetEnhanceRemoteObjectStubFuzzTest(const uint8_t *data, size_t size)
 {
-    MessageParcel datas;
-    datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     uint32_t code = SecurityComponentServiceInterfaceCode::GET_SECURITY_COMPONENT_ENHANCE_OBJECT;
-    service->OnRemoteRequest(code, datas, reply, option);
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 

@@ -18,9 +18,13 @@
 #include <vector>
 #include <thread>
 #include "accesstoken_kit.h"
+#include "fuzz_common.h"
+#include "i_sec_comp_service.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_info.h"
+#include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "sec_comp_service.h"
 #include "unregistersecuritycomponentstub_fuzzer.h"
 
 using namespace OHOS::Security::SecurityComponent;
@@ -28,15 +32,23 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void UnregisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
-    MessageParcel datas;
-    datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     uint32_t code = SecurityComponentServiceInterfaceCode::UNREGISTER_SECURITY_COMPONENT;
-    service->OnRemoteRequest(code, datas, reply, option);
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+    CompoRandomGenerator generator(data, size);
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+    int32_t randomInt = generator.GetData<int32_t>();
+    if (!rawData.WriteInt32(randomInt)) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 

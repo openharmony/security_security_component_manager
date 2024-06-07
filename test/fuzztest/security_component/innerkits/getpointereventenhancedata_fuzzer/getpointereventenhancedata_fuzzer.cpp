@@ -28,7 +28,7 @@ namespace OHOS {
 static void GetPointerEventEnhanceDataFuzzTest(const uint8_t *data, size_t size)
 {
     uint8_t *data1 = const_cast<uint8_t *>(data);
-    uint8_t  enhanceData[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    uint8_t  enhanceData[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; // receive data
     uint32_t enhancedataLen = 10;
     SecCompEnhanceKit::GetPointerEventEnhanceData(data1, size, enhanceData, enhancedataLen);
 }

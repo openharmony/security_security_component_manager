@@ -19,6 +19,11 @@
 #include <vector>
 #include <thread>
 #include "accesstoken_kit.h"
+#include "fuzz_common.h"
+#include "i_sec_comp_service.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_info.h"
+#include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
 
@@ -27,15 +32,25 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void VerifySavePermissionStubFuzzTest(const uint8_t *data, size_t size)
 {
-    MessageParcel datas;
-    datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     uint32_t code = SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION;
-    service->OnRemoteRequest(code, datas, reply, option);
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+    CompoRandomGenerator generator(data, size);
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+
+    uint32_t tokenid = generator.GetData<uint32_t>();
+    if (!rawData.WriteUint32(tokenid)) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 

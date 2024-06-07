@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,40 @@
  * limitations under the License.
  */
 
+#include "preregisterseccompprocessstub_fuzz.h"
+
 #include <iostream>
 #include <string>
-#include <vector>
 #include <thread>
+#include <vector>
 #include "accesstoken_kit.h"
 #include "fuzz_common.h"
+#include "i_sec_comp_service.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_info.h"
+#include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "unregistersecuritycomponent_fuzzer.h"
 
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
-
-static void UnregisterSecurityComponentFuzzTest(const uint8_t *data, size_t size)
+static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t size)
 {
-    CompoRandomGenerator generator(data, size);
-    SecCompKit::UnregisterSecurityComponent(generator.GetData<int32_t>());
+    uint32_t code =
+        SecurityComponentServiceInterfaceCode::PRE_REGISTER_PROCESS;
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service =
+        std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 
@@ -38,6 +54,6 @@ static void UnregisterSecurityComponentFuzzTest(const uint8_t *data, size_t size
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
-    OHOS::UnregisterSecurityComponentFuzzTest(data, size);
+    OHOS::PreRegisterSecCompProcessStubFuzzTest(data, size);
     return 0;
 }

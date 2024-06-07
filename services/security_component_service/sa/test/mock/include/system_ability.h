@@ -14,8 +14,9 @@
   */
 #ifndef MOCK_SECURITY_COMPONENT_SYSTEM_ABILITY_H
 #define MOCK_SECURITY_COMPONENT_SYSTEM_ABILITY_H
-
+#ifndef FUZZ_ENABLE
 #include <gmock/gmock.h>
+#endif // FUZZ_ENABLE
 #include "if_system_ability_manager.h"
 #include "iremote_object.h"
 
@@ -34,8 +35,14 @@ public:
     virtual void OnStart() {};
 
     virtual void OnStop() {};
-
+#ifndef FUZZ_ENABLE
     MOCK_METHOD1(Publish, bool(sptr<IRemoteObject>));
+#else
+    bool Publish(sptr<IRemoteObject> obj)
+    {
+        return true;
+    }
+#endif // FUZZ_ENABLE
 
     SystemAbility(bool runOnCreate = false) {};
 

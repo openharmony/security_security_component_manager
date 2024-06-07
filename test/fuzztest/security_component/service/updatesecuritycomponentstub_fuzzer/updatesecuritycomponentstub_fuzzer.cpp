@@ -18,25 +18,79 @@
 #include <vector>
 #include <thread>
 #include "accesstoken_kit.h"
+#include "fuzz_common.h"
+#include "i_sec_comp_service.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_info.h"
+#include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "sec_comp_service.h"
 #include "updatesecuritycomponentstub_fuzzer.h"
 
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
+static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& compoInfo)
+{
+    uint32_t code =
+        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT;
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return 0;
+    }
+    if (!rawData.WriteUint32(type)) {
+        return 0;
+    }
+
+    if (!rawData.WriteString(compoInfo)) {
+        return 0;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service =
+        std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
+    MessageParcel deserializedReply;
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(reply, deserializedReply);
+    int32_t res = 0;
+    if (!deserializedReply.ReadInt32(res)) {
+        return 0;
+    }
+    int32_t scId = 0;
+    if (!deserializedReply.ReadInt32(scId)) {
+        return 0;
+    }
+    return scId;
+}
+
 static void UpdateSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
-    MessageParcel datas;
-    datas.WriteInterfaceToken(u"ohos.security.ISecCompService");
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     uint32_t code = SecurityComponentServiceInterfaceCode::UPDATE_SECURITY_COMPONENT;
-    service->OnRemoteRequest(code, datas, reply, option);
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+    CompoRandomGenerator generator(data, size);
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return;
+    }
+
+    uint32_t type = generator.GetScType();
+    std::string compoInfo = generator.GenerateRandomCompoStr(type);
+    int32_t scId = RegisterSecurityComponentStub(type, compoInfo);
+    if (!rawData.WriteInt32(scId)) {
+        return;
+    }
+    if (!rawData.WriteString(compoInfo)) {
+        return;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
 }
 } // namespace OHOS
 
