@@ -33,7 +33,7 @@ using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace {
-void emptyCallback(int32_t input)
+void EmptyCallback(int32_t input)
 {
     return;
 }
@@ -120,7 +120,7 @@ static void ReportSecurityComponentClickEventStubFuzzTest(const uint8_t *data, s
         return;
     }
 
-    sptr<SecCompDialogCallback> callbackObj = sptr<SecCompDialogCallback>::MakeSptr(emptyCallback);
+    sptr<SecCompDialogCallback> callbackObj = sptr<SecCompDialogCallback>::MakeSptr(EmptyCallback);
     if (!input.WriteRemoteObject(callbackObj->AsObject())) {
         return;
     }
