@@ -61,6 +61,8 @@ REGISTER_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: The security component is registered successfully}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
+  CALLER_BUNDLE_VERSION: {type: STRING, desc: caller bundle version}
   SC_ID: {type: INT32, desc: security component id}
   SC_TYPE: {type: STRING, desc: security component type}
 
