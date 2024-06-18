@@ -17,6 +17,8 @@
 #include <unistd.h>
 
 #include "app_mgr_death_recipient.h"
+#include "bundle_info.h"
+#include "bundle_mgr_client.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
@@ -33,6 +35,7 @@ namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompService"};
 static const int32_t ROOT_UID = 0;
+static constexpr int32_t BASE_USER_RANGE = 200000;
 }
 
 REGISTER_SYSTEM_ABILITY_BY_ID(SecCompService, SA_ID_SECURITY_COMPONENT_SERVICE, true);
@@ -204,6 +207,20 @@ int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
 
     int32_t res = SecCompManager::GetInstance().RegisterSecurityComponent(type, jsonRes, caller, scId);
     FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
+
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    OHOS::AppExecFwk::BundleMgrClient bmsClient;
+    std::string bundleName = "";
+    bmsClient.GetNameForUid(uid, bundleName);
+
+    AppExecFwk::BundleInfo bundleInfo;
+    int32_t userId = uid / BASE_USER_RANGE;
+    bmsClient.GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId);
+
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALLER_BUNDLE_NAME", bundleName, "CALLER_BUNDLE_VERSION",
+        bundleInfo.versionName, "SC_ID", scId, "SC_TYPE", type);
     return res;
 }
 

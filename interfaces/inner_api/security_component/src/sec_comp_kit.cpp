@@ -52,9 +52,6 @@ int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
         return res;
     }
     SecCompEnhanceAdapter::RegisterScIdEnhance(scId);
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
-        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "SC_ID", scId, "SC_TYPE", type);
     return res;
 }
 

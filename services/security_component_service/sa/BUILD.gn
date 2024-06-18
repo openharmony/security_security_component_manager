@@ -89,6 +89,8 @@ ohos_source_set("security_component_service_src_set") {
     "ability_runtime:app_manager",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "graphic_2d:librender_service_client",
