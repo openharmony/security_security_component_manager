@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -94,3 +94,26 @@ UNREGISTER_SUCCESS:
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
   SC_ID: {type: INT32, desc: security component id}
+
+SESSION_INFO_CHECK_FAILED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
+  CALLER_PID: {type: INT32, desc: caller pid}
+  CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
+  CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
+  SERVICE_SESSION_ID: {type: INT32, desc: session id stored in server}
+  SERVICE_SEQ_NUM: {type: INT32, desc: sequence number stored in server}
+
+CALLBACK_INFO_CHECK_FAILED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
+  CALLER_PID: {type: INT32, desc: caller pid}
+  CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
+  CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
+  SERVICE_SESSION_ID: {type: INT32, desc: session id stored in server}
+  SERVICE_SEQ_NUM: {type: INT32, desc: sequence number stored in server}
+
+PREPROCESS_MESSAGE_FAILED:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
+  PREPROCESS_TYPE: {type: INT32, desc: preprocess type}
+  CALLER_PID: {type: INT32, desc: caller pid}
+  CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
+  CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
