@@ -204,8 +204,6 @@ void SecCompManager::NotifyProcessBackground(int32_t pid)
         return;
     }
 
-    FirstUseDialog::GetInstance().RemoveDialogWaitEntitys(pid);
-
     SecCompPermManager::GetInstance().RevokeAppPermisionsDelayed(iter->second.tokenId);
     iter->second.isForeground = false;
     if (!IsForegroundCompExist()) {
