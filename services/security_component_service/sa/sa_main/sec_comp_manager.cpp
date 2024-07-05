@@ -545,7 +545,7 @@ bool SecCompManager::Initialize()
     SC_LOG_DEBUG(LABEL, "Initialize!!");
     SecCompEnhanceAdapter::StartEnhanceService();
 
-    secRunner_ = AppExecFwk::EventRunner::Create(true);
+    secRunner_ = AppExecFwk::EventRunner::Create(true, AppExecFwk::ThreadMode::FFRT);
     if (!secRunner_) {
         SC_LOG_ERROR(LABEL, "failed to create a recvRunner.");
         return false;
