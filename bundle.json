@@ -16,7 +16,7 @@
     "hisysevent_config": [
       "//base/security/security_component_manager/hisysevent.yaml"
     ],
-    "features": [ "security_component_manager_feature_coverage = false" ],
+    "features": [ "security_component_manager_feature_coverage" ],
     "adapted_system_type": [
       "standard"
     ],
