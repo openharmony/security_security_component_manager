@@ -57,6 +57,7 @@ public:
 private:
     int32_t CheckKeyEvent(const SecCompClickEvent& clickInfo) const;
     int32_t CheckPointEvent(const SecCompClickEvent& clickInfo) const;
+    bool IsScreenReadMode() const;
     bool isGrant_ = false;
 };
 }  // namespace SecurityComponent

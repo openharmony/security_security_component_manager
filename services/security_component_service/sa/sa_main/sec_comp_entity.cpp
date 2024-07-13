@@ -15,8 +15,11 @@
 #include "sec_comp_entity.h"
 
 #include <chrono>
+#include "datashare_helper.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
+#include "iservice_registry.h"
+#include "i_sec_comp_service.h"
 #include "sec_comp_err.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_info_helper.h"
@@ -30,6 +33,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEntity"};
 static constexpr uint64_t MAX_TOUCH_INTERVAL = 1000000L; // 1000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
+constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+constexpr const char *SETTINGS_DATASHARE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+constexpr const char *SETTINGS_DATASHARE_SEARCH_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?" \
+    "Proxy=true&key=accessibility_screenreader_enabled";
+constexpr const char *ADVANCED_DATA_COLUMN_KEYWORD = "KEYWORD";
+constexpr const char *ADVANCED_DATA_COLUMN_VALUE = "VALUE";
 }
 
 int32_t SecCompEntity::GrantTempPermission()
@@ -88,8 +99,12 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
     }
 
     int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
-    if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
+    bool isScreenReadMode = IsScreenReadMode();
+    if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && !isScreenReadMode) {
         res = CheckPointEvent(clickInfo);
+    } else if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && isScreenReadMode) {
+        SC_LOG_WARN(LABEL, "Device is in screen read mode, skip event check.");
+        return SC_OK;
     } else if (clickInfo.type == ClickEventType::KEY_EVENT_TYPE) {
         res = CheckKeyEvent(clickInfo);
     }
@@ -111,6 +126,49 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
         return SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL;
     }
     return SC_OK;
+}
+
+bool SecCompEntity::IsScreenReadMode() const
+{
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get sa manager is nullptr.");
+        return false;
+    }
+    auto remoteObj = saManager->GetSystemAbility(SA_ID_SECURITY_COMPONENT_SERVICE);
+    if (remoteObj == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get remoteObj is nullptr.");
+        return false;
+    }
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+        DataShare::DataShareHelper::Creator(remoteObj, SETTINGS_DATASHARE_URI, SETTINGS_DATA_EXT_URI);
+    if (dataShareHelper == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get dataShareHelper is nullptr.");
+        return false;
+    }
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    predicates.EqualTo(ADVANCED_DATA_COLUMN_KEYWORD, "accessibility_screenreader_enabled");
+    OHOS::Uri uri(SETTINGS_DATASHARE_SEARCH_URI);
+    auto result = dataShareHelper->Query(uri, predicates, columns);
+    if (result == nullptr) {
+        SC_LOG_ERROR(LABEL, "Query result is nullptr.");
+        dataShareHelper->Release();
+        return false;
+    }
+    if (result->GoToFirstRow() != DataShare::E_OK) {
+        SC_LOG_ERROR(LABEL, "Query failed, GoToFirstRow error.");
+        result->Close();
+        dataShareHelper->Release();
+        return false;
+    }
+    int32_t columnIndex;
+    result->GetColumnIndex(ADVANCED_DATA_COLUMN_VALUE, columnIndex);
+    std::string value;
+    result->GetString(columnIndex, value);
+    result->Close();
+    dataShareHelper->Release();
+    return value == "1";
 }
 }  // namespace SecurityComponent
 }  // namespace Security
