@@ -17,6 +17,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <display.h>
+#include <display_info.h>
+#include "display_manager.h"
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
@@ -27,6 +30,26 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
+namespace {
+bool GetScreenSize(double& width, double& height)
+{
+    sptr<OHOS::Rosen::Display> display =
+        OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplaySync();
+    if (display == nullptr) {
+        return false;
+    }
+
+    auto info = display->GetDisplayInfo();
+    if (info == nullptr) {
+        return false;
+    }
+
+    width = static_cast<double>(info->GetWidth());
+    height = static_cast<double>(info->GetHeight());
+    return true;
+}
+};
+
 uint32_t CompoRandomGenerator::GetScType()
 {
     // generate a number in range
@@ -157,10 +180,13 @@ std::string CompoRandomGenerator::ConstructPasteJson()
 void CompoRandomGenerator::ConstructRandomRect(SecCompRect &rect)
 {
     // a window rect should val >= 0
-    rect.x_ = std::fabs(GetData<double>());
-    rect.y_ = std::fabs(GetData<double>());
-    rect.width_ = std::fabs(GetData<double>());
-    rect.height_ = std::fabs(GetData<double>());
+    double width;
+    double height;
+    GetScreenSize(width, height);
+    rect.x_ = std::fmod(std::fabs(GetData<double>()), width);
+    rect.y_ = std::fmod(std::fabs(GetData<double>()), height);
+    rect.width_ = std::fmod(std::fabs(GetData<double>()), width);
+    rect.height_ = std::fmod(std::fabs(GetData<double>()), height);
 }
 
 void CompoRandomGenerator::ConstructButtonRect(
@@ -176,14 +202,21 @@ void CompoRandomGenerator::ConstructButtonRect(
     padding.top = top;
     padding.bottom = window.height_ - bottom;
 
+    double width;
+    double height;
+    double sizeLimitRate = 0.09;
+    GetScreenSize(width, height);
+    double sizeLimit = width * height * sizeLimitRate;
+    double buttonMaxWidth = sizeLimit / buttonRect.height_;
+
     tmp1 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.width_));
     tmp2 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.width_));
     double left = std::min(tmp1, tmp2);
     double right = std::max(tmp1, tmp2);
     buttonRect.x_ = window.x_ + left;
-    buttonRect.width_ = right - left;
+    buttonRect.width_ = std::min({right - left, buttonMaxWidth, window.width_ - buttonRect.x_ - 1});
     padding.left = left;
-    padding.right = window.width_ - right;
+    padding.right = window.width_ - buttonRect.width_ - left;
 }
 
 void CompoRandomGenerator::ConstructWindowJson(

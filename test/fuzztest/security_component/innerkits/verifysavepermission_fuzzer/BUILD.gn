@@ -48,5 +48,6 @@ ohos_fuzztest("VerifySavePermissionFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "hilog:libhilog",
+    "window_manager:libdm",
   ]
 }

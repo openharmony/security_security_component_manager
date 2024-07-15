@@ -52,5 +52,6 @@ ohos_fuzztest("UpdateSecurityComponentFuzzTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "window_manager:libdm",
   ]
 }
