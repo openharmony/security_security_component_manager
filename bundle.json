@@ -29,6 +29,7 @@
         "access_token",
         "bundle_framework",
         "c_utils",
+        "data_share",
         "eventhandler",
         "hilog",
         "hisysevent",
