@@ -85,6 +85,7 @@ ohos_source_set("security_component_service_src_set") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_base:session_info",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:runtime",
