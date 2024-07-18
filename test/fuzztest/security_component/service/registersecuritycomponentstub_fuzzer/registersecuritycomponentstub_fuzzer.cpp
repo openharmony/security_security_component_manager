@@ -14,6 +14,7 @@
  */
 #include "registersecuritycomponentstub_fuzzer.h"
 
+#include <fcntl.h>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -57,6 +58,10 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     service->OnRemoteRequest(code, input, reply, option);
+    auto fd = open("/dev/null", O_WRONLY);
+    std::vector<std::u16string>inputstr = {u""};
+    service->Dump(fd, inputstr);
+    close(fd);
 }
 } // namespace OHOS
 
