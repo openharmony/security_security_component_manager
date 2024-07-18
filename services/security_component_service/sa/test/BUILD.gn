@@ -67,8 +67,8 @@ ohos_unittest("sec_comp_service_test") {
   }
 
   deps = [
-    "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set",
-    "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
+    "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
+    "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
     "//third_party/googletest:gmock_main",
   ]
 
