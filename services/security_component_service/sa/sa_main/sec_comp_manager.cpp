@@ -555,8 +555,10 @@ bool SecCompManager::Initialize()
     DelayExitTask::GetInstance().Init(secHandler_);
     FirstUseDialog::GetInstance().Init(secHandler_);
     SecCompEnhanceAdapter::EnableInputEnhance();
+    SecCompPermManager::GetInstance().InitEventHandler(secHandler_);
+    DelayExitTask::GetInstance().Start();
 
-    return SecCompPermManager::GetInstance().InitEventHandler(secHandler_);
+    return true;
 }
 }  // namespace SecurityComponent
 }  // namespace Security
