@@ -256,10 +256,9 @@ void SecCompPermManager::CancelAppRevokingPermisions(AccessToken::AccessTokenID 
     secHandler_->ProxyRemoveTask(taskName);
 }
 
-bool SecCompPermManager::InitEventHandler(const std::shared_ptr<SecEventHandler>& secHandler)
+void SecCompPermManager::InitEventHandler(const std::shared_ptr<SecEventHandler>& secHandler)
 {
     secHandler_ = secHandler;
-    return true;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

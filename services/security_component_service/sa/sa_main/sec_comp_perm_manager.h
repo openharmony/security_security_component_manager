@@ -41,7 +41,7 @@ public:
     int32_t RevokeAppPermission(AccessToken::AccessTokenID tokenId, const std::string& permissionName);
     void RevokeAppPermissions(AccessToken::AccessTokenID tokenId);
 
-    bool InitEventHandler(const std::shared_ptr<SecEventHandler>& secHandler);
+    void InitEventHandler(const std::shared_ptr<SecEventHandler>& secHandler);
     std::shared_ptr<SecEventHandler> GetSecEventHandler() const;
 
     void RevokeAppPermisionsDelayed(AccessToken::AccessTokenID tokenId);
