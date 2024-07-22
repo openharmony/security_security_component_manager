@@ -41,6 +41,8 @@ constexpr const char *SETTINGS_DATASHARE_SEARCH_URI =
     "Proxy=true&key=accessibility_screenreader_enabled";
 constexpr const char *ADVANCED_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *ADVANCED_DATA_COLUMN_VALUE = "VALUE";
+constexpr const char *QUERY_KEYWORD = "accessibility_screenreader_enabled";
+static bool IsScreenReadMode();
 }
 
 int32_t SecCompEntity::GrantTempPermission()
@@ -128,7 +130,8 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
     return SC_OK;
 }
 
-bool SecCompEntity::IsScreenReadMode() const
+namespace {
+static bool IsScreenReadMode()
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -148,7 +151,7 @@ bool SecCompEntity::IsScreenReadMode() const
     }
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> columns;
-    predicates.EqualTo(ADVANCED_DATA_COLUMN_KEYWORD, "accessibility_screenreader_enabled");
+    predicates.EqualTo(ADVANCED_DATA_COLUMN_KEYWORD, QUERY_KEYWORD);
     OHOS::Uri uri(SETTINGS_DATASHARE_SEARCH_URI);
     auto result = dataShareHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
@@ -169,6 +172,7 @@ bool SecCompEntity::IsScreenReadMode() const
     result->Close();
     dataShareHelper->Release();
     return value == "1";
+}
 }
 }  // namespace SecurityComponent
 }  // namespace Security
