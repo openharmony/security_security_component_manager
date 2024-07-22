@@ -14,10 +14,12 @@
  */
 #include "sec_comp_client.h"
 
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "sec_comp_load_callback.h"
 #include "sec_comp_log.h"
 #include "sec_comp_proxy.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace Security {
@@ -102,6 +104,12 @@ bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
     }
 
     return proxy->VerifySavePermission(tokenId);
+}
+
+bool SecCompClient::IsSystemAppCalling()
+{
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
 }
 
 sptr<IRemoteObject> SecCompClient::GetEnhanceRemoteObject(bool doLoadSa)

@@ -15,9 +15,9 @@
 #include "save_button.h"
 
 #include <tuple>
+#include "ipc_skeleton.h"
 #include "sec_comp_log.h"
 #include "tokenid_kit.h"
-#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace Security {

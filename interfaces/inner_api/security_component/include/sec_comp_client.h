@@ -41,6 +41,7 @@ public:
     int32_t PreRegisterSecCompProcess();
     bool IsServiceExist();
     bool LoadService();
+    bool IsSystemAppCalling();
 
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();
