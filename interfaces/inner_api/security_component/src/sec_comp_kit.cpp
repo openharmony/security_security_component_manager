@@ -159,6 +159,11 @@ bool SecCompKit::LoadService()
 {
     return SecCompClient::GetInstance().LoadService();
 }
+
+bool SecCompKit::IsSystemAppCalling()
+{
+    return SecCompClient::GetInstance().IsSystemAppCalling();
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

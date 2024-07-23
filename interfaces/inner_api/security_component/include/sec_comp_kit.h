@@ -38,6 +38,7 @@ public:
     static int32_t PreRegisterSecCompProcess();
     static bool IsServiceExist();
     static bool LoadService();
+    static bool IsSystemAppCalling();
 };
 }  // namespace SecurityComponent
 }  // namespace Security
