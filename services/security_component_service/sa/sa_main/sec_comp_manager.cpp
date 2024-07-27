@@ -241,7 +241,7 @@ void SecCompManager::NotifyProcessDied(int32_t pid)
 
 void SecCompManager::ExitSaProcess()
 {
-    OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
+    OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     if (IsCompExist()) {
         SC_LOG_INFO(LABEL, "Apps using security component still exist, no exit sa");
         return;
