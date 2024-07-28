@@ -32,6 +32,7 @@ void SecCompDialogCallback::OnDialogClosed(int32_t result)
 
     SC_LOG_DEBUG(LABEL, "OnDialogClosed call");
     callback_(result);
+    callback_ = nullptr;
 }
 } // namespace SecurityComponent
 } // namespace Security
