@@ -19,6 +19,7 @@
 #include "iremote_stub.h"
 #include "nocopyable.h"
 #include "sec_comp_dialog_callback_stub.h"
+#include "sec_comp_err.h"
 #include "sec_comp_info.h"
 
 namespace OHOS {
@@ -31,7 +32,12 @@ public:
         callback_ = std::move(callback);
     };
 
-    ~SecCompDialogCallback() override {};
+    ~SecCompDialogCallback() override
+    {
+        if (callback_) {
+            callback_(SC_SERVICE_ERROR_GRANT_CANCEL_FOR_DIALOG_CLOSE);
+        }
+    };
 
     void OnDialogClosed(int32_t result) override;
 private:
