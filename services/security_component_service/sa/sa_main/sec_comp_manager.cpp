@@ -14,6 +14,7 @@
  */
 #include "sec_comp_manager.h"
 
+#include "bundle_mgr_client.h"
 #include "delay_exit_task.h"
 #include "hisysevent.h"
 #include "i_sec_comp_service.h"
@@ -21,6 +22,7 @@
 #include "iservice_registry.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
+#include "sec_comp_info.h"
 #include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
 
@@ -296,14 +298,18 @@ void SecCompManager::ExitWhenAppMgrDied()
 void SecCompManager::SendCheckInfoEnhanceSysEvent(int32_t scId,
     SecCompType type, const std::string& scene, int32_t res)
 {
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    OHOS::AppExecFwk::BundleMgrClient bmsClient;
+    std::string bundleName = "";
+    bmsClient.GetNameForUid(uid, bundleName);
     if (res == SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CHALLENGE_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", type, "CALL_SCENE",
             scene);
     } else {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLBACK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_TYPE", type,
             "CALL_SCENE", scene, "REASON", TransformCallBackResult(static_cast<enum SCErrCode>(res)));
     }
@@ -345,8 +351,12 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     std::shared_ptr<SecCompBase> component(componentPtr);
     if (component == nullptr) {
         SC_LOG_ERROR(LABEL, "Parse component info invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "REGITSTER", "SC_TYPE", type);
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
@@ -392,8 +402,12 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     if (reportComponentInfo == nullptr) {
         SC_LOG_ERROR(LABEL, "Update component info invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "UPDATE",
             "SC_TYPE", sc->GetType());
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
@@ -430,16 +444,24 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     if ((reportComponentInfo == nullptr) || (!reportComponentInfo->GetValid())) {
         SC_LOG_ERROR(LABEL, "report component info invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
             sc->GetType());
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
             sc->GetType());
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
@@ -455,6 +477,18 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
 
     sc->componentInfo_ = reportComponentInfo;
     return SC_OK;
+}
+
+static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType eventType, int32_t scId,
+    SecCompType scType)
+{
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    OHOS::AppExecFwk::BundleMgrClient bmsClient;
+    std::string bundleName = "";
+    bmsClient.GetNameForUid(uid, bundleName);
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, eventName,
+        eventType, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
+        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
 int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
@@ -486,9 +520,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
 
     res = sc->CheckClickInfo(clickInfo);
     if (res != SC_OK) {
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", sc->GetType());
+        ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
+            scId, sc->GetType());
         if (res == SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL) {
             malicious_.AddAppToMaliciousAppList(caller.pid);
         }
@@ -504,9 +537,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
 
     res = sc->GrantTempPermission();
     if (res != SC_OK) {
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_FAILED",
-            HiviewDFX::HiSysEvent::EventType::FAULT, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", sc->GetType());
+        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT,
+            scId, sc->GetType());
         return res;
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
