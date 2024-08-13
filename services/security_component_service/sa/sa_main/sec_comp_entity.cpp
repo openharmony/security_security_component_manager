@@ -15,6 +15,7 @@
 #include "sec_comp_entity.h"
 
 #include <chrono>
+#include "bundle_mgr_client.h"
 #include "datashare_helper.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
@@ -122,8 +123,12 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
 
     if ((res != SC_OK) && (res != SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE)) {
         SC_LOG_ERROR(LABEL, "HMAC checkout failed");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId_, "SC_TYPE", componentInfo_->type_);
         return SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL;
     }

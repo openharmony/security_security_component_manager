@@ -17,6 +17,7 @@ CALLBACK_FAILED:
   __BASE: {type: SECURITY, level: CRITICAL, desc: Failed to execute the callback}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CALL_SCENE: {type: STRING, desc: call scene}
   REASON: {type: STRING, desc: callback execution failure cause}
   SC_ID: {type: INT32, desc: security component id}
@@ -26,12 +27,14 @@ CALLER_CHECK_FAILED:
   __BASE: {type: SECURITY, level: CRITICAL, desc: Illegal invocation}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CALL_SCENE: {type: STRING, desc: call scene}
 
 CHALLENGE_CHECK_FAILED:
   __BASE: {type: SECURITY, level: CRITICAL, desc: Challenge value verification failed}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CALL_SCENE: {type: STRING, desc: call scene}
   SC_ID: {type: INT32, desc: security component id}
   SC_TYPE: {type: STRING, desc: security component type}
@@ -40,6 +43,7 @@ CLICK_INFO_CHECK_FAILED:
   __BASE: {type: SECURITY, level: CRITICAL, desc: Failed to verify the click event}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   SC_ID: {type: INT32, desc: security component id}
   SC_TYPE: {type: STRING, desc: security component type}
 
@@ -47,6 +51,7 @@ COMPONENT_INFO_CHECK_FAILED:
   __BASE: {type: SECURITY, level: CRITICAL, desc: Failed to verify the component information}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CALL_SCENE: {type: STRING, desc: call scene}
   SC_ID: {type: INT32, desc: security component id}
   SC_TYPE: {type: STRING, desc: security component type}
@@ -55,6 +60,7 @@ INIT_FAILED:
   __BASE: {type: FAULT, level: CRITICAL, desc: Failed to initialize the security component environment}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   REASON: {type: STRING, desc: callback execution failure cause}
 
 REGISTER_SUCCESS:
@@ -79,6 +85,7 @@ TEMP_GRANT_FAILED:
   __BASE: {type: FAULT, level: CRITICAL, desc: Security component authorization failed}
   CALLER_PID: {type: INT32, desc: caller pid}
   CALLER_UID: {type: INT32, desc: caller uid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   SC_ID: {type: INT32, desc: security component id}
   SC_TYPE: {type: STRING, desc: security component type}
 
@@ -98,6 +105,7 @@ UNREGISTER_SUCCESS:
 SESSION_INFO_CHECK_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
   CALLER_PID: {type: INT32, desc: caller pid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
   CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
   SERVICE_SESSION_ID: {type: INT32, desc: session id stored in server}
@@ -106,6 +114,7 @@ SESSION_INFO_CHECK_FAILED:
 CALLBACK_INFO_CHECK_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
   CALLER_PID: {type: INT32, desc: caller pid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
   CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
   SERVICE_SESSION_ID: {type: INT32, desc: session id stored in server}
@@ -115,5 +124,6 @@ PREPROCESS_MESSAGE_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, desc: Failed to verify session information}
   PREPROCESS_TYPE: {type: INT32, desc: preprocess type}
   CALLER_PID: {type: INT32, desc: caller pid}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
   CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
