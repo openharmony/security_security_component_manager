@@ -57,6 +57,7 @@ ohos_unittest("sec_comp_service_test") {
     "unittest/src/sec_comp_stub_test.cpp",
     "unittest/src/service_test_common.cpp",
     "unittest/src/window_info_helper_test.cpp",
+    "unittest/src/zzenv_exit_operate.cpp",
   ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
