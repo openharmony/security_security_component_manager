@@ -703,3 +703,28 @@ HWTEST_F(SecCompManagerTest, TransformCallBackResult001, TestSize.Level1)
     res = SC_SERVICE_ERROR_VALUE_INVALID;
     SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
 }
+
+/**
+ * @tc.name: AddSecurityComponentProcess001
+ * @tc.desc: Test AddSecurityComponentProcess
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, AddSecurityComponentProcess001, TestSize.Level1)
+{
+    bool isSaExit = SecCompManager::GetInstance().isSaExit_;
+    SecCompManager::GetInstance().isSaExit_ = true;
+    SecCompCallerInfo info = {
+        .pid = 0,
+        .tokenId = 0,
+        .uid = 0,
+    };
+    EXPECT_EQ(SC_SERVICE_ERROR_SERVICE_NOT_EXIST,
+        SecCompManager::GetInstance().AddSecurityComponentProcess(info));
+    auto oldmap = SecCompManager::GetInstance().componentMap_;
+    SecCompManager::GetInstance().componentMap_.clear();
+    SecCompManager::GetInstance().isSaExit_ = false;
+    EXPECT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentProcess(info));
+    SecCompManager::GetInstance().componentMap_ = oldmap;
+    SecCompManager::GetInstance().isSaExit_ = isSaExit;
+}
