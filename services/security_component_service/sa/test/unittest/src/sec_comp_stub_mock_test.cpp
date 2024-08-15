@@ -15,6 +15,7 @@
 
 #include "sec_comp_stub_mock_test.h"
 
+#include "sec_comp_dialog_callback.h"
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
 #include "sec_comp_click_event_parcel.h"
@@ -248,4 +249,20 @@ HWTEST_F(SecCompStubMockTest, UnmarshallingMock001, TestSize.Level1)
     uint8_t data[32] = {0};
     in.WriteBuffer(data, 32);
     EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+}
+
+/**
+ * @tc.name: PreRegisterSecCompProcessMock001
+ * @tc.desc: Test PreRegisterSecCompProcessInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompStubMockTest, PreRegisterSecCompProcessMock001, TestSize.Level1)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    data.FlushBuffer();
+    reply.FlushBuffer();
+    data.WriteInt32(1);
+    ASSERT_EQ(SC_OK, stub_->PreRegisterSecCompProcessInner(data, reply));
 }

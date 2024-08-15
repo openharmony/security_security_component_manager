@@ -14,6 +14,7 @@
  */
 #include "first_use_dialog_test.h"
 
+#include <cstdio>
 #include "accesstoken_kit.h"
 #include "location_button.h"
 #include "save_button.h"
@@ -42,6 +43,23 @@ void FirstUseDialogTest::SetUpTestCase()
 
 void FirstUseDialogTest::TearDownTestCase()
 {
+    struct stat fstatJson = {};
+    if (stat(SEC_COMP_SRV_CFG_FILE.c_str(), &fstatJson) != 0) {
+        return;
+    }
+    // if json file is created by root, delete it
+    if (fstatJson.st_uid == 0) {
+        std::string cmdline = "rm -f " + SEC_COMP_SRV_CFG_FILE;
+        system(cmdline.c_str());
+    }
+    struct stat fstatDir = {};
+    if (stat(SEC_COMP_SRV_CFG_PATH.c_str(), &fstatDir) != 0) {
+        return;
+    }
+    if (fstatDir.st_uid == 0) {
+        std::string cmdline = "chown security_component:security_component " + SEC_COMP_SRV_CFG_PATH;
+        system(cmdline.c_str());
+    }
 }
 
 void FirstUseDialogTest::SetUp()
