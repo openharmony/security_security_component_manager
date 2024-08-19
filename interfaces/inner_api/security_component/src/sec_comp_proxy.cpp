@@ -283,25 +283,17 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
 bool SecCompProxy::VerifySavePermission(AccessToken::AccessTokenID tokenId)
 {
     std::lock_guard<std::mutex> lock(useIPCMutex_);
-    MessageParcel rawData;
     MessageParcel data;
     if (!data.WriteInterfaceToken(SecCompProxy::GetDescriptor())) {
         SC_LOG_ERROR(LABEL, "Verify write descriptor failed.");
         return false;
     }
-
-    if (!rawData.WriteUint32(tokenId)) {
+    if (!data.WriteUint32(tokenId)) {
         SC_LOG_ERROR(LABEL, "Verify write tokenId failed.");
         return false;
     }
 
-    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, data)) {
-        SC_LOG_ERROR(LABEL, "Verify serialize session info failed.");
-        return false;
-    }
-
     MessageParcel reply;
-    MessageParcel deserializedReply;
     MessageOption option(MessageOption::TF_SYNC);
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
@@ -311,19 +303,12 @@ bool SecCompProxy::VerifySavePermission(AccessToken::AccessTokenID tokenId)
     int32_t requestResult = remote->SendRequest(
         static_cast<uint32_t>(SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION),
         data, reply, option);
-
-    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(reply, deserializedReply)) {
-        SC_LOG_ERROR(LABEL, "Verify deserialize session info failed.");
-        return false;
-    }
-
     if (requestResult != SC_OK) {
         SC_LOG_ERROR(LABEL, "Verify request failed, result: %{public}d.", requestResult);
         return false;
     }
-
     bool res;
-    if (!deserializedReply.ReadBool(res)) {
+    if (!reply.ReadBool(res)) {
         SC_LOG_ERROR(LABEL, "Verify read res failed.");
         return false;
     }
