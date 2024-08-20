@@ -232,13 +232,8 @@ int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParce
         SC_LOG_ERROR(LABEL, "Not medialibrary called");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
-    MessageParcel deserializedData;
-    if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(data, deserializedData, reply)) {
-        SC_LOG_ERROR(LABEL, "Verify deserialize session info failed");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
     uint32_t tokenId;
-    if (!deserializedData.ReadUint32(tokenId)) {
+    if (!data.ReadUint32(tokenId)) {
         SC_LOG_ERROR(LABEL, "Verify read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
@@ -249,14 +244,8 @@ int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParce
     }
 
     bool res = this->VerifySavePermission(tokenId);
-    MessageParcel rawReply;
-    if (!rawReply.WriteBool(res)) {
+    if (!reply.WriteBool(res)) {
         SC_LOG_ERROR(LABEL, "Verify temp save permission result failed");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(rawReply, reply)) {
-        SC_LOG_ERROR(LABEL, "Verify serialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
