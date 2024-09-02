@@ -24,6 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "DelayExitTask"};
 static const std::string DELAY_EXIT_TASK = "DelayExitTask";
 static const int32_t DELAY_EXIT_MILLISECONDS = 120 * 1000; // 2m
+static std::mutex g_instanceMutex;
 }
 
 DelayExitTask::DelayExitTask()
@@ -32,8 +33,14 @@ DelayExitTask::DelayExitTask()
 
 DelayExitTask& DelayExitTask::GetInstance()
 {
-    static DelayExitTask instance;
-    return instance;
+    static DelayExitTask* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new DelayExitTask();
+        }
+    }
+    return *instance;
 }
 
 void DelayExitTask::Init(const std::shared_ptr<SecEventHandler>& secHandler)

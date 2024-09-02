@@ -25,12 +25,19 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURIT
 static const int32_t DELAY_REVOKE_MILLISECONDS = 10 * 1000;
 static const std::string REVOKE_TASK_PREFIX = "RevokeAll";
 static const std::string REVOKE_SAVE_PERM_TASK_PREFIX = "RevokeSavePerm";
+static std::mutex g_instanceMutex;
 }
 
 SecCompPermManager& SecCompPermManager::GetInstance()
 {
-    static SecCompPermManager instance;
-    return instance;
+    static SecCompPermManager* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new SecCompPermManager();
+        }
+    }
+    return *instance;
 }
 
 bool SecCompPermManager::DelaySaveRevokePermission(AccessToken::AccessTokenID tokenId, const std::string& taskName)

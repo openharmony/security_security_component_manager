@@ -26,12 +26,19 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClient"};
+static std::mutex g_instanceMutex;
 }  // namespace
 
 SecCompClient& SecCompClient::GetInstance()
 {
-    static SecCompClient instance;
-    return instance;
+    static SecCompClient* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new SecCompClient();
+        }
+    }
+    return *instance;
 }
 
 SecCompClient::SecCompClient()

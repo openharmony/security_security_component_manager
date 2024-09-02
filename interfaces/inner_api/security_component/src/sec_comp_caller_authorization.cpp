@@ -14,6 +14,7 @@
  */
 #include "sec_comp_caller_authorization.h"
 
+#include <mutex>
 #include "sec_comp_log.h"
 
 namespace OHOS {
@@ -24,6 +25,7 @@ static constexpr int32_t MAX_FUNC_ASM_SIZE = 0x250;
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompCallerAuthorization"};
 static constexpr size_t MAX_CALLER_SIZE = 10;
+static std::mutex g_instanceMutex;
 }
 
 void SecCompCallerAuthorization::RegisterSecCompKitCaller(std::vector<uintptr_t>& callerList)
@@ -58,8 +60,14 @@ bool SecCompCallerAuthorization::IsKitCaller(uintptr_t callerAddr)
 
 SecCompCallerAuthorization& SecCompCallerAuthorization::GetInstance()
 {
-    static SecCompCallerAuthorization instance;
-    return instance;
+    static SecCompCallerAuthorization* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new SecCompCallerAuthorization();
+        }
+    }
+    return *instance;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

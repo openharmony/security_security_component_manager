@@ -49,6 +49,7 @@ const std::string CALLBACK_KEY = "ohos.ability.params.callback";
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
+static std::mutex g_instanceMutex;
 }
 
 void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
@@ -70,8 +71,14 @@ void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
 
 FirstUseDialog& FirstUseDialog::GetInstance()
 {
-    static FirstUseDialog instance;
-    return instance;
+    static FirstUseDialog* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new FirstUseDialog();
+        }
+    }
+    return *instance;
 }
 
 bool FirstUseDialog::IsCfgDirExist(void)
