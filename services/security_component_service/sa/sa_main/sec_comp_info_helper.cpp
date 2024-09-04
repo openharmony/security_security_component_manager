@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompInfoHelper"};
 static constexpr double MAX_RECT_PERCENT = 0.1F; // 10%
 static constexpr double ZERO_OFFSET = 0.0F;
-static std::mutex g_renderLock;
 }
 
 void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
