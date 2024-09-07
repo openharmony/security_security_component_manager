@@ -60,6 +60,7 @@ ohos_source_set("security_component_enhance_sdk_src_set") {
 }
 
 ohos_source_set("security_component_no_cfi_enhance_sdk_src_set") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   part_name = "security_component_manager"
   public_configs = [ ":sec_comp_enhance_config" ]
