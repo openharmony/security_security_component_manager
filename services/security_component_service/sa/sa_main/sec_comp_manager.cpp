@@ -35,6 +35,7 @@ static constexpr int32_t SC_ID_START = 1000;
 static constexpr int32_t MAX_INT_NUM = 0x7fffffff;
 static constexpr int32_t MAX_SINGLE_PROC_COMP_SIZE = 500;
 static constexpr unsigned long REPORT_REMOTE_OBJECT_SIZE = 2UL;
+static std::mutex g_instanceMutex;
 }
 
 SecCompManager::SecCompManager()
@@ -44,8 +45,14 @@ SecCompManager::SecCompManager()
 
 SecCompManager& SecCompManager::GetInstance()
 {
-    static SecCompManager instance;
-    return instance;
+    static SecCompManager* instance = nullptr;
+    if (instance == nullptr) {
+        std::lock_guard<std::mutex> lock(g_instanceMutex);
+        if (instance == nullptr) {
+            instance = new SecCompManager();
+        }
+    }
+    return *instance;
 }
 
 int32_t SecCompManager::CreateScId()
