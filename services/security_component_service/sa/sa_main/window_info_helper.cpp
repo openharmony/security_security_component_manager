@@ -39,6 +39,7 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
         return windowId == info->wid_;
     });
     if ((iter == infos.end()) || (*iter == nullptr)) {
+        SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
         return scale;
     }
     scale = (*iter)->scaleVal_;
@@ -73,7 +74,8 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
     }
 
     int32_t compLayer = INVALID_WINDOW_LAYER;
-    std::vector<int32_t> layerList;
+    // {windowId, zOrder}
+    std::vector<std::pair<int32_t, int32_t>> layerList;
     for (auto& info : infos) {
         if (info == nullptr) {
             continue;
@@ -88,7 +90,7 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
             info->windowRect_.height_ *= info->floatingScale_;
         }
         if (IsRectInWindRect(info->windowRect_, secRect)) {
-            layerList.emplace_back(info->zOrder_);
+            layerList.emplace_back(std::make_pair(info->windowId_, info->zOrder_));
         }
     }
 
@@ -101,11 +103,13 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         return true;
     }
 
-    auto iter = std::find_if(layerList.begin(), layerList.end(), [compLayer](const int layer) {
-        return layer >= compLayer;
+    auto iter = std::find_if(layerList.begin(), layerList.end(),
+        [compLayer](const std::pair<int32_t, int32_t> layer) {
+        return layer.second >= compLayer;
     });
     if (iter != layerList.end()) {
-        SC_LOG_ERROR(LABEL, "component window %{public}d is covered, click check failed", compWinId);
+        SC_LOG_ERROR(LABEL, "component window %{public}d is covered by %{public}d, click check failed",
+            compWinId, iter->first);
         return false;
     }
     return true;
