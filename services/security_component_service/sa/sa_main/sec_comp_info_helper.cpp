@@ -248,6 +248,7 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
                         tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
                     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
                 }
+                SC_LOG_INFO(LABEL, "Grant location permission, scid = %{public}d.", componentInfo->nodeId_);
                 return SC_OK;
             }
         case PASTE_COMPONENT:
@@ -255,14 +256,14 @@ int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenI
             if (res != SC_OK) {
                 return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
             }
-            SC_LOG_DEBUG(LABEL, "grant paste permission");
+            SC_LOG_INFO(LABEL, "Grant paste permission, scid = %{public}d.", componentInfo->nodeId_);
             return SC_OK;
         case SAVE_COMPONENT:
             if (IsDlpSandboxCalling(tokenId)) {
                 SC_LOG_INFO(LABEL, "Dlp sandbox app are not allowed to use save component.");
                 return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
             }
-            SC_LOG_DEBUG(LABEL, "grant save permission");
+            SC_LOG_INFO(LABEL, "Grant save permission, scid = %{public}d.", componentInfo->nodeId_);
             return SecCompPermManager::GetInstance().GrantTempSavePermission(tokenId);
         default:
             SC_LOG_ERROR(LABEL, "Parse component type unknown");

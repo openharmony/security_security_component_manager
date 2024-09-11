@@ -345,7 +345,6 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
 
 bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
 {
-    SC_LOG_ERROR(LABEL, "1111");
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
         SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
         return false;
@@ -377,7 +376,6 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
         SC_LOG_ERROR(LABEL, "bg is invalid.");
         return false;
     }
-    SC_LOG_ERROR(LABEL, "2222");
     return true;
 }
 }  // namespace base
