@@ -106,6 +106,7 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
 }
 
 ohos_source_set("security_component_no_cfi_framework_src_set") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   part_name = "security_component_manager"
   include_dirs = [
@@ -141,6 +142,7 @@ ohos_source_set("security_component_no_cfi_framework_src_set") {
 }
 
 ohos_source_set("security_component_no_cfi_enhance_adapter_src_set") {
+  branch_protector_ret = "pac_ret"
   subsystem_name = "security"
   part_name = "security_component_manager"
   include_dirs = [
