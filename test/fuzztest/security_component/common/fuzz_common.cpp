@@ -31,23 +31,9 @@ namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 namespace {
-bool GetScreenSize(double& width, double& height)
-{
-    sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplaySync();
-    if (display == nullptr) {
-        return false;
-    }
-
-    auto info = display->GetDisplayInfo();
-    if (info == nullptr) {
-        return false;
-    }
-
-    width = static_cast<double>(info->GetWidth());
-    height = static_cast<double>(info->GetHeight());
-    return true;
-}
+static const int32_t DEFAULT_BUTTON_SIZE = 20;
+static const int32_t DEFAULT_SCREEN_SIZE = 128;
+static const int32_t BUTTON_FLOAT_SIZE = 10;
 };
 
 uint32_t CompoRandomGenerator::GetScType()
@@ -55,6 +41,7 @@ uint32_t CompoRandomGenerator::GetScType()
     // generate a number in range
     return GetData<uint32_t>() % (SecCompType::MAX_SC_TYPE - 1) + 1;
 }
+
 std::string CompoRandomGenerator::GenerateRandomCompoStr(uint32_t type)
 {
     switch (type) {
@@ -103,9 +90,9 @@ std::string CompoRandomGenerator::ConstructLocationJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
-    return jsonComponent.dump();
+    compoJson_ = jsonComponent;
+    return compoJson_.dump();
 }
-
 
 std::string CompoRandomGenerator::ConstructSaveJson()
 {
@@ -139,7 +126,8 @@ std::string CompoRandomGenerator::ConstructSaveJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
-    return jsonComponent.dump();
+    compoJson_ = jsonComponent;
+    return compoJson_.dump();
 }
 
 std::string CompoRandomGenerator::ConstructPasteJson()
@@ -174,49 +162,27 @@ std::string CompoRandomGenerator::ConstructPasteJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
-    return jsonComponent.dump();
-}
-
-void CompoRandomGenerator::ConstructRandomRect(SecCompRect &rect)
-{
-    // a window rect should val >= 0
-    double width;
-    double height;
-    GetScreenSize(width, height);
-    rect.x_ = std::fmod(std::fabs(GetData<double>()), width);
-    rect.y_ = std::fmod(std::fabs(GetData<double>()), height);
-    rect.width_ = std::fmod(std::fabs(GetData<double>()), width);
-    rect.height_ = std::fmod(std::fabs(GetData<double>()), height);
+    compoJson_ = jsonComponent;
+    return compoJson_.dump();
 }
 
 void CompoRandomGenerator::ConstructButtonRect(
     SecCompRect &window, PaddingSize &padding, SecCompRect &buttonRect)
 {
-    ConstructRandomRect(window);
-    double tmp1 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.height_));
-    double tmp2 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.height_));
-    double top = std::min(tmp1, tmp2);
-    double bottom = std::max(tmp1, tmp2);
-    buttonRect.y_ = window.y_ + top;
-    buttonRect.height_ = bottom - top;
-    padding.top = top;
-    padding.bottom = window.height_ - bottom;
+    window.x_ = (DEFAULT_SCREEN_SIZE >> 1) - BUTTON_FLOAT_SIZE;
+    window.y_ = (DEFAULT_SCREEN_SIZE >> 1) - BUTTON_FLOAT_SIZE;
+    window.width_ = (DEFAULT_SCREEN_SIZE >> 1) + BUTTON_FLOAT_SIZE;
+    window.height_ = (DEFAULT_SCREEN_SIZE >> 1) + BUTTON_FLOAT_SIZE;
+    
+    buttonRect.x_ = std::fmod(std::fabs(GetData<double>()), window.width_) + window.x_;
+    buttonRect.y_ = std::fmod(std::fabs(GetData<double>()), window.height_) + window.y_;
+    buttonRect.width_ = DEFAULT_BUTTON_SIZE;
+    buttonRect.height_ = DEFAULT_BUTTON_SIZE;
 
-    double width;
-    double height;
-    double sizeLimitRate = 0.09;
-    GetScreenSize(width, height);
-    double sizeLimit = width * height * sizeLimitRate;
-    double buttonMaxWidth = sizeLimit / buttonRect.height_;
-
-    tmp1 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.width_));
-    tmp2 = std::fmod(std::fabs(GetData<double>()), static_cast<double>(window.width_));
-    double left = std::min(tmp1, tmp2);
-    double right = std::max(tmp1, tmp2);
-    buttonRect.x_ = window.x_ + left;
-    buttonRect.width_ = std::min({right - left, buttonMaxWidth, window.width_ - buttonRect.x_ - 1});
-    padding.left = left;
-    padding.right = window.width_ - buttonRect.width_ - left;
+    padding.bottom = window.y_ + window.height_ - buttonRect.y_ - buttonRect.height_;
+    padding.top = window.y_ - buttonRect.y_;
+    padding.left = buttonRect.x_ - window.x_;
+    padding.right = window.x_ + window.width_ - buttonRect.x_ - buttonRect.width_;
 }
 
 void CompoRandomGenerator::ConstructWindowJson(

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -37,7 +38,47 @@ void EmptyCallback(int32_t input)
 {
     return;
 }
+
+bool ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number_float()) {
+        return false;
+    }
+
+    res = json.at(tag).get<double>();
+    return true;
 }
+
+void GetCompoRect(nlohmann::json &jsonComponent, SecCompRect& rect)
+{
+    if ((jsonComponent.find(JsonTagConstants::JSON_RECT) == jsonComponent.end()) ||
+        !jsonComponent.at(JsonTagConstants::JSON_RECT).is_object()) {
+        return;
+    }
+
+    auto jsonSize = jsonComponent.at(JsonTagConstants::JSON_RECT);
+    if (!ParseDimension(jsonSize, JsonTagConstants::JSON_RECT_X, rect.x_)) {
+        return;
+    }
+
+    if (!ParseDimension(jsonSize, JsonTagConstants::JSON_RECT_Y, rect.y_)) {
+        return;
+    }
+
+    if (!ParseDimension(jsonSize, JsonTagConstants::JSON_RECT_WIDTH, rect.width_)) {
+        return;
+    }
+
+    if (!ParseDimension(jsonSize, JsonTagConstants::JSON_RECT_HEIGHT, rect.height_)) {
+        return;
+    }
+
+    return;
+}
+static constexpr uint64_t MAX_TOUCH_INTERVAL = 1000000L; // 1000ms
+static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
+}
+
 void ConstructClickEvent(CompoRandomGenerator &generator, SecCompClickEvent& clickEvent)
 {
     int32_t randomType = generator.GetData<int32_t>() % 2 + 1; // generate type in range
@@ -45,13 +86,17 @@ void ConstructClickEvent(CompoRandomGenerator &generator, SecCompClickEvent& cli
 
     SecCompKeyEvent keyEvent;
     SecCompPointEvent pointEvent;
+    SecCompRect rect;
+    uint64_t current = static_cast<uint64_t>(
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
+    GetCompoRect(generator.compoJson_, rect);
     if (clickEvent.type == ClickEventType::POINT_EVENT_TYPE) {
-        pointEvent.touchX = generator.GetData<double>();
-        pointEvent.touchY = generator.GetData<double>();
-        pointEvent.timestamp = generator.GetData<uint64_t>();
+        pointEvent.touchX = std::fmod(generator.GetData<double>(), rect.width_) + rect.x_;
+        pointEvent.touchY = std::fmod(generator.GetData<double>(), rect.height_) + rect.y_;
+        pointEvent.timestamp = generator.GetData<uint64_t>() % MAX_TOUCH_INTERVAL + current;
         clickEvent.point = pointEvent;
     } else if (clickEvent.type == ClickEventType::KEY_EVENT_TYPE) {
-        keyEvent.timestamp = generator.GetData<uint64_t>();
+        keyEvent.timestamp = generator.GetData<uint64_t>() % MAX_TOUCH_INTERVAL + current;
         keyEvent.keyCode = generator.GetData<uint32_t>();
         clickEvent.key = keyEvent;
     }
