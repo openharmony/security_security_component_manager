@@ -30,6 +30,42 @@
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
+static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& compoInfo)
+{
+    uint32_t code =
+        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT;
+    MessageParcel rawData;
+    MessageParcel input;
+    MessageParcel reply;
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return 0;
+    }
+    if (!rawData.WriteUint32(type)) {
+        return 0;
+    }
+
+    if (!rawData.WriteString(compoInfo)) {
+        return 0;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service =
+        std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
+    MessageParcel deserializedReply;
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(reply, deserializedReply);
+    int32_t res = 0;
+    if (!deserializedReply.ReadInt32(res)) {
+        return 0;
+    }
+    int32_t scId = 0;
+    if (!deserializedReply.ReadInt32(scId)) {
+        return 0;
+    }
+    return scId;
+}
+
 static void UnregisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
     uint32_t code = SecurityComponentServiceInterfaceCode::UNREGISTER_SECURITY_COMPONENT;
@@ -37,11 +73,13 @@ static void UnregisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t 
     MessageParcel input;
     MessageParcel reply;
     CompoRandomGenerator generator(data, size);
+    uint32_t type = generator.GetScType();
+    std::string compoInfo = generator.GenerateRandomCompoStr(type);
+    int32_t scId = RegisterSecurityComponentStub(type, compoInfo);
     if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
         return;
     }
-    int32_t randomInt = generator.GetData<int32_t>();
-    if (!rawData.WriteInt32(randomInt)) {
+    if (!rawData.WriteInt32(scId)) {
         return;
     }
     SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);

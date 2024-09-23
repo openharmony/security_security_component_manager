@@ -22,6 +22,7 @@ sc_include_dirs = [
   "${sec_comp_dir}/interfaces/inner_api/security_component/include",
   "${sec_comp_dir}/services/security_component_service/sa/test/mock/include",
   "${sec_comp_dir}/test/fuzztest/security_component/common",
+  "${sec_comp_dir}/test/fuzztest/security_component/mock",
 ]
 
 sc_deps = []
@@ -48,8 +49,6 @@ sc_external_deps = [
   "ipc:ipc_core",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
-  "window_manager:libdm",
-  "window_manager:libwm",
 ]
 
 sc_service_sources = [
@@ -63,7 +62,6 @@ sc_service_sources = [
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_mgr_death_recipient.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_state_observer.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/delay_exit_task.cpp",
-  "${sec_comp_dir}/services/security_component_service/sa/sa_main/first_use_dialog.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_dialog_callback_proxy.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_entity.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_info_helper.cpp",
@@ -81,4 +79,5 @@ sc_mock_sources = [
   "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/sec_comp_enhance_adapter.cpp",
   "${sec_comp_dir}/test/fuzztest/security_component/common/fuzz_common.cpp",
+  "${sec_comp_dir}/test/fuzztest/security_component/mock/first_use_dialog.cpp",
 ]

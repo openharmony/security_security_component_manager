@@ -73,6 +73,7 @@ public:
     float scaleY_ { 1.0f };
 };
 
+#ifndef FUZZ_ENABLE
 class WindowManager {
 public:
     static WindowManager& GetInstance()
@@ -119,6 +120,47 @@ public:
 private:
     ~WindowManager() {};
 };
+#else
+class WindowManager {
+public:
+    static WindowManager& GetInstance()
+    {
+        static WindowManager instance;
+        return instance;
+    };
+
+    WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list)
+    {
+        sptr<AccessibilityWindowInfo> compWin = sptr<AccessibilityWindowInfo>::MakeSptr();
+        compWin->wid_ = 0;
+        compWin->layer_ = 0;
+        compWin->scaleVal_ = 1.0;
+        list.emplace_back(compWin);
+        return OHOS::Rosen::WMError::WM_OK;
+    };
+    
+    WMError GetUnreliableWindowInfo(int32_t windowId, std::vector<sptr<UnreliableWindowInfo>>& infos) const
+    {
+        sptr<UnreliableWindowInfo> compoLayer = sptr<UnreliableWindowInfo>::MakeSptr();
+        compoLayer->windowId_ = 0;
+        compoLayer->zOrder_ = 0;
+        compoLayer->floatingScale_ = 1.0;
+        infos.emplace_back(compoLayer);
+        sptr<UnreliableWindowInfo> coverLayer = sptr<UnreliableWindowInfo>::MakeSptr();
+        // window is 128*128, cover window is 96*96
+        coverLayer->windowRect_ = Rect{0, 0, 96, 96};
+        coverLayer->windowId_ = 1;
+        coverLayer->zOrder_ = 1;
+        coverLayer->floatingScale_ = 1.0;
+        infos.emplace_back(coverLayer);
+        return OHOS::Rosen::WMError::WM_OK;
+    }
+
+    WindowManager() {};
+private:
+    ~WindowManager() {};
+};
+#endif // FUZZ_ENABLE
 } // namespace Rosen
 } // namespace OHOS
 #endif // SECURITY_COMPONENT_MOCK_WINDOW_MANAGER_H

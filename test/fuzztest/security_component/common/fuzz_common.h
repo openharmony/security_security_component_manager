@@ -36,21 +36,30 @@ public:
     std::string ConstructPasteJson();
     template <class T> T GetData()
     {
-        T object{};
+        T object{0};
         size_t objectSize = sizeof(object);
-        if (data_ == nullptr || objectSize > dataLenth_ - basePos) {
-            basePos = 0; // reset read point
+        if (data_ == nullptr) {
             return object; // return empty obj
         }
-        errno_t ret = memcpy_s(&object, objectSize, data_ + basePos, objectSize);
-        if (ret != EOK) {
-            return {};
+        size_t readedSize = 0;
+        char* objectPtr = reinterpret_cast<char*>(&object);
+        while (readedSize < objectSize) {
+            size_t needRead = std::min(objectSize - readedSize, dataLenth_ - basePos);
+            errno_t ret = memcpy_s(objectPtr + readedSize, needRead, data_ + basePos, needRead);
+            if (ret != EOK) {
+                T empty{0};
+                return empty;
+            }
+            readedSize += needRead;
+            basePos += needRead;
+            if (basePos >= dataLenth_) {
+                basePos = 0;
+            }
         }
-        basePos += objectSize;
         return object;
     }
+    nlohmann::json compoJson_;
 private:
-    void ConstructRandomRect(SecCompRect &rect);
     void ConstructButtonRect(
         SecCompRect &window, PaddingSize &padding, SecCompRect &buttonRect);
     void ConstructWindowJson(nlohmann::json &jsonComponent,
