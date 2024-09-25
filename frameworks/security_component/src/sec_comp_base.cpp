@@ -51,6 +51,12 @@ const std::string JsonTagConstants::JSON_BORDER_TAG = "border";
 const std::string JsonTagConstants::JSON_BORDER_WIDTH_TAG = "borderWidth";
 const std::string JsonTagConstants::JSON_PARENT_TAG = "parent";
 const std::string JsonTagConstants::JSON_PARENT_EFFECT_TAG = "parentEffect";
+const std::string JsonTagConstants::JSON_IS_CLIPPED_TAG = "isClipped";
+const std::string JsonTagConstants::JSON_TOP_CLIP_TAG = "topClip";
+const std::string JsonTagConstants::JSON_BOTTOM_CLIP_TAG = "bottomClip";
+const std::string JsonTagConstants::JSON_LEFT_CLIP_TAG = "leftClip";
+const std::string JsonTagConstants::JSON_RIGHT_CLIP_TAG = "rightClip";
+const std::string JsonTagConstants::JSON_PARENT_TAG_TAG = "parentTag";
 const std::string JsonTagConstants::JSON_STYLE_TAG = "style";
 const std::string JsonTagConstants::JSON_TEXT_TAG = "text";
 const std::string JsonTagConstants::JSON_ICON_TAG = "icon";
@@ -87,6 +93,17 @@ bool SecCompBase::ParseBool(const nlohmann::json& json, const std::string& tag, 
     }
 
     res = json.at(tag).get<bool>();
+    return true;
+}
+
+bool SecCompBase::ParseString(const nlohmann::json& json, const std::string& tag, std::string& res)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_string()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+
+    res = json.at(tag).get<std::string>();
     return true;
 }
 
@@ -176,7 +193,28 @@ bool SecCompBase::ParseParent(const nlohmann::json& json, const std::string& tag
         return false;
     }
     auto jsonParent = json.at(tag);
-    return ParseBool(jsonParent, JsonTagConstants::JSON_PARENT_EFFECT_TAG, parentEffect_);
+    if (!ParseBool(jsonParent, JsonTagConstants::JSON_PARENT_EFFECT_TAG, parentEffect_)) {
+        return false;
+    }
+    if (!ParseBool(jsonParent, JsonTagConstants::JSON_IS_CLIPPED_TAG, isClipped_)) {
+        return false;
+    }
+    if (!ParseDimension(jsonParent, JsonTagConstants::JSON_TOP_CLIP_TAG, topClip_)) {
+        return false;
+    }
+    if (!ParseDimension(jsonParent, JsonTagConstants::JSON_BOTTOM_CLIP_TAG, bottomClip_)) {
+        return false;
+    }
+    if (!ParseDimension(jsonParent, JsonTagConstants::JSON_LEFT_CLIP_TAG, leftClip_)) {
+        return false;
+    }
+    if (!ParseDimension(jsonParent, JsonTagConstants::JSON_RIGHT_CLIP_TAG, rightClip_)) {
+        return false;
+    }
+    if (!ParseString(jsonParent, JsonTagConstants::JSON_PARENT_TAG_TAG, parentTag_)) {
+        return false;
+    }
+    return true;
 }
 
 bool SecCompBase::ParseRect(const nlohmann::json& json, const std::string& tag, SecCompRect& rect)
@@ -301,6 +339,12 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     };
     jsonRes[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, parentEffect_ },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, isClipped_ },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, topClip_ },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, bottomClip_ },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, leftClip_ },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, rightClip_ },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, parentTag_ },
     };
 
     jsonRes[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {

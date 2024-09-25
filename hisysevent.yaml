@@ -127,3 +127,8 @@ PREPROCESS_MESSAGE_FAILED:
   CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
   CLIENT_SESSION_ID: {type: INT32, desc: session id stored in client}
   CLIENT_SEQ_NUM: {type: INT32, desc: sequence number stored in client}
+
+CLIP_CHECK_FAILED:
+  __BASE: {type: SECURITY, level: CRITICAL, desc: The security component is clipped by parent component}
+  CALLER_BUNDLE_NAME: {type: STRING, desc: caller bundle name}
+  COMPONENT_INFO: {type: STRING, desc: component information}

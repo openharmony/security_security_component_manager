@@ -58,6 +58,12 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, LocationDesc::SELECT_LOCATION },
@@ -108,6 +114,12 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD },
@@ -158,6 +170,12 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE },
