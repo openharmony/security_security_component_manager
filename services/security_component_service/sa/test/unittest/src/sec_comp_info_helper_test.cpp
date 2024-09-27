@@ -235,6 +235,12 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level1)
 
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, true },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent);
     ASSERT_FALSE(comp->GetValid());
