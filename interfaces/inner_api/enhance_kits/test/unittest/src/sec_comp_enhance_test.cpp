@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "sec_comp_enhance_test.h"
+#include <dlfcn.h>
 #include <unistd.h>
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
@@ -27,27 +28,24 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static bool g_inputEnhanceExist = false;
 static bool g_srvEnhanceExist = false;
 static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 76;
-#if defined(__LP64__)
-static const std::string LIB_PATH = "/system/lib64/";
-#else
-static const std::string LIB_PATH = "/system/lib/";
-#endif
-static const std::string INNER_PATH = "platformsdk/";
-static const std::string ENHANCE_INPUT_INTERFACE_LIB =
-    LIB_PATH + INNER_PATH + "libsecurity_component_client_enhance.z.so";
-static const std::string ENHANCE_SRV_INTERFACE_LIB = LIB_PATH + "libsecurity_component_service_enhance.z.so";
+static const std::string ENHANCE_INPUT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
+static const std::string ENHANCE_SRV_INTERFACE_LIB = "libsecurity_component_service_enhance.z.so";
 static constexpr uint32_t MAX_HMAC_SIZE = 64;
 }  // namespace
 
 void SecCompEnhanceTest::SetUpTestCase()
 {
-    if (access(ENHANCE_INPUT_INTERFACE_LIB.c_str(), F_OK) == 0) {
+    void *handle = dlopen(ENHANCE_INPUT_INTERFACE_LIB.c_str(), RTLD_LAZY);
+    if (handle != nullptr) {
         g_inputEnhanceExist = true;
     }
+    dlclose(handle);
 
-    if (access(ENHANCE_SRV_INTERFACE_LIB.c_str(), F_OK) == 0) {
+    handle = dlopen(ENHANCE_SRV_INTERFACE_LIB.c_str(), RTLD_LAZY);
+    if (handle != nullptr) {
         g_srvEnhanceExist = true;
     }
+    dlclose(handle);
     system("kill -9 `pidof security_component_service`");
     SC_LOG_INFO(LABEL, "SetUpTestCase.");
 }

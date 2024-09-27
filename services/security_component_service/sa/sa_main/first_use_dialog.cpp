@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include "ability_manager_client.h"
 #include "accesstoken_kit.h"
+#include "bundle_mgr_client.h"
 #include "hisysevent.h"
 #include "sec_comp_dialog_callback_proxy.h"
 #include "sec_comp_err.h"
@@ -270,8 +271,11 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     }
     int32_t res = sc->GrantTempPermission();
     if (res != SC_OK) {
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(sc->uid_, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_FAILED",
-            HiviewDFX::HiSysEvent::EventType::FAULT, "CALLER_UID", sc->uid_,
+            HiviewDFX::HiSysEvent::EventType::FAULT, "CALLER_UID", sc->uid_, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", sc->pid_, "SC_ID", scId, "SC_TYPE", sc->GetType());
     } else {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",

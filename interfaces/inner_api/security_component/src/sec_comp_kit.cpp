@@ -14,6 +14,7 @@
  */
 #include "sec_comp_kit.h"
 
+#include "bundle_mgr_client.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "sec_comp_caller_authorization.h"
@@ -35,8 +36,12 @@ int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
         reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
         SC_LOG_ERROR(LABEL, "register security component fail, caller invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "REGITSTER");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
@@ -60,8 +65,12 @@ int32_t SecCompKit::UpdateSecurityComponent(int32_t scId, std::string& component
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
         reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
         SC_LOG_ERROR(LABEL, "update security component fail, caller invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "UPDATE");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
@@ -99,8 +108,12 @@ int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
         reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
         SC_LOG_ERROR(LABEL, "report click event fail, caller invalid");
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "CLICK");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }

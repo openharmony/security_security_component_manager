@@ -24,6 +24,7 @@
 #include "save_button.h"
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
+#include "sec_comp_tool.h"
 #include "service_test_common.h"
 #include "window_manager.h"
 
@@ -619,4 +620,32 @@ HWTEST_F(SecCompInfoHelperTest, GrantTempPermission001, TestSize.Level1)
 
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
         SecCompInfoHelper::GrantTempPermission(*tokenid, shared_comp));
+}
+
+/**
+ * @tc.name: IsColorSimilar001
+ * @tc.desc: Test IsColorSimilar
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, IsColorSimilar001, TestSize.Level1)
+{
+    SecCompColor color1 = {
+        .argb = {
+            .red = 0xFF,
+            .green = 0xFF,
+            .blue = 0xFF,
+            .alpha = 0xFF,
+        }
+    };
+
+    SecCompColor color2 = {
+        .argb = {
+            .red = 0xFF,
+            .green = 0xFF,
+            .blue = 0xFF,
+            .alpha = 0xF0, // different alpha
+        }
+    };
+    EXPECT_TRUE(IsColorSimilar(color1, color2));
 }
