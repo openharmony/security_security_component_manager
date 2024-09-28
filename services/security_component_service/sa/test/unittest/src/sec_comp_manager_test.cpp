@@ -94,13 +94,24 @@ static LocationButton BuildValidLocationComponent()
     button.bg_ = SecCompBackground::CIRCLE;
     return button;
 }
+static const int32_t SLEEP_TIME = 5;
 }
 
 void SecCompManagerTest::SetUpTestCase()
 {}
 
 void SecCompManagerTest::TearDownTestCase()
-{}
+{
+    if (SecCompManager::GetInstance().secRunner_ != nullptr) {
+        SecCompManager::GetInstance().secRunner_->queue_.reset();
+        SecCompManager::GetInstance().secRunner_ = nullptr;
+    }
+    if (SecCompManager::GetInstance().secHandler_ != nullptr) {
+        SecCompManager::GetInstance().secHandler_->eventRunner_.reset();
+        SecCompManager::GetInstance().secHandler_ = nullptr;
+    }
+    sleep(SLEEP_TIME);
+}
 
 void SecCompManagerTest::SetUp()
 {

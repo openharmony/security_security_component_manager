@@ -130,6 +130,7 @@ void SecCompRegisterCallbackTest::TearDown()
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Level1)
 {
+    sleep(1);
     nlohmann::json jsonRes;
     TestCommon::BuildLocationComponentInfo(jsonRes);
     std::string locationInfo = jsonRes.dump();
