@@ -80,6 +80,12 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG,
@@ -116,6 +122,12 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG,
@@ -152,6 +164,12 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_LEFT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, GetData<double>() },
+        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG,
