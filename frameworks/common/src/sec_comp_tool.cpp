@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ static constexpr double TWO_HUNDREDS_FORTY_ANGLE = 240.0;
 static constexpr double THREE_HUNDREDS_SIXTY_ANGLE = 360.0;
 static constexpr double DEFAULT_R = 100.0;
 static const uint8_t MAX_ALPHA = 0xFF;
-static const double MIN_CONTRAST_ALPHA = 0.5;
+static const double MIN_CONTRACST_ALPHA = 0.5;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompTool"};
 }
@@ -129,7 +129,7 @@ static bool IsColorAplhaSimilar(const SecCompColor& fgColor, const SecCompColor&
     double bgAlpha = static_cast<double>(bgColor.argb.alpha) / MAX_ALPHA;
 
     double mixAlpha = fgAlpha + bgAlpha - fgAlpha * bgAlpha;
-    if (GreatNotEqual(bgAlpha / mixAlpha, MIN_CONTRAST_ALPHA)) {
+    if (GreatNotEqual(bgAlpha / mixAlpha, MIN_CONTRACST_ALPHA)) {
         SC_LOG_ERROR(LABEL, "FgAlpha=%{public}x BgAlpha=%{public}x is similar, check failed",
             fgColor.argb.alpha, bgColor.argb.alpha);
         return true;
