@@ -15,9 +15,12 @@
 #include "sec_comp_info_helper.h"
 
 #include "accesstoken_kit.h"
+#include "bundle_mgr_client.h"
 #include "display.h"
 #include "display_info.h"
 #include "display_manager.h"
+#include "hisysevent.h"
+#include "ipc_skeleton.h"
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
@@ -68,6 +71,17 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     if (comp == nullptr) {
         SC_LOG_ERROR(LABEL, "Parse component failed");
         return comp;
+    }
+
+    if (comp->isClipped_) {
+        int32_t uid = IPCSkeleton::GetCallingUid();
+        OHOS::AppExecFwk::BundleMgrClient bmsClient;
+        std::string bundleName = "";
+        bmsClient.GetNameForUid(uid, bundleName);
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLIP_CHECK_FAILED",
+            HiviewDFX::HiSysEvent::EventType::SECURITY,
+            "CALLER_BUNDLE_NAME", bundleName,
+            "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
     comp->SetValid(CheckComponentValid(comp));

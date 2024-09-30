@@ -66,6 +66,12 @@ public:
     static const std::string JSON_BORDER_WIDTH_TAG;
     static const std::string JSON_PARENT_TAG;
     static const std::string JSON_PARENT_EFFECT_TAG;
+    static const std::string JSON_IS_CLIPPED_TAG;
+    static const std::string JSON_TOP_CLIP_TAG;
+    static const std::string JSON_BOTTOM_CLIP_TAG;
+    static const std::string JSON_LEFT_CLIP_TAG;
+    static const std::string JSON_RIGHT_CLIP_TAG;
+    static const std::string JSON_PARENT_TAG_TAG;
 
     static const std::string JSON_STYLE_TAG;
     static const std::string JSON_TEXT_TAG;
@@ -108,6 +114,12 @@ public:
 
     // parent effect
     bool parentEffect_ = false;
+    bool isClipped_ = false;
+    DimensionT topClip_;
+    DimensionT bottomClip_;
+    DimensionT leftClip_;
+    DimensionT rightClip_;
+    std::string parentTag_;
 
     SecCompType type_ = UNKNOWN_SC_TYPE;
     SecCompRect rect_;
@@ -127,6 +139,7 @@ private:
     bool ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res);
     bool ParseColor(const nlohmann::json& json, const std::string& tag, SecCompColor& res);
     bool ParseBool(const nlohmann::json& json, const std::string& tag, bool& res);
+    bool ParseString(const nlohmann::json& json, const std::string& tag, std::string& res);
     bool ParsePadding(const nlohmann::json& json, const std::string& tag, PaddingSize& res);
     bool ParseColors(const nlohmann::json& json, const std::string& tag);
     bool ParseBorders(const nlohmann::json& json, const std::string& tag);
