@@ -68,8 +68,12 @@ int32_t SecCompEntity::CheckPointEvent(const SecCompClickEvent& clickInfo) const
     }
 
     if (!componentInfo_->rect_.IsInRect(clickInfo.point.touchX, clickInfo.point.touchY)) {
-        SC_LOG_ERROR(LABEL, "touch point is not in component rect, %{public}lf, %{public}lf",
-            clickInfo.point.touchX, clickInfo.point.touchY);
+        SC_LOG_ERROR(LABEL, "touch point is not in component rect = (%{public}f, %{public}f)" \
+            "left top point of component rect = (%{public}f, %{public}f)" \
+            "right bottom point of component rect = (%{public}f, %{public}f)",
+            clickInfo.point.touchX, clickInfo.point.touchY, componentInfo_->rect_.x_, componentInfo_->rect_.y_,
+            componentInfo_->rect_.x_ + componentInfo_->rect_.width_,
+            componentInfo_->rect_.y_ + componentInfo_->rect_.height_);
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
     return SC_OK;
