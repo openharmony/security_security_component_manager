@@ -46,7 +46,7 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
     comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scale;
     comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scale;
 
-    SC_LOG_DEBUG(LABEL, "After adjust x %{public}lf, y %{public}lf, width %{public}lf, height %{public}lf",
+    SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
 }
 
@@ -226,6 +226,7 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
     }
 
     float scale = WindowInfoHelper::GetWindowScale(comp->windowId_);
+    SC_LOG_DEBUG(LABEL, "WindowScale = %{public}f", scale);
     if (!IsEqual(scale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
         AdjustSecCompRect(comp, scale);
     }
