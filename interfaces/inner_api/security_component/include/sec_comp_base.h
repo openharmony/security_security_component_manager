@@ -66,6 +66,7 @@ public:
     static const std::string JSON_BORDER_WIDTH_TAG;
     static const std::string JSON_PARENT_TAG;
     static const std::string JSON_PARENT_EFFECT_TAG;
+    static const std::string JSON_PARENT_CHECK_FAILED_TAG;
     static const std::string JSON_IS_CLIPPED_TAG;
     static const std::string JSON_TOP_CLIP_TAG;
     static const std::string JSON_BOTTOM_CLIP_TAG;
@@ -114,6 +115,7 @@ public:
 
     // parent effect
     bool parentEffect_ = false;
+    bool isParentCheckFailed_ = false;
     bool isClipped_ = false;
     DimensionT topClip_;
     DimensionT bottomClip_;

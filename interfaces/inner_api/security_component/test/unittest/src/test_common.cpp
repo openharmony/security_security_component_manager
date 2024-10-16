@@ -58,6 +58,7 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, false },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
@@ -114,6 +115,7 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, false },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
@@ -170,6 +172,7 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
     };
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, false },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
