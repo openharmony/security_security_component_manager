@@ -449,18 +449,24 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, Check security component", caller.pid);
     SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    OHOS::AppExecFwk::BundleMgrClient bmsClient;
+    std::string bundleName = "";
+    bmsClient.GetNameForUid(uid, bundleName);
     if ((reportComponentInfo == nullptr) || (!reportComponentInfo->GetValid())) {
         SC_LOG_ERROR(LABEL, "report component info invalid");
-        int32_t uid = IPCSkeleton::GetCallingUid();
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
             sc->GetType());
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
+    if (report && (report->isClipped_ || report->isParentCheckFailed_)) {
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLIP_CHECK_FAILED",
+            HiviewDFX::HiSysEvent::EventType::SECURITY,
+            "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
+    }
+
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         int32_t uid = IPCSkeleton::GetCallingUid();

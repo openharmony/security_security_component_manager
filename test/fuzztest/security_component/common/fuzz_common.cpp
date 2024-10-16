@@ -80,6 +80,7 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
@@ -122,6 +123,7 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
@@ -164,6 +166,7 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     // set default val
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, GetData<bool>() },
+        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, GetData<bool>() },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, GetData<double>() },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, GetData<double>() },
