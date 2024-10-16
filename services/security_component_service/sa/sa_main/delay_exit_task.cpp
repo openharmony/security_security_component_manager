@@ -15,7 +15,6 @@
 #include "delay_exit_task.h"
 
 #include "sec_comp_log.h"
-#include "sec_comp_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -43,9 +42,10 @@ DelayExitTask& DelayExitTask::GetInstance()
     return *instance;
 }
 
-void DelayExitTask::Init(const std::shared_ptr<SecEventHandler>& secHandler)
+void DelayExitTask::Init(const std::shared_ptr<SecEventHandler>& secHandler, std::function<void ()> exitTask)
 {
     secHandler_ = secHandler;
+    exitTask_ = exitTask;
 }
 
 void DelayExitTask::Start()
@@ -55,12 +55,8 @@ void DelayExitTask::Start()
         return;
     }
 
-    std::function<void()> delayed = ([]() {
-        SecCompManager::GetInstance().ExitSaProcess();
-    });
-
     SC_LOG_INFO(LABEL, "Delay exit service after %{public}d ms", DELAY_EXIT_MILLISECONDS);
-    secHandler_->ProxyPostTask(delayed, DELAY_EXIT_TASK, DELAY_EXIT_MILLISECONDS);
+    secHandler_->ProxyPostTask(exitTask_, DELAY_EXIT_TASK, DELAY_EXIT_MILLISECONDS);
 }
 
 void DelayExitTask::Stop()

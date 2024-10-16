@@ -16,7 +16,8 @@ import("//build/ohos.gni")
 group("security_component_build_module") {
   if (is_standard_system) {
     deps = [
-      "interfaces/inner_api/security_component:libsecurity_component_sdk",
+      "frameworks/inner_api/security_component:libsecurity_component_sdk",
+      "services/security_component_service/sa:security_component_common",
       "services/security_component_service/sa:security_component_service",
       "services/security_component_service/sa/sa_profile:security_component_sa_profile_standard",
     ]
@@ -29,8 +30,8 @@ group("security_component_build_module_test") {
   if (is_standard_system) {
     deps += [
       "frameworks/enhance_adapter/test:unittest",
-      "interfaces/inner_api/enhance_kits/test:unittest",
-      "interfaces/inner_api/security_component/test:unittest",
+      "frameworks/inner_api/enhance_kits/test:unittest",
+      "frameworks/inner_api/security_component/test:unittest",
       "services/security_component_service/sa/test:unittest",
     ]
   }

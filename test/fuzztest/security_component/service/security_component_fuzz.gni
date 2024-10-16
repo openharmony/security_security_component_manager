@@ -19,6 +19,8 @@ sc_include_dirs = [
   "${sec_comp_dir}/frameworks/common/include",
   "${sec_comp_dir}/frameworks/enhance_adapter/include",
   "${sec_comp_dir}/frameworks/security_component/include",
+  "${sec_comp_dir}/frameworks/inner_api/security_component/include",
+  "${sec_comp_dir}/interfaces/inner_api/security_component_common",
   "${sec_comp_dir}/interfaces/inner_api/security_component/include",
   "${sec_comp_dir}/services/security_component_service/sa/test/mock/include",
   "${sec_comp_dir}/test/fuzztest/security_component/common",
@@ -53,12 +55,12 @@ sc_external_deps = [
 
 sc_service_sources = [
   "${sec_comp_dir}/frameworks/common/src/sec_comp_tool.cpp",
+  "${sec_comp_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
   "${sec_comp_dir}/frameworks/security_component/src/location_button.cpp",
   "${sec_comp_dir}/frameworks/security_component/src/paste_button.cpp",
   "${sec_comp_dir}/frameworks/security_component/src/save_button.cpp",
   "${sec_comp_dir}/frameworks/security_component/src/sec_comp_base.cpp",
   "${sec_comp_dir}/frameworks/security_component/src/sec_comp_click_event_parcel.cpp",
-  "${sec_comp_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_mgr_death_recipient.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/app_state_observer.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/delay_exit_task.cpp",

@@ -15,10 +15,12 @@
 #ifndef SECURITY_COMPONENT_DELAY_EXIT_TASK_H
 #define SECURITY_COMPONENT_DELAY_EXIT_TASK_H
 
+#include <functional>
 #include <memory>
 #include <string>
 #include "nocopyable.h"
 #include "sec_event_handler.h"
+#include "security_component_service_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Security {
@@ -28,12 +30,13 @@ public:
     static DelayExitTask& GetInstance();
     virtual ~DelayExitTask() = default;
 
-    void Init(const std::shared_ptr<SecEventHandler>& secHandler);
+    void Init(const std::shared_ptr<SecEventHandler>& secHandler, std::function<void ()> exitTask);
     void Start();
     void Stop();
 private:
     DelayExitTask();
     std::shared_ptr<SecEventHandler> secHandler_;
+    std::function<void ()> exitTask_ = []() { return; };
 
     DISALLOW_COPY_AND_MOVE(DelayExitTask);
 };

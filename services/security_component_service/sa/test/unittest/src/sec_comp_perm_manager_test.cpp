@@ -16,7 +16,9 @@
 
 #include "accesstoken_kit.h"
 #include "sec_comp_err.h"
+#include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
+#include "service_test_common.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -167,4 +169,33 @@ HWTEST_F(SecCompPermManagerTest, VerifyPermission001, TestSize.Level1)
     ASSERT_FALSE(permMgr.VerifyPermission(id, PASTE_COMPONENT));
     ASSERT_FALSE(permMgr.VerifyPermission(id, SAVE_COMPONENT));
     ASSERT_FALSE(permMgr.VerifyPermission(id, static_cast<SecCompType>(-1)));
+}
+
+/**
+ * @tc.name: DLP-GrantTempPermission001
+ * @tc.desc: Test DLP sandbox app grant save button
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompPermManagerTest, GrantTempPermission001, TestSize.Level1)
+{
+    OHOS::Security::AccessToken::AccessTokenIDInner tokenInner = {
+        .tokenUniqueID = 0x00001,
+        .res = 1,
+        .dlpFlag = 1,
+        .type = OHOS::Security::AccessToken::TOKEN_HAP,
+        .version = 0,
+    };
+    OHOS::Security::AccessToken::AccessTokenID *tokenid =
+        reinterpret_cast<OHOS::Security::AccessToken::AccessTokenID *>(&tokenInner);
+    ASSERT_NE(0, *tokenid);
+    SecCompPermManager permMgr;
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildSaveComponentJson(jsonComponent);
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(SAVE_COMPONENT, jsonComponent);
+    ASSERT_NE(nullptr, comp);
+    std::shared_ptr<SecCompBase> shared_comp(comp);
+
+    EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
+        permMgr.GrantTempPermission(*tokenid, shared_comp));
 }

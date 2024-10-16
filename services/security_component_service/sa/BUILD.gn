@@ -15,6 +15,72 @@ import("//build/ohos.gni")
 
 sec_comp_root_dir = "../../.."
 
+config("security_component_common_config") {
+  include_dirs = [
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
+  ]
+}
+
+ohos_shared_library("security_component_common") {
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+
+  innerapi_tags = [ "sasdk" ]
+  public_configs = [ ":security_component_common_config" ]
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  include_dirs = [
+    "${sec_comp_root_dir}/frameworks/common/include",
+    "${sec_comp_root_dir}/frameworks/security_component/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
+  ]
+
+  sources = [
+    "sa_main/delay_exit_task.cpp",
+    "sa_main/sec_comp_info_helper.cpp",
+    "sa_main/sec_event_handler.cpp",
+    "sa_main/window_info_helper.cpp",
+  ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-fvisibility=hidden",
+    "-DSEC_COMP_SERVICE_COMPILE_ENABLE",
+  ]
+  cflags = [ "-DHILOG_ENABLE" ]
+
+  deps = [
+    "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_service_src_set",
+    "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "json:nlohmann_json_static",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm",
+    "window_manager:libwm",
+  ]
+}
+
 config("security_component_service_config") {
   include_dirs = [
     "sa_main",
@@ -45,37 +111,35 @@ ohos_source_set("security_component_service_src_set") {
     "sa_main",
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/enhance_adapter/include",
-    "${sec_comp_root_dir}/frameworks/security_component/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
   ]
 
   sources = [
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
     "sa_main/app_mgr_death_recipient.cpp",
     "sa_main/app_state_observer.cpp",
-    "sa_main/delay_exit_task.cpp",
     "sa_main/first_use_dialog.cpp",
     "sa_main/sec_comp_dialog_callback_proxy.cpp",
     "sa_main/sec_comp_entity.cpp",
-    "sa_main/sec_comp_info_helper.cpp",
     "sa_main/sec_comp_malicious_apps.cpp",
     "sa_main/sec_comp_manager.cpp",
     "sa_main/sec_comp_perm_manager.cpp",
     "sa_main/sec_comp_service.cpp",
     "sa_main/sec_comp_stub.cpp",
-    "sa_main/sec_event_handler.cpp",
-    "sa_main/window_info_helper.cpp",
   ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",
     "-fvisibility=hidden",
+    "-DSEC_COMP_SERVICE_COMPILE_ENABLE",
   ]
   cflags = [ "-DHILOG_ENABLE" ]
 
   deps = [
+    ":security_component_common",
     ":security_component_service.rc",
-    "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
   ]
 
@@ -119,12 +183,11 @@ ohos_shared_library("security_component_service") {
   branch_protector_ret = "pac_ret"
 
   deps = [
+    ":security_component_common",
     ":security_component_service.rc",
     ":security_component_service_src_set",
-    "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
   ]
   external_deps = [ "hilog:libhilog" ]
-  public_configs = [ ":security_component_service_config" ]
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
 }

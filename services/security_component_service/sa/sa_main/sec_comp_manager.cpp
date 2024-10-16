@@ -597,7 +597,10 @@ bool SecCompManager::Initialize()
     }
 
     secHandler_ = std::make_shared<SecEventHandler>(secRunner_);
-    DelayExitTask::GetInstance().Init(secHandler_);
+    exitSaProcessFunc_ = []() {
+        SecCompManager::GetInstance().ExitSaProcess();
+    };
+    DelayExitTask::GetInstance().Init(secHandler_, exitSaProcessFunc_);
     FirstUseDialog::GetInstance().Init(secHandler_);
     SecCompEnhanceAdapter::EnableInputEnhance();
     SecCompPermManager::GetInstance().InitEventHandler(secHandler_);

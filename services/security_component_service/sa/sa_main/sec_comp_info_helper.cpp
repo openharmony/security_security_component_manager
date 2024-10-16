@@ -23,7 +23,6 @@
 #include "save_button.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
-#include "sec_comp_service.h"
 #include "sec_comp_tool.h"
 #include "window_info_helper.h"
 
@@ -223,59 +222,6 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
     }
 
     return true;
-}
-
-int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenId,
-    const std::shared_ptr<SecCompBase>& componentInfo)
-{
-    if ((tokenId <= 0) || (componentInfo == nullptr)) {
-        SC_LOG_ERROR(LABEL, "Grant component is null");
-        return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-    }
-
-    SecCompType type = componentInfo->type_;
-    int32_t res;
-    switch (type) {
-        case LOCATION_COMPONENT:
-            {
-                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId,
-                    "ohos.permission.APPROXIMATELY_LOCATION");
-                if (res != SC_OK) {
-                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-                }
-                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.LOCATION");
-                if (res != SC_OK) {
-                    SecCompPermManager::GetInstance().RevokeAppPermission(
-                        tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
-                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-                }
-                SC_LOG_INFO(LABEL, "Grant location permission, scid = %{public}d.", componentInfo->nodeId_);
-                return SC_OK;
-            }
-        case PASTE_COMPONENT:
-            res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.SECURE_PASTE");
-            if (res != SC_OK) {
-                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-            }
-            SC_LOG_INFO(LABEL, "Grant paste permission, scid = %{public}d.", componentInfo->nodeId_);
-            return SC_OK;
-        case SAVE_COMPONENT:
-            if (IsDlpSandboxCalling(tokenId)) {
-                SC_LOG_INFO(LABEL, "Dlp sandbox app are not allowed to use save component.");
-                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-            }
-            SC_LOG_INFO(LABEL, "Grant save permission, scid = %{public}d.", componentInfo->nodeId_);
-            return SecCompPermManager::GetInstance().GrantTempSavePermission(tokenId);
-        default:
-            SC_LOG_ERROR(LABEL, "Parse component type unknown");
-            break;
-    }
-    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-}
-
-inline bool SecCompInfoHelper::IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
-{
-    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security
