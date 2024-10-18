@@ -51,22 +51,35 @@
       ],
       "inner_kits": [
         {
-          "name": "//base/security/security_component_manager/interfaces/inner_api/security_component:libsecurity_component_sdk",
+          "name": "//base/security/security_component_manager/frameworks/inner_api/security_component:libsecurity_component_sdk",
           "header": {
             "header_files": [
               "i_sec_comp_probe.h",
-              "sec_comp_kit.h"
+              "location_button.h",
+              "paste_button.h",
+              "save_button.h",
+              "sec_comp_base.h",
+              "sec_comp_enhance_adapter.h",
+              "sec_comp_enhance_kit.h",
+              "sec_comp_enhance_kit_c.h",
+              "sec_comp_err.h",
+              "sec_comp_info.h",
+              "sec_comp_kit.h",
+              "sec_comp_ui_register.h",
+              "security_component_service_ipc_interface_code.h"
             ],
             "header_base": "//base/security/security_component_manager/interfaces/inner_api/security_component/include"
           }
         },
         {
-          "name": "//base/security/security_component_manager/services/security_component_service/sa:security_component_service",
+          "name": "//base/security/security_component_manager/services/security_component_service/sa:security_component_common",
           "header": {
             "header_files": [
-               "sec_comp_manager.h"
+              "delay_exit_task.h",
+              "sec_comp_info_helper.h",
+              "sec_event_handler.h"
             ],
-            "header_base": "//base/security/security_component_manager/services/security_component_service/sa/sa_main"
+            "header_base": "//base/security/security_component_manager/interfaces/inner_api/security_component_common"
           }
         }
       ],

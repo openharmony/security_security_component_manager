@@ -40,7 +40,7 @@ ohos_fuzztest("VerifySavePermissionFuzzTest") {
     "verifysavepermission_fuzzer.cpp",
   ]
 
-  deps = [ "${sec_comp_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk" ]
+  deps = [ "${sec_comp_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk" ]
 
   external_deps = [
     "ability_base:want",

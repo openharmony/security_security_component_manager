@@ -17,12 +17,8 @@ sec_comp_root_dir = "../../.."
 
 config("sec_comp_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "include",
-    "${sec_comp_root_dir}/frameworks/common/include",
-    "${sec_comp_root_dir}/frameworks/enhance_adapter/include/",
-    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits/include",
-  ]
+  include_dirs =
+      [ "${sec_comp_root_dir}/interfaces/inner_api/security_component/include" ]
 }
 
 ohos_shared_library("libsecurity_component_sdk") {
@@ -32,13 +28,15 @@ ohos_shared_library("libsecurity_component_sdk") {
   output_name = "libsecurity_component_sdk"
 
   public_configs = [ ":sec_comp_config" ]
+  innerapi_tags = [ "sasdk" ]
 
   include_dirs = [
     "include",
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/enhance_adapter/include/",
-    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/enhance_kits/include",
     "${sec_comp_root_dir}/frameworks/security_component/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
   ]
 
   sources = [
@@ -56,7 +54,7 @@ ohos_shared_library("libsecurity_component_sdk") {
   deps = [
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
-    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits:security_component_no_cfi_enhance_sdk_src_set",
+    "${sec_comp_root_dir}/frameworks/inner_api/enhance_kits:security_component_no_cfi_enhance_sdk_src_set",
   ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]

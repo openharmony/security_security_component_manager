@@ -49,7 +49,7 @@ static bool IsScreenReadMode();
 int32_t SecCompEntity::GrantTempPermission()
 {
     isGrant_ = true;
-    return SecCompInfoHelper::GrantTempPermission(tokenId_, componentInfo_);
+    return SecCompPermManager::GetInstance().GrantTempPermission(tokenId_, componentInfo_);
 }
 
 bool SecCompEntity::CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const

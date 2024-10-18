@@ -19,7 +19,6 @@
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
 #include "sec_comp_info.h"
-#include "sec_comp_perm_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -38,8 +37,6 @@ T* ConstructComponent(const nlohmann::json& jsonComponent)
 class __attribute__((visibility("default"))) SecCompInfoHelper {
 public:
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent);
-    static int32_t GrantTempPermission(AccessToken::AccessTokenID tokenId,
-        const std::shared_ptr<SecCompBase>& componentInfo);
     static bool CheckComponentValid(SecCompBase* comp);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect);
 

@@ -24,19 +24,20 @@ ohos_unittest("sec_comp_sdk_test") {
   include_dirs = [
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/security_component/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/include",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
   ]
 
   sources = [
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_caller_authorization.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_client.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_death_recipient.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_kit.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_load_callback.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_proxy.cpp",
-    "${sec_comp_root_dir}/interfaces/inner_api/security_component/src/sec_comp_ui_register.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_caller_authorization.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_client.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_death_recipient.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_kit.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_load_callback.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_proxy.cpp",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_ui_register.cpp",
     "unittest/src/location_button_test.cpp",
     "unittest/src/paste_button_test.cpp",
     "unittest/src/save_button_test.cpp",
@@ -53,7 +54,7 @@ ohos_unittest("sec_comp_sdk_test") {
   deps = [
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
-    "${sec_comp_root_dir}/interfaces/inner_api/enhance_kits:security_component_no_cfi_enhance_sdk_src_set",
+    "${sec_comp_root_dir}/frameworks/inner_api/enhance_kits:security_component_no_cfi_enhance_sdk_src_set",
   ]
 
   external_deps = [
@@ -76,6 +77,8 @@ ohos_unittest("sec_comp_register_callback_test") {
   include_dirs = [
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/security_component/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
     "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
   ]
 
@@ -93,7 +96,7 @@ ohos_unittest("sec_comp_register_callback_test") {
     cflags_cc += [ "-DSECURITY_COMPONENT_ENHANCE_ENABLE" ]
   }
 
-  deps = [ "${sec_comp_root_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk" ]
+  deps = [ "${sec_comp_root_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",

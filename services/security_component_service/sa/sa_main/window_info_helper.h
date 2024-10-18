@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-class WindowInfoHelper {
+class __attribute__((visibility("default"))) WindowInfoHelper {
 public:
     static float GetWindowScale(int32_t windowId);
     static bool CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect);

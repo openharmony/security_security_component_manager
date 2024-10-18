@@ -95,7 +95,11 @@ public:
     virtual void UnregisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
 };
 
+#ifndef SEC_COMP_SERVICE_COMPILE_ENABLE
 class SecCompEnhanceAdapter final {
+#else
+class __attribute__((visibility("default"))) SecCompEnhanceAdapter final {
+#endif
 public:
     static void InitEnhanceHandler(EnhanceInterfaceType type);
     static int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen);

@@ -23,7 +23,6 @@ ohos_fuzztest("UnregisterSecurityComponentFuzzTest") {
 
   include_dirs = [
     "${sec_comp_dir}/frameworks/common/include",
-    "${sec_comp_dir}/interfaces/inner_api/security_component/include",
     "${sec_comp_dir}/test/fuzztest/security_component/common",
   ]
   cflags = [
@@ -40,7 +39,7 @@ ohos_fuzztest("UnregisterSecurityComponentFuzzTest") {
     "unregistersecuritycomponent_fuzzer.cpp",
   ]
 
-  deps = [ "${sec_comp_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk" ]
+  deps = [ "${sec_comp_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk" ]
 
   external_deps = [
     "ability_base:want",

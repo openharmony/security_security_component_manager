@@ -15,6 +15,7 @@
 #ifndef SECURITY_COMPONENT_MANAGER_H
 #define SECURITY_COMPONENT_MANAGER_H
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -91,7 +92,8 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> secRunner_;
     std::shared_ptr<SecEventHandler> secHandler_;
     SecCompMaliciousApps malicious_;
-
+    
+    std::function<void ()> exitSaProcessFunc_ = []() { return; };
     DISALLOW_COPY_AND_MOVE(SecCompManager);
 };
 }  // namespace SecurityComponent
