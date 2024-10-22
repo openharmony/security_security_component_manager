@@ -469,10 +469,6 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
 
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
-        int32_t uid = IPCSkeleton::GetCallingUid();
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
