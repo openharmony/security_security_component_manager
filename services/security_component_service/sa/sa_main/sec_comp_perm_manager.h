@@ -59,7 +59,6 @@ private:
         const std::string& permissionName);
     void RemoveAppGrantPermissionRecord(AccessToken::AccessTokenID tokenId,
         const std::string& permissionName);
-    bool IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId);
 
     std::unordered_map<AccessToken::AccessTokenID, int32_t> applySaveCountMap_;
     std::unordered_map<AccessToken::AccessTokenID, std::deque<std::string>> saveTaskDequeMap_;

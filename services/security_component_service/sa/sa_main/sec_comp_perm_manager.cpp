@@ -268,6 +268,13 @@ void SecCompPermManager::InitEventHandler(const std::shared_ptr<SecEventHandler>
     secHandler_ = secHandler;
 }
 
+namespace {
+inline bool IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
+{
+    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
+}
+}
+
 int32_t SecCompPermManager::GrantTempPermission(AccessToken::AccessTokenID tokenId,
     const std::shared_ptr<SecCompBase>& componentInfo)
 {
@@ -312,11 +319,6 @@ int32_t SecCompPermManager::GrantTempPermission(AccessToken::AccessTokenID token
             break;
     }
     return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-}
-
-inline bool SecCompPermManager::IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
-{
-    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security
