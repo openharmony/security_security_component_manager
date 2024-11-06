@@ -51,7 +51,6 @@ const std::string JsonTagConstants::JSON_BORDER_TAG = "border";
 const std::string JsonTagConstants::JSON_BORDER_WIDTH_TAG = "borderWidth";
 const std::string JsonTagConstants::JSON_PARENT_TAG = "parent";
 const std::string JsonTagConstants::JSON_PARENT_EFFECT_TAG = "parentEffect";
-const std::string JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG = "isParentCheckFailed";
 const std::string JsonTagConstants::JSON_IS_CLIPPED_TAG = "isClipped";
 const std::string JsonTagConstants::JSON_TOP_CLIP_TAG = "topClip";
 const std::string JsonTagConstants::JSON_BOTTOM_CLIP_TAG = "bottomClip";
@@ -197,9 +196,6 @@ bool SecCompBase::ParseParent(const nlohmann::json& json, const std::string& tag
     if (!ParseBool(jsonParent, JsonTagConstants::JSON_PARENT_EFFECT_TAG, parentEffect_)) {
         return false;
     }
-    if (!ParseBool(jsonParent, JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, isParentCheckFailed_)) {
-        return false;
-    }
     if (!ParseBool(jsonParent, JsonTagConstants::JSON_IS_CLIPPED_TAG, isClipped_)) {
         return false;
     }
@@ -343,7 +339,6 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     };
     jsonRes[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, parentEffect_ },
-        { JsonTagConstants::JSON_PARENT_CHECK_FAILED_TAG, isParentCheckFailed_},
         { JsonTagConstants::JSON_IS_CLIPPED_TAG, isClipped_ },
         { JsonTagConstants::JSON_TOP_CLIP_TAG, topClip_ },
         { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, bottomClip_ },
