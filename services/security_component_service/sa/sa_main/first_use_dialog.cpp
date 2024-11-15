@@ -23,6 +23,7 @@
 #include "accesstoken_kit.h"
 #include "bundle_mgr_client.h"
 #include "hisysevent.h"
+#include "ipc_skeleton.h"
 #include "sec_comp_dialog_callback_proxy.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
@@ -45,6 +46,7 @@ const std::string GRANT_ABILITY_ABILITY_NAME = "com.ohos.permissionmanager.Secur
 const std::string TYPE_KEY = "ohos.user.security.type";
 const std::string TOKEN_KEY = "ohos.ability.params.token";
 const std::string CALLBACK_KEY = "ohos.ability.params.callback";
+const std::string CALLER_UID_KEY = "ohos.caller.uid";
 
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
@@ -319,6 +321,8 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
     want.SetParam(TYPE_KEY, typeNum);
     want.SetParam(TOKEN_KEY, callerToken);
     want.SetParam(CALLBACK_KEY, srvCallback);
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    want.SetParam(CALLER_UID_KEY, uid);
     int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
     SC_LOG_INFO(LABEL, "start ability res %{public}d", startRes);
     if (startRes != 0) {
