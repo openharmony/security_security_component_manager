@@ -54,7 +54,7 @@ public:
 
     ~FirstUseDialog() = default;
     int32_t NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId);
     void Init(std::shared_ptr<SecEventHandler> secHandler);
     int32_t GrantDialogWaitEntity(int32_t scId);
     void RemoveDialogWaitEntitys(int32_t pid);
@@ -73,7 +73,7 @@ private:
     void LoadFirstUseRecord(void);
     void SaveFirstUseRecord(void);
     void StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId);
     void SendSaveEventHandler(void);
 
     std::mutex useMapMutex_;

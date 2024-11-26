@@ -62,6 +62,7 @@ const std::string JsonTagConstants::JSON_TEXT_TAG = "text";
 const std::string JsonTagConstants::JSON_ICON_TAG = "icon";
 const std::string JsonTagConstants::JSON_BG_TAG = "bg";
 const std::string JsonTagConstants::JSON_WINDOW_ID = "windowId";
+const std::string JsonTagConstants::JSON_DISPLAY_ID = "displayId";
 
 bool SecCompBase::ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res)
 {
@@ -295,6 +296,13 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
         return false;
     }
     windowId_ = jsonSrc.at(JsonTagConstants::JSON_WINDOW_ID).get<int32_t>();
+
+    if ((jsonSrc.find(JsonTagConstants::JSON_DISPLAY_ID) == jsonSrc.end()) ||
+        !jsonSrc.at(JsonTagConstants::JSON_DISPLAY_ID).is_number()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", JsonTagConstants::JSON_DISPLAY_ID.c_str());
+        return false;
+    }
+    displayId_ = jsonSrc.at(JsonTagConstants::JSON_DISPLAY_ID).get<uint64_t>();
     return true;
 }
 
@@ -353,6 +361,7 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         { JsonTagConstants::JSON_BG_TAG, bg_ },
     };
     jsonRes[JsonTagConstants::JSON_WINDOW_ID] = windowId_;
+    jsonRes[JsonTagConstants::JSON_DISPLAY_ID] = displayId_;
 }
 
 std::string SecCompBase::ToJsonStr() const
