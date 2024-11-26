@@ -30,6 +30,11 @@ public:
     {
         return sptr<Display>::MakeSptr();
     }
+
+    sptr<Display> GetDisplayById(uint64_t displayId)
+    {
+        return sptr<Display>::MakeSptr();
+    }
 };
 }
 #endif // SECURITY_COMPONENT_MANAGER_DISPLAY_MANAGER_MOCK_H

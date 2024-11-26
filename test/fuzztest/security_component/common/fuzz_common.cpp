@@ -96,6 +96,7 @@ std::string CompoRandomGenerator::ConstructLocationJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -138,6 +139,7 @@ std::string CompoRandomGenerator::ConstructSaveJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -180,6 +182,7 @@ std::string CompoRandomGenerator::ConstructPasteJson()
             GetData<int32_t>() % static_cast<int32_t>(SecCompBackground::MAX_BG_TYPE) },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }

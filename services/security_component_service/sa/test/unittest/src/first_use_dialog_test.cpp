@@ -407,46 +407,46 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level1)
     diag.secHandler_ = nullptr;
 
     // no entity
-    EXPECT_EQ(diag.NotifyFirstUseDialog(nullptr, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_EQ(diag.NotifyFirstUseDialog(nullptr, nullptr, nullptr, 0), SC_SERVICE_ERROR_VALUE_INVALID);
 
     std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
     // no handler
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr, 0), SC_SERVICE_ERROR_VALUE_INVALID);
 
     // no calltoken
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_NE(nullptr, runner);
     std::shared_ptr<SecEventHandler> handler = std::make_shared<SecEventHandler>(runner);
     diag.secHandler_ = handler;
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr, 0), SC_SERVICE_ERROR_VALUE_INVALID);
 
     // no dialogCallback
     sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, nullptr), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, nullptr, 0), SC_SERVICE_ERROR_VALUE_INVALID);
 
     // type invalid
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject), SC_OK);
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, 0), SC_OK);
 
     // first use location button
     entity->componentInfo_ = std::make_shared<LocationButton>();
     entity->componentInfo_->type_ = LOCATION_COMPONENT;
     entity->tokenId_ = 0;
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject),
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, 0),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // first use save button
     entity->componentInfo_->type_ = SAVE_COMPONENT;
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject),
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, 0),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // second use save button
-    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject),
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, 0),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
-    diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject);
+    diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject, 0);
 
     // wait for event handler done
     sleep(3);

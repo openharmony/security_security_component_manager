@@ -72,10 +72,10 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     return comp;
 }
 
-static bool GetScreenSize(double& width, double& height)
+static bool GetScreenSize(double& width, double& height, const uint64_t displayId)
 {
     sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplaySync();
+        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;
@@ -94,11 +94,12 @@ static bool GetScreenSize(double& width, double& height)
     return true;
 }
 
-bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect)
+bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect,
+    const uint64_t displayId)
 {
     double curScreenWidth = 0.0F;
     double curScreenHeight = 0.0F;
-    if (!GetScreenSize(curScreenWidth, curScreenHeight)) {
+    if (!GetScreenSize(curScreenWidth, curScreenHeight, displayId)) {
         SC_LOG_ERROR(LABEL, "Get screen size is invalid");
         return false;
     }

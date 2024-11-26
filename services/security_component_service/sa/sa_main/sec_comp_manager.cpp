@@ -467,7 +467,8 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
-    if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_))) {
+    if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
+        report->displayId_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
@@ -538,7 +539,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, callerToken, dialogCallback) ==
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent);
+    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, callerToken, dialogCallback, report->displayId_) ==
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
