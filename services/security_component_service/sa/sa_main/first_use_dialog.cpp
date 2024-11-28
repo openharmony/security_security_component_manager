@@ -47,6 +47,7 @@ const std::string TYPE_KEY = "ohos.user.security.type";
 const std::string TOKEN_KEY = "ohos.ability.params.token";
 const std::string CALLBACK_KEY = "ohos.ability.params.callback";
 const std::string CALLER_UID_KEY = "ohos.caller.uid";
+const std::string DISPLAY_ID = "ohos.display.id";
 
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
@@ -296,7 +297,7 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
 }
 
 void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId)
 {
     int32_t typeNum;
     SecCompType type = entity->GetType();
@@ -323,6 +324,7 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
     want.SetParam(CALLBACK_KEY, srvCallback);
     int32_t uid = IPCSkeleton::GetCallingUid();
     want.SetParam(CALLER_UID_KEY, uid);
+    want.SetParam(DISPLAY_ID, static_cast<long long>(displayId));
     int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
     SC_LOG_INFO(LABEL, "start ability res %{public}d", startRes);
     if (startRes != 0) {
@@ -373,7 +375,7 @@ bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
 }
 
 int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId)
 {
     if (entity == nullptr) {
         SC_LOG_ERROR(LABEL, "Entity is invalid.");
@@ -409,7 +411,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     auto iter = firstUseMap_.find(tokenId);
     if (iter == firstUseMap_.end()) {
         SC_LOG_INFO(LABEL, "has not use record, start dialog");
-        StartDialogAbility(entity, callerToken, dialogCallback);
+        StartDialogAbility(entity, callerToken, dialogCallback, displayId);
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
 
@@ -418,7 +420,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
         SC_LOG_INFO(LABEL, "no need notify again.");
         return SC_OK;
     }
-    StartDialogAbility(entity, callerToken, dialogCallback);
+    StartDialogAbility(entity, callerToken, dialogCallback, displayId);
     return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
 }
 

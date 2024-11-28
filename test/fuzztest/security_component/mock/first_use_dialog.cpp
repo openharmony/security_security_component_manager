@@ -86,7 +86,7 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
 }
 
 void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId)
 {
     return;
 }
@@ -102,7 +102,7 @@ bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
 }
 
 int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId)
 {
     return SC_OK;
 }
