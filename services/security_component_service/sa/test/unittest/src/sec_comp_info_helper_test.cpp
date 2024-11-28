@@ -149,36 +149,36 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
 
     rect.x_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.x_ = g_testWidth;
 
     rect.y_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.y_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.x_ = g_testWidth;
 
     rect.y_ = g_curScreenHeight + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.y_ = g_testHeight;
 
     rect.width_ = g_curScreenWidth;
     rect.height_ = g_curScreenHeight;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.width_ = g_testWidth;
     rect.height_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth - g_testWidth;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.x_ = g_testWidth;
     rect.y_ = g_curScreenHeight - g_testHeight;
 
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     rect.y_ = g_testHeight;
 }
 
@@ -192,30 +192,30 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
 
     windowRect.x_ = g_testWidth + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.x_ = g_testWidth;
 
     windowRect.y_ = g_testHeight + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.y_ = g_testHeight;
 
     windowRect.width_ = g_testWidth - 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.width_ = g_testWidth;
 
     windowRect.height_ = g_testHeight - 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.height_ = g_testHeight;
 
     windowRect.width_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.width_ = g_testWidth;
 
     windowRect.height_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0));
     windowRect.height_ = g_testHeight;
 }
 
