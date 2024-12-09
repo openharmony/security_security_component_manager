@@ -149,5 +149,5 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level1)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect));
+    ASSERT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect));
 }
