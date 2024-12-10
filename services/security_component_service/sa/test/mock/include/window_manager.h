@@ -89,6 +89,7 @@ public:
     };
     WMError GetUnreliableWindowInfo(int32_t windowId, std::vector<sptr<UnreliableWindowInfo>>& infos) const
     {
+        infos = info_;
         return result_;
     }
 

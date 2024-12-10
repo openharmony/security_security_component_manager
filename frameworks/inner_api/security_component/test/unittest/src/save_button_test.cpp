@@ -79,6 +79,10 @@ HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::LINE_ICON;
     stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
     ASSERT_FALSE(button.FromJson(jsonComponent));
+
+    stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::PICTURE_ICON;
+    stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
+    ASSERT_FALSE(button.FromJson(jsonComponent));
 }
 
 /**

@@ -273,7 +273,7 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .extraInfo.data = data,
         .extraInfo.dataSize = 16,
     };
-    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
+    EXPECT_EQ(SC_OK,
         secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, touch, nullptr, nullptr));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
     setuid(uid);
