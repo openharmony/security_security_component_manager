@@ -416,7 +416,9 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
         return false;
     }
     bg_ = static_cast<SecCompBackground>(jsonStyle.at(JsonTagConstants::JSON_BG_TAG).get<int32_t>());
-    if ((bg_ <= SecCompBackground::UNKNOWN_BG) || (bg_ >= SecCompBackground::MAX_BG_TYPE)) {
+    if ((bg_ != SecCompBackground::NO_BG_TYPE) && (bg_ != SecCompBackground::CAPSULE) &&
+        (bg_ != SecCompBackground::CIRCLE) && (bg_ != SecCompBackground::NORMAL) &&
+        (bg_ != SecCompBackground::ROUNDED_RECTANGLE)) {
         SC_LOG_ERROR(LABEL, "bg is invalid.");
         return false;
     }

@@ -32,6 +32,7 @@ enum class SecCompBackground {
     CAPSULE = 0,
     CIRCLE = 1,
     NORMAL = 2,
+    ROUNDED_RECTANGLE = 8,
     MAX_BG_TYPE
 };
 
