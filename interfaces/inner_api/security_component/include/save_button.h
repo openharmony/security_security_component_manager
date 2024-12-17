@@ -36,6 +36,7 @@ enum class SaveDesc : int32_t {
     EXPORT_TO_GALLERY = 9,
     QUICK_SAVE_TO_GALLERY = 10,
     RESAVE_TO_GALLERY = 11,
+    SAVE_ALL = 12,
     MAX_LABEL_TYPE
 };
 
