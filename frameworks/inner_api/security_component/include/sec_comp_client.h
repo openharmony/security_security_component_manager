@@ -64,6 +64,9 @@ private:
     bool readyFlag_ = false;
     std::condition_variable secComCon_;
     std::mutex proxyMutex_;
+    bool secCompSAFlag_ = false;
+    std::condition_variable secCompSACon_;
+    std::mutex secCompSAMutex_;
     sptr<ISecCompService> proxy_ = nullptr;
     sptr<SecCompDeathRecipient> serviceDeathObserver_ = nullptr;
 };
