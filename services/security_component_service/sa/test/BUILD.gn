@@ -69,7 +69,6 @@ ohos_unittest("sec_comp_service_test") {
   deps = [
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
@@ -83,6 +82,7 @@ ohos_unittest("sec_comp_service_test") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -141,10 +141,8 @@ ohos_unittest("sec_comp_service_mock_test") {
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
-  deps = [
-    "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
-    "//third_party/googletest:gmock_main",
-  ]
+  deps =
+      [ "${sec_comp_root_dir}/frameworks:security_component_framework_src_set" ]
 
   external_deps = [
     "ability_base:base",
@@ -157,6 +155,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "googletest:gmock_main",
     "graphic_2d:librender_service_client",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
