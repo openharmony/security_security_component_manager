@@ -273,8 +273,10 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .extraInfo.data = data,
         .extraInfo.dataSize = 16,
     };
+    SecCompInfo secCompInfo { scId, locationInfo, touch };
+    std::string message;
     EXPECT_EQ(SC_OK,
-        secCompService_->ReportSecurityComponentClickEvent(scId, locationInfo, touch, nullptr, nullptr));
+        secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
     setuid(uid);
 }
@@ -363,7 +365,9 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
     EXPECT_NE(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
 
     struct SecCompClickEvent touchInfo;
-    EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(scId, componentInfo, touchInfo, nullptr, nullptr),
+    SecCompInfo secCompInfo { scId, componentInfo, touchInfo };
+    std::string message;
+    EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message),
       SC_SERVICE_ERROR_VALUE_INVALID);
     secCompService_->GetEnhanceRemoteObject();
 }

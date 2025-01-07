@@ -38,6 +38,8 @@ private:
     int32_t VerifySavePermissionInner(MessageParcel& data, MessageParcel& reply);
     int32_t GetEnhanceRemoteObjectInner(MessageParcel& data, MessageParcel& reply);
     int32_t PreRegisterSecCompProcessInner(MessageParcel& data, MessageParcel& reply);
+    int32_t WriteSecurityComponentClickEventResult(int32_t res, MessageParcel& reply,
+        const std::string& message);
     bool IsMediaLibraryCalling();
 
     using RequestFuncType = int32_t (SecCompStub::*)(MessageParcel& data, MessageParcel& reply);

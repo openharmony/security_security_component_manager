@@ -19,6 +19,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <string>
+
 #include "i_sec_comp_service.h"
 #include "sec_comp_death_recipient.h"
 #include "sec_comp_err.h"
@@ -33,9 +34,8 @@ public:
     int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId);
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo);
     int32_t UnregisterSecurityComponent(int32_t scId);
-    int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
+    int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
     sptr<IRemoteObject> GetEnhanceRemoteObject(bool doLoadSa);
     int32_t PreRegisterSecCompProcess();

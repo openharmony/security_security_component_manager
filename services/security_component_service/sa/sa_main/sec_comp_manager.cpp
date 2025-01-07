@@ -36,6 +36,7 @@ static constexpr int32_t MAX_INT_NUM = 0x7fffffff;
 static constexpr int32_t MAX_SINGLE_PROC_COMP_SIZE = 500;
 static constexpr unsigned long REPORT_REMOTE_OBJECT_SIZE = 2UL;
 static std::mutex g_instanceMutex;
+const std::string START_DIALOG = "start dialog, onclick will be trap after dialog closed.";
 }
 
 SecCompManager::SecCompManager()
@@ -354,7 +355,8 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
         return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
     }
 
-    SecCompBase* componentPtr = SecCompInfoHelper::ParseComponent(type, jsonComponent);
+    std::string message;
+    SecCompBase* componentPtr = SecCompInfoHelper::ParseComponent(type, jsonComponent, message);
     std::shared_ptr<SecCompBase> component(componentPtr);
     if (component == nullptr) {
         SC_LOG_ERROR(LABEL, "Parse component info invalid");
@@ -405,7 +407,8 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent);
+    std::string message;
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     if (reportComponentInfo == nullptr) {
         SC_LOG_ERROR(LABEL, "Update component info invalid");
@@ -444,10 +447,10 @@ int32_t SecCompManager::UnregisterSecurityComponent(int32_t scId, const SecCompC
 }
 
 int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompEntity> sc, int32_t scId,
-    const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller)
+    const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller, std::string& message)
 {
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, Check security component", caller.pid);
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
@@ -468,7 +471,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     }
 
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
-        report->displayId_))) {
+        report->displayId_, message))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
@@ -501,11 +504,19 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
-int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
+static void ReportEvent(std::string eventName, int32_t scId, SecCompType scType)
+{
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, eventName,
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
+}
+
+int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller,
-    const SecCompClickEvent& clickInfo, const std::vector<sptr<IRemoteObject>>& remote)
+    const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
 {
     if (remote.size() < REPORT_REMOTE_OBJECT_SIZE) {
+        SC_LOG_ERROR(LABEL, "remote object size is invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
     auto callerToken = remote[0];
@@ -513,25 +524,26 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
 
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
+        message = ", is malicious App, never allow it";
         return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
     }
 
     OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
-    std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, scId);
+    std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, secCompInfo.scId);
     if (sc == nullptr) {
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
 
-    int32_t res = CheckClickSecurityComponentInfo(sc, scId, jsonComponent, caller);
+    int32_t res = CheckClickSecurityComponentInfo(sc, secCompInfo.scId, jsonComponent, caller, message);
     if (res != SC_OK) {
         return res;
     }
 
-    res = sc->CheckClickInfo(clickInfo);
+    res = sc->CheckClickInfo(secCompInfo.clickInfo, message);
     if (res != SC_OK) {
         ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
-            scId, sc->GetType());
+            secCompInfo.scId, sc->GetType());
         if (res == SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL) {
             malicious_.AddAppToMaliciousAppList(caller.pid);
         }
@@ -539,7 +551,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message);
     if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, callerToken, dialogCallback, report->displayId_) ==
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
@@ -548,13 +560,10 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
 
     res = sc->GrantTempPermission();
     if (res != SC_OK) {
-        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT,
-            scId, sc->GetType());
+        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, secCompInfo.scId, sc->GetType());
         return res;
     }
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
-        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", sc->GetType());
+    ReportEvent("TEMP_GRANT_SUCCESS", secCompInfo.scId, sc->GetType());
     return res;
 }
 

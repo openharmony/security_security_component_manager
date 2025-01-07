@@ -101,9 +101,8 @@ int32_t SecCompKit::UnregisterSecurityComponent(int32_t scId)
     return res;
 }
 
-int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
-    std::string& componentInfo, const SecCompClickEvent& clickInfo,
-    sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback)
+int32_t SecCompKit::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+    sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback, std::string& message)
 {
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
         reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
@@ -129,14 +128,13 @@ int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_MEMORY_OPERATE_FAIL;
     }
 
-    if (!SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo)) {
+    if (!SecCompEnhanceAdapter::EnhanceDataPreprocess(secCompInfo.scId, secCompInfo.componentInfo)) {
         SC_LOG_ERROR(LABEL, "Preprocess security component fail");
         return SC_ENHANCE_ERROR_VALUE_INVALID;
     }
 
-    int32_t res =
-        SecCompClient::GetInstance().ReportSecurityComponentClickEvent(scId, componentInfo,
-        clickInfo, callerToken, callbackRemote);
+    int32_t res = SecCompClient::GetInstance().ReportSecurityComponentClickEvent(secCompInfo,
+        callerToken, callbackRemote, message);
     if (res != SC_OK) {
         SC_LOG_ERROR(LABEL, "report click event fail, error: %{public}d", res);
     }

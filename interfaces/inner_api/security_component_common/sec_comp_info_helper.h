@@ -18,6 +18,7 @@
 #include "accesstoken_kit.h"
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
+#include "sec_comp_err.h"
 #include "sec_comp_info.h"
 
 namespace OHOS {
@@ -36,9 +37,10 @@ T* ConstructComponent(const nlohmann::json& jsonComponent)
 
 class __attribute__((visibility("default"))) SecCompInfoHelper {
 public:
-    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent);
-    static bool CheckComponentValid(SecCompBase* comp);
-    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const uint64_t displayId);
+    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent, std::string& message);
+    static bool CheckComponentValid(SecCompBase* comp, std::string& message);
+    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const uint64_t displayId,
+        std::string& message);
 
 private:
     static float GetWindowScale(int32_t windowId);

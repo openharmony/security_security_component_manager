@@ -16,8 +16,10 @@
 #define SECURITY_COMPONENT_PROXY_H
 
 #include <string>
+
 #include "i_sec_comp_service.h"
 #include "iremote_proxy.h"
+#include "sec_comp_err.h"
 
 namespace OHOS {
 namespace Security {
@@ -29,15 +31,14 @@ public:
     int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId) override;
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo) override;
     int32_t UnregisterSecurityComponent(int32_t scId) override;
-    int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback) override;
+    int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, sptr<IRemoteObject> callerToken,
+        sptr<IRemoteObject> dialogCallback, std::string& message) override;
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override;
     sptr<IRemoteObject> GetEnhanceRemoteObject() override;
     int32_t PreRegisterSecCompProcess() override;
 
 private:
-    int32_t SendReportClickEventRequest(MessageParcel& data);
+    int32_t SendReportClickEventRequest(MessageParcel& data, std::string& message);
     static inline BrokerDelegator<SecCompProxy> delegator_;
     std::mutex useIPCMutex_;
 };

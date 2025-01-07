@@ -167,6 +167,28 @@ int32_t SecCompStub::UnregisterSecurityComponentInner(MessageParcel& data, Messa
     return SC_OK;
 }
 
+int32_t SecCompStub::WriteSecurityComponentClickEventResult(int32_t res, MessageParcel& reply,
+    const std::string& message)
+{
+    MessageParcel rawReply;
+    if (!rawReply.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Report security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!rawReply.WriteString(message)) {
+        SC_LOG_ERROR(LABEL, "Report security component error message failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(rawReply, reply)) {
+        SC_LOG_ERROR(LABEL, "Report serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    return SC_OK;
+}
+
 int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data, MessageParcel& reply)
 {
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -208,22 +230,10 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    int32_t res =
-        this->ReportSecurityComponentClickEvent(scId,
-        componentInfo, clickInfoParcel->clickInfoParams_,
-        callerToken, dialogCallback);
-    MessageParcel rawReply;
-    if (!rawReply.WriteInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Report security component result failed");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(rawReply, reply)) {
-        SC_LOG_ERROR(LABEL, "Report serialize session info failed");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    return SC_OK;
+    SecCompInfo secCompInfo { scId, componentInfo, clickInfoParcel->clickInfoParams_ };
+    std::string message;
+    int32_t res = this->ReportSecurityComponentClickEvent(secCompInfo, callerToken, dialogCallback, message);
+    return WriteSecurityComponentClickEventResult(res, reply, message);
 }
 
 int32_t SecCompStub::VerifySavePermissionInner(MessageParcel& data, MessageParcel& reply)
