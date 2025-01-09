@@ -50,11 +50,10 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
 std::string GetSecCompWindowMsg(int32_t compWinId, const SecCompRect& secRect,
     int32_t coverWindowId)
 {
-    std::string message =
-        ", security component window id = " + std::to_string(compWinId) +
-        ", is covered by window id = " + std::to_string(coverWindowId) +
-        ", security component window(x = " + std::to_string(secRect.x_) +
-        ", y = " + std::to_string(secRect.y_) +
+    std::string message = ", the id of the window where the security component is located is " +
+        std::to_string(compWinId) + ", security component is covered by the window(id = " +
+        std::to_string(coverWindowId) + "), the size of security component is (x = " +
+        std::to_string(secRect.x_) + ", y = " + std::to_string(secRect.y_) +
         ", width = " + std::to_string(secRect.width_) +
         ", height = " + std::to_string(secRect.height_) + ")";
     return message;
@@ -62,11 +61,9 @@ std::string GetSecCompWindowMsg(int32_t compWinId, const SecCompRect& secRect,
 
 std::string GetCoveredWindowMsg(const Rosen::Rect& windowRect)
 {
-    std::string coveredWindowMessage =
-        ", cover Window(x = " + std::to_string(windowRect.posX_) +
-        ", y = " + std::to_string(windowRect.posY_) +
-        ", width = " + std::to_string(windowRect.width_) +
-        ", height = " + std::to_string(windowRect.height_) + ")";
+    std::string coveredWindowMessage = ", the size of window covering security component is (x = " +
+        std::to_string(windowRect.posX_) + ", y = " + std::to_string(windowRect.posY_) +
+        ", width = " + std::to_string(windowRect.width_) + ", height = " + std::to_string(windowRect.height_) + ")";
     return coveredWindowMessage;
 }
 
@@ -135,7 +132,7 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
             continue;
         }
         if (info->floatingScale_ != 0.0) {
-        info->windowRect_.width_ *= info->floatingScale_;
+            info->windowRect_.width_ *= info->floatingScale_;
             info->windowRect_.height_ *= info->floatingScale_;
         }
         if (IsRectInWindRect(info->windowRect_, secRect)) {

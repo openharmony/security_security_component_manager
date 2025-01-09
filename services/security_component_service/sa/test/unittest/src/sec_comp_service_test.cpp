@@ -273,7 +273,7 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .extraInfo.data = data,
         .extraInfo.dataSize = 16,
     };
-    SecCompInfo secCompInfo { scId, locationInfo, touch };
+    SecCompInfo secCompInfo{ scId, locationInfo, touch };
     std::string message;
     EXPECT_EQ(SC_OK,
         secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
@@ -365,7 +365,7 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
     EXPECT_NE(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
 
     struct SecCompClickEvent touchInfo;
-    SecCompInfo secCompInfo { scId, componentInfo, touchInfo };
+    SecCompInfo secCompInfo{ scId, componentInfo, touchInfo };
     std::string message;
     EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message),
       SC_SERVICE_ERROR_VALUE_INVALID);

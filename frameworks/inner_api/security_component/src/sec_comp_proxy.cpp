@@ -14,11 +14,11 @@
  */
 #include "sec_comp_proxy.h"
 
-#include <mutex>
 #include "sec_comp_click_event_parcel.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Security {

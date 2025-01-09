@@ -19,7 +19,6 @@
 
 #include "access_token.h"
 #include "iremote_broker.h"
-#include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "security_component_service_ipc_interface_code.h"
 

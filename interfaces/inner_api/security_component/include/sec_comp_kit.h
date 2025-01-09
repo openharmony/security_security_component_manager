@@ -18,7 +18,6 @@
 #include <string>
 #include "accesstoken_kit.h"
 #include "iremote_object.h"
-#include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_comp_ui_register.h"
 

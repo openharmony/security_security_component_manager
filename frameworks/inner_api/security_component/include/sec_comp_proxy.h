@@ -16,10 +16,8 @@
 #define SECURITY_COMPONENT_PROXY_H
 
 #include <string>
-
 #include "i_sec_comp_service.h"
 #include "iremote_proxy.h"
-#include "sec_comp_err.h"
 
 namespace OHOS {
 namespace Security {

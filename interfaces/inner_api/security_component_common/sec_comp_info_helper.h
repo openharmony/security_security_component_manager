@@ -18,7 +18,6 @@
 #include "accesstoken_kit.h"
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
-#include "sec_comp_err.h"
 #include "sec_comp_info.h"
 
 namespace OHOS {

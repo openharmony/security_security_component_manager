@@ -16,8 +16,6 @@
 #define FRAMEWORKS_COMMON_SECURITY_COMPONENT_ERR_H
 
 #include <inttypes.h>
-#include <string>
-#include "sec_comp_info.h"
 
 namespace OHOS {
 namespace Security {
@@ -52,12 +50,6 @@ enum SCErrCode : int32_t {
     SC_ENHANCE_ERROR_IN_MALICIOUS_LIST = -109,
     SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL = -110,
     SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL = -111,
-};
-
-struct SecCompInfo {
-    int32_t scId;
-    std::string componentInfo;
-    SecCompClickEvent clickInfo;
 };
 } // namespace SecurityComponent
 } // namespace Security

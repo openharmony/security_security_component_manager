@@ -230,7 +230,7 @@ int32_t SecCompStub::ReportSecurityComponentClickEventInner(MessageParcel& data,
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    SecCompInfo secCompInfo { scId, componentInfo, clickInfoParcel->clickInfoParams_ };
+    SecCompInfo secCompInfo{ scId, componentInfo, clickInfoParcel->clickInfoParams_ };
     std::string message;
     int32_t res = this->ReportSecurityComponentClickEvent(secCompInfo, callerToken, dialogCallback, message);
     return WriteSecurityComponentClickEventResult(res, reply, message);

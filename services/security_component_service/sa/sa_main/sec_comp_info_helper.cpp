@@ -14,6 +14,9 @@
  */
 #include "sec_comp_info_helper.h"
 
+#include <iomanip>
+#include <sstream>
+
 #include "accesstoken_kit.h"
 #include "display.h"
 #include "display_info.h"
@@ -35,8 +38,10 @@ static constexpr double MAX_RECT_PERCENT = 0.1F; // 10%
 static constexpr double ZERO_OFFSET = 0.0F;
 const std::string OUT_OF_SCREEN = ", security component is out of screen, security component(x = ";
 const std::string OUT_OF_WINDOW = ", security component is out of window, security component(x = ";
-const std::string LARGER_THAN_TEN_PERCENT = ", security component is larger than 10 percent of screen, security "
-    "component(width = ";
+const std::string SECURITY_COMPONENT_IS_TOO_LARGER =
+    ", security component is too larger, security component(width = ";
+const int HEX_FIELD_WIDTH = 2;
+const char HEX_FILL_CHAR = '0';
 }
 
 void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
@@ -119,7 +124,7 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
-            "), current screen (width = " + std::to_string(curScreenWidth) +
+            "), current screen(width = " + std::to_string(curScreenWidth) +
             ", height = " + std::to_string(curScreenHeight) + ")";
         return false;
     }
@@ -129,7 +134,7 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
-            "), current screen (width = " + std::to_string(curScreenWidth) +
+            "), current screen(width = " + std::to_string(curScreenWidth) +
             ", height = " + std::to_string(curScreenHeight) + ")";
         return false;
     }
@@ -140,7 +145,7 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         message = OUT_OF_WINDOW + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
-            "), window (x = " + std::to_string(windowRect.x_) + ", y = " + std::to_string(windowRect.y_) +
+            "), current window(x = " + std::to_string(windowRect.x_) + ", y = " + std::to_string(windowRect.y_) +
             ", width = " + std::to_string(windowRect.width_) + ", height = " +
             std::to_string(windowRect.height_) + ")";
         return false;
@@ -149,8 +154,8 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
     // check rect > 10%
     if (GreatOrEqual((rect.width_ * rect.height_), (curScreenWidth * curScreenHeight * MAX_RECT_PERCENT))) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is larger than 10 percent of screen");
-        message = LARGER_THAN_TEN_PERCENT + std::to_string(rect.width_) +
-            ", height = " + std::to_string(rect.height_) + "), current screen (width = "
+        message = SECURITY_COMPONENT_IS_TOO_LARGER + std::to_string(rect.width_) +
+            ", height = " + std::to_string(rect.height_) + "), current screen(width = "
             + std::to_string(curScreenWidth) + ", height = " + std::to_string(curScreenHeight) + ")";
         return false;
     }
@@ -158,13 +163,25 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
     return true;
 }
 
+std::string ColorToHexString(const SecCompColor& color)
+{
+    std::stringstream ss;
+    ss << std::hex;
+    ss << std::setw(HEX_FIELD_WIDTH) << std::setfill(HEX_FILL_CHAR) << static_cast<int>(color.argb.alpha);
+    ss << std::setw(HEX_FIELD_WIDTH) << std::setfill(HEX_FILL_CHAR) << static_cast<int>(color.argb.red);
+    ss << std::setw(HEX_FIELD_WIDTH) << std::setfill(HEX_FILL_CHAR) << static_cast<int>(color.argb.green);
+    ss << std::setw(HEX_FIELD_WIDTH) << std::setfill(HEX_FILL_CHAR) << static_cast<int>(color.argb.blue);
+
+    return "#" + ss.str();
+}
+
 static bool CheckSecCompBaseButtonColorsimilar(const SecCompBase* comp, std::string& message)
 {
     if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) && !IsColorFullTransparent(comp->bgColor_) &&
-        (comp->icon_ != NO_TEXT) && IsColorSimilar(comp->iconColor_, comp->bgColor_)) {
+        (comp->icon_ != NO_ICON) && IsColorSimilar(comp->iconColor_, comp->bgColor_)) {
         SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconColor is similar with backgroundColor.");
         message = ", icon color is similar with background color, icon color = " +
-            std::to_string(comp->iconColor_.value) + ", background color = " + std::to_string(comp->bgColor_.value);
+            ColorToHexString(comp->iconColor_) + ", background color = " + ColorToHexString(comp->bgColor_);
         return false;
     }
 
@@ -172,7 +189,7 @@ static bool CheckSecCompBaseButtonColorsimilar(const SecCompBase* comp, std::str
         (comp->text_ != NO_TEXT) && IsColorSimilar(comp->fontColor_, comp->bgColor_)) {
         SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontColor is similar with backgroundColor.");
         message = ", font color is similar with background color, font color = " +
-            std::to_string(comp->fontColor_.value) + ", background color = " + std::to_string(comp->bgColor_.value);
+            ColorToHexString(comp->fontColor_) + ", background color = " + ColorToHexString(comp->bgColor_);
         return false;
     }
 
@@ -223,7 +240,7 @@ static bool CheckSecCompBase(const SecCompBase* comp, std::string& message)
     if (comp->parentEffect_) {
         SC_LOG_ERROR(LABEL,
             "SecurityComponentCheckFail: the parents of security component have invalid effect.");
-        message = "the parents of security component have invalid effect";
+        message = "PARENT_HAVE_INVALID_EFFECT";
         return false;
     }
 
@@ -245,14 +262,13 @@ static bool CheckSecCompBase(const SecCompBase* comp, std::string& message)
 
     if ((comp->text_ != NO_TEXT) && (IsColorTransparent(comp->fontColor_))) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: fontColor is too transparent.");
-        message = ", font color is too transparent, font color = " + std::to_string(comp->fontColor_.value);
+        message = ", font color is too transparent, font color = " + ColorToHexString(comp->fontColor_);
         return false;
     }
 
     if ((comp->icon_ != NO_ICON) && (IsColorTransparent(comp->iconColor_))) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: iconColor is too transparent.");
-        message = ", icon color is too transparent, icon color = "
-            + std::to_string(comp->iconColor_.value);
+        message = ", icon color is too transparent, icon color = " + ColorToHexString(comp->iconColor_);
         return false;
     }
 

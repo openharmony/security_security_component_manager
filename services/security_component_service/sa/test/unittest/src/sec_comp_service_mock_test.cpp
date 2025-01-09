@@ -113,7 +113,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
             .dataSize = 1
         },
     };
-    SecCompInfo secCompInfo { scId, saveInfo, touch };
+    SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
     EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
@@ -149,7 +149,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
         .point.timestamp = static_cast<uint64_t>(
             std::chrono::high_resolution_clock::now().time_since_epoch().count())
     };
-    SecCompInfo secCompInfo { scId, saveInfo, touch };
+    SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
@@ -192,7 +192,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
             .dataSize = 1
         },
     };
-    SecCompInfo secCompInfo { scId, saveInfo, touch };
+    SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
         secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
@@ -235,7 +235,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
             .dataSize = 1
         },
     };
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
 
@@ -295,7 +295,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
             .dataSize = 1
         },
     };
-    SecCompInfo secCompInfo { scId, locationInfo, clickInfo1 };
+    SecCompInfo secCompInfo{ scId, locationInfo, clickInfo1 };
     std::string message;
     ASSERT_EQ(SC_OK,
         secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));

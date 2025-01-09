@@ -19,7 +19,6 @@
 #include <condition_variable>
 #include <mutex>
 #include <string>
-
 #include "i_sec_comp_service.h"
 #include "sec_comp_death_recipient.h"
 #include "sec_comp_err.h"

@@ -220,7 +220,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -257,7 +257,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -311,7 +311,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -352,7 +352,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -389,7 +389,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
@@ -429,7 +429,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent004, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = nullptr;
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_ENHANCE_ERROR_VALUE_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -468,7 +468,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, locationInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, locationInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -507,7 +507,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -549,7 +549,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -586,7 +586,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo { scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));

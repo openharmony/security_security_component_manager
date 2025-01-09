@@ -504,13 +504,6 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
-static void ReportEvent(std::string eventName, int32_t scId, SecCompType scType)
-{
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, eventName,
-        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
-}
-
 int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller,
     const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
@@ -524,7 +517,6 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& secCompIn
 
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
-        message = ", is malicious App, never allow it";
         return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
     }
 
@@ -563,7 +555,9 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& secCompIn
         ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, secCompInfo.scId, sc->GetType());
         return res;
     }
-    ReportEvent("TEMP_GRANT_SUCCESS", secCompInfo.scId, sc->GetType());
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", secCompInfo.scId, "SC_TYPE", sc->GetType());
     return res;
 }
 

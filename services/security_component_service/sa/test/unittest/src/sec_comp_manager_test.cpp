@@ -433,7 +433,7 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     buttonValid.ToJson(jsonVaild);
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
     int32_t scId = 1;
-    SecCompInfo secCompInfo { scId, "", clickInfo};
+    SecCompInfo secCompInfo{ scId, "", clickInfo};
     std::string message;
     ASSERT_NE(SC_OK, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(secCompInfo,
         jsonVaild, caller, remote, message));
@@ -488,7 +488,7 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     buttonValid.ToJson(jsonVaild);
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
-    SecCompInfo secCompInfo { ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
         secCompInfo, jsonVaild, caller, remote, message));
