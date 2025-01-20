@@ -46,7 +46,7 @@ public:
     }
 
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
-    int32_t CheckClickInfo(const SecCompClickEvent& clickInfo) const;
+    int32_t CheckClickInfo(const SecCompClickEvent& clickInfo, std::string& message) const;
 
     std::shared_ptr<SecCompBase> componentInfo_;
     AccessToken::AccessTokenID tokenId_;

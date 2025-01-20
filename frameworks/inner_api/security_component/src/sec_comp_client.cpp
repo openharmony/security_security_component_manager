@@ -106,9 +106,8 @@ int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
     return proxy->UnregisterSecurityComponent(scId);
 }
 
-int32_t SecCompClient::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+int32_t SecCompClient::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message)
 {
     auto proxy = GetProxy(true);
     if (proxy == nullptr) {
@@ -116,7 +115,7 @@ int32_t SecCompClient::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    return proxy->ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken, dialogCallback);
+    return proxy->ReportSecurityComponentClickEvent(secCompInfo, callerToken, dialogCallback, message);
 }
 
 bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)

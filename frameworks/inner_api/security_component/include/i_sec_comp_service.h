@@ -16,6 +16,7 @@
 #define I_SECURITY_COMPONENT_SERVICE_H
 
 #include <string>
+
 #include "access_token.h"
 #include "iremote_broker.h"
 #include "sec_comp_info.h"
@@ -34,8 +35,8 @@ public:
         const std::string& componentInfo, int32_t& scId) = 0;
     virtual int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo) = 0;
     virtual int32_t UnregisterSecurityComponent(int32_t scId) = 0;
-    virtual int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo,
-        const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback) = 0;
+    virtual int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message) = 0;
     virtual bool VerifySavePermission(AccessToken::AccessTokenID tokenId) = 0;
     virtual sptr<IRemoteObject> GetEnhanceRemoteObject() = 0;
     virtual int32_t PreRegisterSecCompProcess() = 0;

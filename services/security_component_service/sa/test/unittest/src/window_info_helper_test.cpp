@@ -101,7 +101,8 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level1)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
 
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect));
+    std::string message;
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
 }
 
 /**
@@ -125,7 +126,8 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level1)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect));
+    std::string message;
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
 }
 
 /**
@@ -149,5 +151,6 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level1)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE,
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
-    ASSERT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect));
+    std::string message;
+    ASSERT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
 }

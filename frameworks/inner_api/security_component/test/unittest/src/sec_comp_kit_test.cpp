@@ -41,7 +41,9 @@ static void TestInCallerNotCheckList()
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr, std::move(func));
+    SecCompInfo SecCompInfo{ scId, emptyStr, click };
+    std::string message;
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(SecCompInfo, nullptr, std::move(func), message);
 
     EXPECT_EQ(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -56,7 +58,9 @@ static void TestInCallerCheckList()
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(scId, emptyStr, click, nullptr, std::move(func));
+    SecCompInfo secCompInfo{ scId, emptyStr, click };
+    std::string message;
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message);
 
     EXPECT_NE(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_NE(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
@@ -126,7 +130,9 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
         .point.timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count())
     };
     OnFirstUseDialogCloseFunc func = nullptr;
-    EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(scId, jsonStr, touch, nullptr, std::move(func)));
+    SecCompInfo secCompInfo{ scId, jsonStr, touch };
+    std::string message;
+    EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message));
     EXPECT_NE(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 

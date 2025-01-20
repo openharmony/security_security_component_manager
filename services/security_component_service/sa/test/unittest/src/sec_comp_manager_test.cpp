@@ -432,9 +432,11 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
-    ASSERT_NE(SC_OK,
-        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(1,
-        jsonVaild, caller, clickInfo, remote));
+    int32_t scId = 1;
+    SecCompInfo secCompInfo{ scId, "", clickInfo};
+    std::string message;
+    ASSERT_NE(SC_OK, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(secCompInfo,
+        jsonVaild, caller, remote, message));
 }
 
 /**
@@ -486,17 +488,19 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
     buttonValid.ToJson(jsonVaild);
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
+        secCompInfo, jsonVaild, caller, remote, message));
 
     jsonVaild[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
+        secCompInfo, jsonVaild, caller, remote, message));
 
     jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonVaild, caller, clickInfo, remote));
+        secCompInfo, jsonVaild, caller, remote, message));
 }
 
 /**

@@ -57,9 +57,8 @@ public:
     int32_t UpdateSecurityComponent(int32_t scId, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
-    int32_t ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& jsonComponent,
-        const SecCompCallerInfo& caller, const SecCompClickEvent& clickInfo,
-        const std::vector<sptr<IRemoteObject>>& remote);
+    int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, const nlohmann::json& jsonComponent,
+        const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
     void NotifyProcessDied(int32_t pid);
@@ -78,7 +77,7 @@ private:
     int32_t DeleteSecurityComponentFromList(int32_t pid, int32_t scId);
     std::shared_ptr<SecCompEntity> GetSecurityComponentFromList(int32_t pid, int32_t scId);
     int32_t CheckClickSecurityComponentInfo(std::shared_ptr<SecCompEntity> sc, int32_t scId,
-        const nlohmann::json& jsonComponent,  const SecCompCallerInfo& caller);
+        const nlohmann::json& jsonComponent,  const SecCompCallerInfo& caller, std::string& message);
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();

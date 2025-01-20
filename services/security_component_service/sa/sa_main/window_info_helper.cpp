@@ -47,6 +47,26 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
     return scale;
 }
 
+std::string GetSecCompWindowMsg(int32_t compWinId, const SecCompRect& secRect,
+    int32_t coverWindowId)
+{
+    std::string message = ", the id of the window where the security component is located is " +
+        std::to_string(compWinId) + ", security component is covered by the window(id = " +
+        std::to_string(coverWindowId) + "), the size of security component is (x = " +
+        std::to_string(secRect.x_) + ", y = " + std::to_string(secRect.y_) +
+        ", width = " + std::to_string(secRect.width_) +
+        ", height = " + std::to_string(secRect.height_) + ")";
+    return message;
+}
+
+std::string GetCoveredWindowMsg(const Rosen::Rect& windowRect)
+{
+    std::string coveredWindowMessage = ", the size of window covering security component is (x = " +
+        std::to_string(windowRect.posX_) + ", y = " + std::to_string(windowRect.posY_) +
+        ", width = " + std::to_string(windowRect.width_) + ", height = " + std::to_string(windowRect.height_) + ")";
+    return coveredWindowMessage;
+}
+
 static bool IsRectInWindRect(const Rosen::Rect& windRect, const SecCompRect& secRect)
 {
     // left or right
@@ -63,7 +83,30 @@ static bool IsRectInWindRect(const Rosen::Rect& windRect, const SecCompRect& sec
     return true;
 }
 
-bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect)
+static bool IsOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, int32_t compLayer,
+    std::string& message, const std::vector<std::pair<int32_t, int32_t>>& layerList)
+{
+    if (compLayer == INVALID_WINDOW_LAYER) {
+        SC_LOG_ERROR(LABEL, "windId %{public}d component layer is wrong", compWinId);
+        return false;
+    }
+
+    if (layerList.size() == static_cast<size_t>(0)) {
+        return true;
+    }
+
+    auto iter = std::find_if(layerList.begin(), layerList.end(), [compLayer](const std::pair<int32_t, int32_t> layer) {
+        return layer.second >= compLayer;
+    });
+    if (iter != layerList.end()) {
+        SC_LOG_ERROR(LABEL, "component window %{public}d is covered by %{public}d, click check failed",
+            compWinId, iter->first);
+        message = GetSecCompWindowMsg(compWinId, secRect, iter->first);
+        return false;
+    }
+    return true;
+}
+bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, std::string& message)
 {
     if ((static_cast<uint32_t>(compWinId) & UI_EXTENSION_MASK) == UI_EXTENSION_MASK) {
         SC_LOG_INFO(LABEL, "UI extension can not check");
@@ -76,6 +119,7 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
     }
 
     int32_t compLayer = INVALID_WINDOW_LAYER;
+    std::string coveredWindowMsg;
     // {windowId, zOrder}
     std::vector<std::pair<int32_t, int32_t>> layerList;
     for (auto& info : infos) {
@@ -93,28 +137,18 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         }
         if (IsRectInWindRect(info->windowRect_, secRect)) {
             layerList.emplace_back(std::make_pair(info->windowId_, info->zOrder_));
+            if (compLayer != INVALID_WINDOW_LAYER && static_cast<int32_t>(info->zOrder_) >= compLayer) {
+                coveredWindowMsg = GetCoveredWindowMsg(info->windowRect_);
+                break;
+            }
         }
     }
 
-    if (compLayer == INVALID_WINDOW_LAYER) {
-        SC_LOG_ERROR(LABEL, "windId %{public}d component layer is wrong", compWinId);
-        return false;
+    bool res = IsOtherWindowCoverComp(compWinId, secRect, compLayer, message, layerList);
+    if (!message.empty()) {
+        message += coveredWindowMsg;
     }
-
-    if (layerList.size() == static_cast<size_t>(0)) {
-        return true;
-    }
-
-    auto iter = std::find_if(layerList.begin(), layerList.end(),
-        [compLayer](const std::pair<int32_t, int32_t> layer) {
-        return layer.second >= compLayer;
-    });
-    if (iter != layerList.end()) {
-        SC_LOG_ERROR(LABEL, "component window %{public}d is covered by %{public}d, click check failed",
-            compWinId, iter->first);
-        return false;
-    }
-    return true;
+    return res;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

@@ -44,7 +44,9 @@ static void ReportSecurityComponentClickEventFuzzTest(const uint8_t *data, size_
     clickInfo.extraInfo.data = data1;
     clickInfo.extraInfo.dataSize = size;
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompKit::ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, nullptr, std::move(func));
+    SecCompInfo SecCompInfo{ scId, componentInfo, clickInfo };
+    std::string message = generator.GenerateRandomCompoStr(generator.GetScType());
+    SecCompKit::ReportSecurityComponentClickEvent(SecCompInfo, nullptr, std::move(func), message);
 }
 } // namespace OHOS
 

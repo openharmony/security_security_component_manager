@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <string>
 
 namespace OHOS {
 namespace Security {
@@ -143,6 +144,12 @@ struct SecCompClickEvent {
         SecCompKeyEvent key;
     };
     ExtraInfo extraInfo;
+};
+
+struct SecCompInfo {
+    int32_t scId;
+    std::string componentInfo;
+    SecCompClickEvent clickInfo;
 };
 }  // namespace SecurityComponent
 }  // namespace Security

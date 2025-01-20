@@ -196,7 +196,7 @@ int32_t SecCompProxy::UnregisterSecurityComponent(int32_t scId)
     return res;
 }
 
-int32_t SecCompProxy::SendReportClickEventRequest(MessageParcel& data)
+int32_t SecCompProxy::SendReportClickEventRequest(MessageParcel& data, std::string& message)
 {
     MessageParcel reply;
     MessageParcel deserializedReply;
@@ -225,12 +225,16 @@ int32_t SecCompProxy::SendReportClickEventRequest(MessageParcel& data)
         SC_LOG_ERROR(LABEL, "Report read res failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
+
+    if (!deserializedReply.ReadString(message)) {
+        SC_LOG_ERROR(LABEL, "Report read error message failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
     return res;
 }
 
-int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+int32_t SecCompProxy::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message)
 {
     std::lock_guard<std::mutex> lock(useIPCMutex_);
     MessageParcel rawData;
@@ -240,12 +244,12 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!rawData.WriteInt32(scId)) {
+    if (!rawData.WriteInt32(secCompInfo.scId)) {
         SC_LOG_ERROR(LABEL, "Report write scId failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!rawData.WriteString(componentInfo)) {
+    if (!rawData.WriteString(secCompInfo.componentInfo)) {
         SC_LOG_ERROR(LABEL, "Report write componentInfo failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
@@ -255,7 +259,7 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
         SC_LOG_ERROR(LABEL, "Report new click event parcel failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    parcel->clickInfoParams_ = clickInfo;
+    parcel->clickInfoParams_ = secCompInfo.clickInfo;
     if (!rawData.WriteParcelable(parcel)) {
         SC_LOG_ERROR(LABEL, "Report write clickInfo failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
@@ -276,7 +280,7 @@ int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    return SendReportClickEventRequest(data);
+    return SendReportClickEventRequest(data, message);
 }
 
 bool SecCompProxy::VerifySavePermission(AccessToken::AccessTokenID tokenId)

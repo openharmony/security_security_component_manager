@@ -43,9 +43,8 @@ public:
     int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId) override;
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo) override;
     int32_t UnregisterSecurityComponent(int32_t scId) override;
-    int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback) override;
+    int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, sptr<IRemoteObject> callerToken,
+        sptr<IRemoteObject> dialogCallback, std::string& message) override;
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override;
     sptr<IRemoteObject> GetEnhanceRemoteObject() override;
     int32_t PreRegisterSecCompProcess() override;

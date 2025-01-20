@@ -244,21 +244,20 @@ int32_t SecCompService::UnregisterSecurityComponent(int32_t scId)
     return SecCompManager::GetInstance().UnregisterSecurityComponent(scId, caller);
 }
 
-int32_t SecCompService::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+int32_t SecCompService::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message)
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentClick");
     SecCompCallerInfo caller;
     nlohmann::json jsonRes;
-    if (ParseParams(componentInfo, caller, jsonRes) != SC_OK) {
+    if (ParseParams(secCompInfo.componentInfo, caller, jsonRes) != SC_OK) {
         FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
     std::vector<sptr<IRemoteObject>> remoteArr = { callerToken, dialogCallback };
     int32_t res =
-        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(scId, jsonRes, caller, clickInfo,
-        remoteArr);
+        SecCompManager::GetInstance().ReportSecurityComponentClickEvent(secCompInfo, jsonRes, caller, remoteArr,
+        message);
     FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
     return res;
 }
