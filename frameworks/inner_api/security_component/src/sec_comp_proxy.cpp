@@ -70,14 +70,15 @@ int32_t SecCompProxy::RegisterSecurityComponent(SecCompType type,
     int32_t requestResult = remote->SendRequest(
         static_cast<uint32_t>(SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT),
         data, reply, option);
-    if (requestResult != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", requestResult);
-        return requestResult;
-    }
 
     if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(reply, deserializedReply)) {
         SC_LOG_ERROR(LABEL, "Register deserialize session info failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (requestResult != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", requestResult);
+        return requestResult;
     }
 
     int32_t res;
