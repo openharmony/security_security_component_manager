@@ -19,10 +19,7 @@
 #include "sec_comp_load_callback.h"
 #include "sec_comp_log.h"
 #include "sec_comp_proxy.h"
-#include "sys_binder.h"
 #include "tokenid_kit.h"
-#include <chrono>
-#include <mutex>
 
 namespace OHOS {
 namespace Security {
@@ -30,10 +27,6 @@ namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClient"};
 static std::mutex g_instanceMutex;
-static constexpr int32_t SENDREQ_FAIL_ERR = 32;
-static const std::vector<int32_t> RETRY_CODE_LIST = {
-    SC_SERVICE_ERROR_SERVICE_NOT_EXIST, BR_DEAD_REPLY, BR_FAILED_REPLY, SENDREQ_FAIL_ERR };
-static const int32_t SA_DIED_TIME_OUT = 500;
 }  // namespace
 
 SecCompClient& SecCompClient::GetInstance()
@@ -71,17 +64,7 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    auto res = proxy->RegisterSecurityComponent(type, componentInfo, scId);
-    if (std::find(RETRY_CODE_LIST.begin(), RETRY_CODE_LIST.end(), res) != RETRY_CODE_LIST.end()) {
-        std::unique_lock<std::mutex> lock(secCompSAMutex_);
-        auto waitStatus = secCompSACon_.wait_for(lock, std::chrono::milliseconds(SA_DIED_TIME_OUT),
-            [this]() { return secCompSAFlag_; });
-        if (waitStatus) {
-            proxy = GetProxy(true);
-            return proxy->RegisterSecurityComponent(type, componentInfo, scId);
-        }
-    }
-    return res;
+    return proxy->RegisterSecurityComponent(type, componentInfo, scId);
 }
 
 int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& componentInfo)
@@ -254,20 +237,11 @@ void SecCompClient::OnRemoteDiedHandle()
 {
     SC_LOG_ERROR(LABEL, "Remote service died");
     std::unique_lock<std::mutex> lock(proxyMutex_);
-    auto remoteObj = proxy_->AsObject();
-    if ((remoteObj != nullptr) && (serviceDeathObserver_ != nullptr)) {
-        remoteObj->RemoveDeathRecipient(serviceDeathObserver_);
-    }
     proxy_ = nullptr;
     serviceDeathObserver_ = nullptr;
     {
         std::unique_lock<std::mutex> lock1(cvLock_);
         readyFlag_ = false;
-    }
-    {
-        std::unique_lock<std::mutex> lock1(secCompSAMutex_);
-        secCompSAFlag_ = true;
-        secCompSACon_.notify_one();
     }
 }
 

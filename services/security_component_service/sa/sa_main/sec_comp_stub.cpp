@@ -15,7 +15,6 @@
 #include "sec_comp_stub.h"
 
 #include "accesstoken_kit.h"
-#include "delay_exit_task.h"
 #include "ipc_skeleton.h"
 #include "sec_comp_click_event_parcel.h"
 #include "sec_comp_enhance_adapter.h"
@@ -53,7 +52,6 @@ int32_t SecCompStub::OnRemoteRequest(
 
 int32_t SecCompStub::RegisterSecurityComponentInner(MessageParcel& data, MessageParcel& reply)
 {
-    SecurityComponent::DelayExitTask::GetInstance().Stop();
     MessageParcel deserializedData;
     if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(data, deserializedData, reply)) {
         SC_LOG_ERROR(LABEL, "Register deserialize session info failed");
