@@ -27,6 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURIT
 const std::string JsonTagConstants::JSON_RECT = "rect";
 const std::string JsonTagConstants::JSON_SC_TYPE = "type";
 const std::string JsonTagConstants::JSON_NODE_ID = "nodeId";
+const std::string JsonTagConstants::JSON_IS_WEARABLE = "isWearable";
 const std::string JsonTagConstants::JSON_RECT_X = "x";
 const std::string JsonTagConstants::JSON_RECT_Y = "y";
 const std::string JsonTagConstants::JSON_RECT_WIDTH = "width";
@@ -36,10 +37,15 @@ const std::string JsonTagConstants::JSON_SIZE_TAG = "size";
 const std::string JsonTagConstants::JSON_FONT_SIZE_TAG = "fontSize";
 const std::string JsonTagConstants::JSON_ICON_SIZE_TAG = "iconSize";
 const std::string JsonTagConstants::JSON_PADDING_SIZE_TAG = "paddingSize";
-const std::string JsonTagConstants::JSON_PADDING_LEFT_TAG = "left";
-const std::string JsonTagConstants::JSON_PADDING_TOP_TAG = "top";
-const std::string JsonTagConstants::JSON_PADDING_RIGHT_TAG = "right";
-const std::string JsonTagConstants::JSON_PADDING_BOTTOM_TAG = "bottom";
+const std::string JsonTagConstants::JSON_LEFT_TAG = "left";
+const std::string JsonTagConstants::JSON_TOP_TAG = "top";
+const std::string JsonTagConstants::JSON_RIGHT_TAG = "right";
+const std::string JsonTagConstants::JSON_BOTTOM_TAG = "bottom";
+const std::string JsonTagConstants::JSON_BORDER_RADIUS_TAG = "borderRadius";
+const std::string JsonTagConstants::JSON_LEFT_TOP_TAG = "leftTop";
+const std::string JsonTagConstants::JSON_LEFT_BOTTOM_TAG = "leftBottom";
+const std::string JsonTagConstants::JSON_RIGHT_TOP_TAG = "rightTop";
+const std::string JsonTagConstants::JSON_RIGHT_BOTTOM_TAG = "rightBottom";
 const std::string JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG = "textIconSpace";
 const std::string JsonTagConstants::JSON_RECT_WIDTH_TAG = "width";
 const std::string JsonTagConstants::JSON_RECT_HEIGHT_TAG = "height";
@@ -117,16 +123,39 @@ bool SecCompBase::ParsePadding(const nlohmann::json& json, const std::string& ta
     }
 
     auto jsonPadding = json.at(tag);
-    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_PADDING_TOP_TAG, res.top)) {
+    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_TOP_TAG, res.top)) {
         return false;
     }
-    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_PADDING_RIGHT_TAG, res.right)) {
+    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_RIGHT_TAG, res.right)) {
         return false;
     }
-    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_PADDING_BOTTOM_TAG, res.bottom)) {
+    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_BOTTOM_TAG, res.bottom)) {
         return false;
     }
-    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_PADDING_LEFT_TAG, res.left)) {
+    if (!ParseDimension(jsonPadding, JsonTagConstants::JSON_LEFT_TAG, res.left)) {
+        return false;
+    }
+    return true;
+}
+
+bool SecCompBase::ParseBorderRadius(const nlohmann::json& json, const std::string& tag, BorderRadius& res)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+
+    auto jsonBorderRadius = json.at(tag);
+    if (!ParseDimension(jsonBorderRadius, JsonTagConstants::JSON_LEFT_TOP_TAG, res.leftTop)) {
+        return false;
+    }
+    if (!ParseDimension(jsonBorderRadius, JsonTagConstants::JSON_RIGHT_TOP_TAG, res.rightTop)) {
+        return false;
+    }
+    if (!ParseDimension(jsonBorderRadius, JsonTagConstants::JSON_LEFT_BOTTOM_TAG, res.leftBottom)) {
+        return false;
+    }
+    if (!ParseDimension(jsonBorderRadius, JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, res.rightBottom)) {
         return false;
     }
     return true;
@@ -184,6 +213,11 @@ bool SecCompBase::ParseSize(const nlohmann::json& json, const std::string& tag)
     if (!ParsePadding(jsonSize, JsonTagConstants::JSON_PADDING_SIZE_TAG, padding_)) {
         return false;
     }
+
+    if (!ParseBorderRadius(jsonSize, JsonTagConstants::JSON_BORDER_RADIUS_TAG, borderRadius_)) {
+        return false;
+    }
+    rect_.borderRadius_ = borderRadius_;
 
     return true;
 }
@@ -302,6 +336,17 @@ bool SecCompBase::ParseCrossAxisState(const nlohmann::json& json, const std::str
     return true;
 }
 
+bool SecCompBase::ParseWearable(const nlohmann::json& json, const std::string& tag)
+{
+    if ((json.find(tag) == json.end()) ||
+        !json.at(tag).is_boolean()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+    isWearableDevice_ = json.at(tag).get<bool>();
+    return true;
+}
+
 bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, bool isClicked)
 {
     SC_LOG_DEBUG(LABEL, "Button info %{public}s.", jsonSrc.dump().c_str());
@@ -309,6 +354,9 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, 
         return false;
     }
     if (!ParseValue(jsonSrc, JsonTagConstants::JSON_NODE_ID, nodeId_)) {
+        return false;
+    }
+    if (!ParseWearable(jsonSrc, JsonTagConstants::JSON_IS_WEARABLE)) {
         return false;
     }
     if (!ParseRect(jsonSrc, JsonTagConstants::JSON_RECT, rect_)) {
@@ -349,6 +397,7 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
 {
     jsonRes[JsonTagConstants::JSON_SC_TYPE] = type_;
     jsonRes[JsonTagConstants::JSON_NODE_ID] = nodeId_;
+    jsonRes[JsonTagConstants::JSON_IS_WEARABLE] = isWearableDevice_;
     jsonRes[JsonTagConstants::JSON_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, rect_.x_},
         {JsonTagConstants::JSON_RECT_Y, rect_.y_},
@@ -362,10 +411,17 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         {JsonTagConstants::JSON_RECT_HEIGHT, windowRect_.height_}
     };
     nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_PADDING_TOP_TAG, padding_.top },
-        { JsonTagConstants::JSON_PADDING_RIGHT_TAG, padding_.right },
-        { JsonTagConstants::JSON_PADDING_BOTTOM_TAG, padding_.bottom },
-        { JsonTagConstants::JSON_PADDING_LEFT_TAG, padding_.left },
+        { JsonTagConstants::JSON_TOP_TAG, padding_.top },
+        { JsonTagConstants::JSON_RIGHT_TAG, padding_.right },
+        { JsonTagConstants::JSON_BOTTOM_TAG, padding_.bottom },
+        { JsonTagConstants::JSON_LEFT_TAG, padding_.left },
+    };
+
+    nlohmann::json jsonBorderRadius = nlohmann::json {
+        { JsonTagConstants::JSON_LEFT_TOP_TAG, borderRadius_.leftTop },
+        { JsonTagConstants::JSON_RIGHT_TOP_TAG, borderRadius_.rightTop },
+        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, borderRadius_.leftBottom },
+        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, borderRadius_.rightBottom },
     };
 
     jsonRes[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
@@ -373,6 +429,7 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         { JsonTagConstants::JSON_ICON_SIZE_TAG, iconSize_ },
         { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, textIconSpace_ },
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
+        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius },
     };
 
     jsonRes[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {

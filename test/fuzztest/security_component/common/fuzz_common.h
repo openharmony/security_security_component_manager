@@ -63,7 +63,7 @@ private:
     void ConstructButtonRect(
         SecCompRect &window, PaddingSize &padding, SecCompRect &buttonRect);
     void ConstructWindowJson(nlohmann::json &jsonComponent,
-        SecCompRect &window, PaddingSize &padding, SecCompRect &buttonRect);
+        SecCompRect &window, PaddingSize &padding, BorderRadius &borderRadius, SecCompRect &buttonRect);
 
     const uint8_t *data_;
     const size_t dataLenth_;

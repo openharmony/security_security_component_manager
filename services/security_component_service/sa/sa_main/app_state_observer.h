@@ -46,7 +46,7 @@ public:
     void OnAppCacheStateChanged(const AppExecFwk::AppStateData &appStateData) override;
 
 private:
-    void RemoveProcessFromForegroundSet(const int32_t pid);
+    void RemoveProcessFromForegroundSet(int32_t pid);
     std::vector<SecCompProcessData> foregrandProcList_;
     OHOS::Utils::RWLock fgProcLock_;
 };

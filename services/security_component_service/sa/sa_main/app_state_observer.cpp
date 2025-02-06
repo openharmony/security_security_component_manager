@@ -86,7 +86,7 @@ void AppStateObserver::AddProcessToForegroundSet(const AppExecFwk::ProcessData &
     AddProcessToForegroundSet(processData.pid, proc);
 }
 
-void AppStateObserver::RemoveProcessFromForegroundSet(const int32_t pid)
+void AppStateObserver::RemoveProcessFromForegroundSet(int32_t pid)
 {
     Utils::UniqueWriteGuard<Utils::RWLock> infoGuard(this->fgProcLock_);
     for (auto iter = foregrandProcList_.begin(); iter != foregrandProcList_.end(); ++iter) {

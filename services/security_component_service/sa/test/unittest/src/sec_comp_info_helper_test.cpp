@@ -22,6 +22,7 @@
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
+#include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
 #include "sec_comp_tool.h"
@@ -153,36 +154,41 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
     std::string message;
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        .displayId = 0,
+        .crossAxisState = CrossAxisState::STATE_INVALID,
+        .isWearable = false
+    };
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
 
     rect.x_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.x_ = g_testWidth;
 
     rect.y_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.y_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.x_ = g_testWidth;
 
     rect.y_ = g_curScreenHeight + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.y_ = g_testHeight;
 
     rect.width_ = g_curScreenWidth;
     rect.height_ = g_curScreenHeight;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.width_ = g_testWidth;
     rect.height_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth - g_testWidth;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.x_ = g_testWidth;
     rect.y_ = g_curScreenHeight - g_testHeight;
 
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.y_ = g_testHeight;
 }
 
@@ -197,30 +203,35 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
     std::string message;
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        .displayId = 0,
+        .crossAxisState = CrossAxisState::STATE_INVALID,
+        .isWearable = false
+    };
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
 
     windowRect.x_ = g_testWidth + 2.0;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.x_ = g_testWidth;
 
     windowRect.y_ = g_testHeight + 2.0;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.y_ = g_testHeight;
 
     windowRect.width_ = g_testWidth - 2.0;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.width_ = g_testWidth;
 
     windowRect.height_ = g_testHeight - 2.0;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.height_ = g_testHeight;
 
     windowRect.width_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.width_ = g_testWidth;
 
     windowRect.height_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     windowRect.height_ = g_testHeight;
 }
 
@@ -299,12 +310,12 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level1)
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = ServiceTestCommon::TEST_DIMENSION;
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = ServiceTestCommon::TEST_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
@@ -325,12 +336,12 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level1)
 
     auto& sizesJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingsJson = sizesJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingsJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    paddingsJson[JsonTagConstants::JSON_BOTTOM_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
-    paddingsJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = ServiceTestCommon::TEST_DIMENSION;
-    paddingsJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    paddingsJson[JsonTagConstants::JSON_BOTTOM_TAG] = ServiceTestCommon::TEST_DIMENSION;
+    paddingsJson[JsonTagConstants::JSON_LEFT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
@@ -431,16 +442,16 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level1)
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::NO_BG_TYPE;
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = ServiceTestCommon::TEST_DIMENSION;
-    paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = ServiceTestCommon::TEST_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
@@ -464,16 +475,16 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
-    paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = ServiceTestCommon::TEST_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
+    paddingJson[JsonTagConstants::JSON_LEFT_TAG] = ServiceTestCommon::TEST_DIMENSION;
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }

@@ -27,6 +27,7 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
@@ -34,10 +35,17 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
     nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_PADDING_TOP_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_RIGHT_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_LEFT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_TOP_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_TAG, TestCommon::TEST_DIMENSION },
+    };
+
+    nlohmann::json jsonBorderRadius = nlohmann::json {
+        { JsonTagConstants::JSON_LEFT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, TEST_DIMENSION },
     };
 
     jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
@@ -45,6 +53,7 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_ICON_SIZE_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
+        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius}
     };
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
@@ -79,6 +88,7 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
 {
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = SAVE_COMPONENT;
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     jsonComponent[JsonTagConstants::JSON_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
@@ -92,10 +102,17 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
     nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_PADDING_TOP_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_RIGHT_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_LEFT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_TOP_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_TAG, TestCommon::TEST_DIMENSION },
+    };
+
+    nlohmann::json jsonBorderRadius = nlohmann::json {
+        { JsonTagConstants::JSON_LEFT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, TEST_DIMENSION },
     };
 
     jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
@@ -103,6 +120,7 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_ICON_SIZE_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
+        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius}
     };
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
@@ -137,6 +155,7 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
 {
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = PASTE_COMPONENT;
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     jsonComponent[JsonTagConstants::JSON_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
@@ -150,10 +169,17 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
     nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_PADDING_TOP_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_RIGHT_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_PADDING_LEFT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_TOP_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_TAG, TestCommon::TEST_DIMENSION },
+    };
+
+    nlohmann::json jsonBorderRadius = nlohmann::json {
+        { JsonTagConstants::JSON_LEFT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_TOP_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, TEST_DIMENSION },
+        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, TEST_DIMENSION },
     };
 
     jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
@@ -161,6 +187,7 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_ICON_SIZE_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, TestCommon::TEST_SIZE },
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
+        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius},
     };
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
