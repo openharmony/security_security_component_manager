@@ -80,6 +80,7 @@ public:
     static const std::string JSON_BG_TAG;
     static const std::string JSON_WINDOW_ID;
     static const std::string JSON_DISPLAY_ID;
+    static const std::string JSON_CROSS_AXIS_STATE;
 };
 
 class __attribute__((visibility("default"))) SecCompBase {
@@ -135,6 +136,7 @@ public:
     int32_t windowId_ = 0;
     uint64_t displayId_ = 0;
     int32_t nodeId_ = 0;
+    CrossAxisState crossAxisState_ = CrossAxisState::STATE_INVALID;
 protected:
     virtual bool IsTextIconTypeValid() = 0;
     virtual bool IsCorrespondenceType() = 0;
@@ -150,6 +152,10 @@ private:
     bool ParseParent(const nlohmann::json& json, const std::string& tag);
     bool ParseRect(const nlohmann::json& json, const std::string& tag, SecCompRect& rect);
     bool ParseStyle(const nlohmann::json& json, const std::string& tag);
+    bool ParseType(const nlohmann::json& json, const std::string& tag);
+    bool ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value);
+    bool ParseDisplayId(const nlohmann::json& json, const std::string& tag);
+    bool ParseCrossAxisState(const nlohmann::json& json, const std::string& tag);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

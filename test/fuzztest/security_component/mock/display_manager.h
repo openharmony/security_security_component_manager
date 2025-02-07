@@ -16,6 +16,7 @@
 #ifndef SECURITY_COMPONENT_MANAGER_DISPLAY_MANAGER_MOCK_H
 #define SECURITY_COMPONENT_MANAGER_DISPLAY_MANAGER_MOCK_H
 #include "display.h"
+#include "display_info.h"
 
 namespace OHOS::Rosen {
 class DisplayManager {
@@ -34,6 +35,11 @@ public:
     sptr<Display> GetDisplayById(uint64_t displayId)
     {
         return sptr<Display>::MakeSptr();
+    }
+
+    sptr<DisplayInfo> GetCurrentFoldCreaseRegion()
+    {
+        return sptr<DisplayInfo>::MakeSptr();
     }
 };
 }

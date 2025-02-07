@@ -16,6 +16,7 @@
 #ifndef SECURITY_COMPONENT_MANAGER_DISPLAY_INFO_MOCK_H
 #define SECURITY_COMPONENT_MANAGER_DISPLAY_INFO_MOCK_H
 #include <parcel.h>
+#include <window_manager.h>
 
 namespace OHOS::Rosen {
 namespace {
@@ -37,6 +38,16 @@ public:
     int32_t GetHeight() const
     {
         return DEFAULT_SCREEN_SIZE;
+    }
+
+    int32_t GetPhysicalHeight() const
+    {
+        return DEFAULT_SCREEN_SIZE;
+    }
+
+    std::vector<Rosen::Rect> GetCreaseRects() const
+    {
+        return std::vector<Rosen::Rect>();
     }
 };
 }

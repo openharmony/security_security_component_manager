@@ -16,6 +16,9 @@
 
 #include "bundle_mgr_client.h"
 #include "delay_exit_task.h"
+#include "display.h"
+#include "display_info.h"
+#include "display_manager.h"
 #include "hisysevent.h"
 #include "i_sec_comp_service.h"
 #include "ipc_skeleton.h"
@@ -471,7 +474,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     }
 
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
-        report->displayId_, message))) {
+        report->displayId_, report->crossAxisState_, message))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
@@ -504,6 +507,21 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
+void SecCompManager::GetFoldOffsetY()
+{
+    if (superFoldOffsetY_ != 0) {
+        return;
+    }
+    auto foldCreaseRegion = OHOS::Rosen::DisplayManager::GetInstance().GetCurrentFoldCreaseRegion();
+    if (foldCreaseRegion != nullptr) {
+        const auto& creaseRects = foldCreaseRegion->GetCreaseRects();
+        if (!creaseRects.empty()) {
+            const auto& rect = creaseRects.front();
+            superFoldOffsetY_ = rect.height_ + rect.posY_;
+        }
+    }
+}
+
 int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, const nlohmann::json& compJson,
     const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
 {
@@ -527,8 +545,14 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
     if (res != SC_OK) {
         return res;
     }
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message);
+    if (report == nullptr) {
+        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+    }
 
-    res = sc->CheckClickInfo(info.clickInfo, message);
+    GetFoldOffsetY();
+
+    res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, report->crossAxisState_, message);
     if (res != SC_OK) {
         ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
             info.scId, sc->GetType());
@@ -539,12 +563,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message);
-    if (report == nullptr) {
-        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
-    }
-    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], report->displayId_) ==
-        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
+    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], report->displayId_,
+        report->crossAxisState_) == SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }

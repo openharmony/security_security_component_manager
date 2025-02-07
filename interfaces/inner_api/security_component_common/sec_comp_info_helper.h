@@ -39,7 +39,7 @@ public:
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent, std::string& message);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const uint64_t displayId,
-        std::string& message);
+        const CrossAxisState crossAxisState, std::string& message);
 
 private:
     static float GetWindowScale(int32_t windowId);

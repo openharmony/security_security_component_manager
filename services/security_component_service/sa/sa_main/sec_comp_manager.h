@@ -81,17 +81,19 @@ private:
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();
+    void GetFoldOffsetY();
 
     OHOS::Utils::RWLock componentInfoLock_;
     std::mutex scIdMtx_;
     std::unordered_map<int32_t, ProcessCompInfos> componentMap_;
     int32_t scIdStart_;
     bool isSaExit_ = false;
+    int32_t superFoldOffsetY_ = 0;
 
     std::shared_ptr<AppExecFwk::EventRunner> secRunner_;
     std::shared_ptr<SecEventHandler> secHandler_;
     SecCompMaliciousApps malicious_;
-    
+
     std::function<void ()> exitSaProcessFunc_ = []() { return; };
     DISALLOW_COPY_AND_MOVE(SecCompManager);
 };

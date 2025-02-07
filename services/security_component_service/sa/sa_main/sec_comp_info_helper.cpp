@@ -82,7 +82,7 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     return comp;
 }
 
-static bool GetScreenSize(double& width, double& height, const uint64_t displayId)
+static bool GetScreenSize(double& width, double& height, const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     sptr<OHOS::Rosen::Display> display =
         OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
@@ -98,18 +98,22 @@ static bool GetScreenSize(double& width, double& height, const uint64_t displayI
     }
 
     width = static_cast<double>(info->GetWidth());
-    height = static_cast<double>(info->GetHeight());
+    if (crossAxisState == CrossAxisState::STATE_CROSS) {
+        height = static_cast<double>(info->GetPhysicalHeight());
+    } else {
+        height = static_cast<double>(info->GetHeight());
+    }
     SC_LOG_DEBUG(LABEL, "display manager Screen width %{public}f height %{public}f",
         width, height);
     return true;
 }
 
 bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect,
-    const uint64_t displayId, std::string& message)
+    const uint64_t displayId, const CrossAxisState crossAxisState, std::string& message)
 {
     double curScreenWidth = 0.0F;
     double curScreenHeight = 0.0F;
-    if (!GetScreenSize(curScreenWidth, curScreenHeight, displayId)) {
+    if (!GetScreenSize(curScreenWidth, curScreenHeight, displayId, crossAxisState)) {
         SC_LOG_ERROR(LABEL, "Get screen size is invalid");
         return false;
     }

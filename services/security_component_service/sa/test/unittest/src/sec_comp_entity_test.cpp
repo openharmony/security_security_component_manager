@@ -117,11 +117,11 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
         .point.timestamp = 0,
     };
     std::string message;
-    ASSERT_NE(entity_->CheckClickInfo(touch, message), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 
     uint64_t current = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
     touch.point.timestamp = current + 10000L; // 10s
-    ASSERT_NE(entity_->CheckClickInfo(touch, message), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_DIFF_COORDINATE; // click event will not hit this rect
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
@@ -129,7 +129,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
     entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_DIFF_COORDINATE;
     touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_NE(entity_->CheckClickInfo(touch, message), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
@@ -138,7 +138,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
     touch.extraInfo.data = buffer;
     touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(entity_->CheckClickInfo(touch, message), SC_OK);
+    ASSERT_EQ(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 }
 
 /**
@@ -156,7 +156,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
         .point.timestamp = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()),
     };
     std::string message;
-    ASSERT_NE(entity_->CheckClickInfo(touch, message), SC_OK);
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 
     entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
     entity_->componentInfo_->rect_.y_ = ServiceTestCommon::TEST_COORDINATE;
@@ -165,7 +165,8 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
 
     // GetAccessibilityWindowInfo failed
     OHOS::Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
-    ASSERT_EQ(entity_->CheckClickInfo(touch, message), SC_SERVICE_ERROR_CLICK_EVENT_INVALID);
+    ASSERT_EQ(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message),
+        SC_SERVICE_ERROR_CLICK_EVENT_INVALID);
 }
 
 /**
@@ -198,14 +199,17 @@ HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level1)
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / 1000;
     clickInfo.key.timestamp = current - 1000000L - 1;
     std::string message;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, message));
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, 0,
+        CrossAxisState::STATE_INVALID, message));
 
     clickInfo.key.timestamp = current + 1;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, message));
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, 0,
+        CrossAxisState::STATE_INVALID, message));
 
     clickInfo.key.timestamp = current - 1;
     clickInfo.key.keyCode = 1;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, message));
+    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, entity_->CheckClickInfo(clickInfo, 0,
+        CrossAxisState::STATE_INVALID, message));
 
     clickInfo.key.keyCode = KEY_SPACE;
     ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
