@@ -27,6 +27,7 @@
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_event_handler.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Security {
@@ -53,8 +54,8 @@ public:
     static FirstUseDialog& GetInstance();
 
     ~FirstUseDialog() = default;
-    int32_t NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId);
+    int32_t NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+        sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState);
     void Init(std::shared_ptr<SecEventHandler> secHandler);
     int32_t GrantDialogWaitEntity(int32_t scId);
     void RemoveDialogWaitEntitys(int32_t pid);
@@ -72,8 +73,9 @@ private:
     void ParseRecords(nlohmann::json& jsonRes);
     void LoadFirstUseRecord(void);
     void SaveFirstUseRecord(void);
-    void StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
-        sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, const uint64_t displayId);
+    void StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+        sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState);
+    bool GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState);
     void SendSaveEventHandler(void);
 
     std::mutex useMapMutex_;

@@ -34,6 +34,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEntity"};
 static constexpr uint64_t MAX_TOUCH_INTERVAL = 1000000L; // 1000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
+static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
@@ -57,7 +58,8 @@ bool SecCompEntity::CompareComponentBasicInfo(SecCompBase* other, bool isRectChe
     return componentInfo_->CompareComponentBasicInfo(other, isRectCheck);
 }
 
-int32_t SecCompEntity::CheckPointEvent(const SecCompClickEvent& clickInfo) const
+int32_t SecCompEntity::CheckPointEvent(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
+    const CrossAxisState crossAxisState) const
 {
     auto current = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
@@ -68,6 +70,11 @@ int32_t SecCompEntity::CheckPointEvent(const SecCompClickEvent& clickInfo) const
     }
 
     if (!componentInfo_->rect_.IsInRect(clickInfo.point.touchX, clickInfo.point.touchY)) {
+        if ((crossAxisState == CrossAxisState::STATE_CROSS) &&
+            componentInfo_->rect_.IsInRect(clickInfo.point.touchX, clickInfo.point.touchY + superFoldOffsetY)) {
+            clickInfo.point.touchY += superFoldOffsetY;
+            return SC_OK;
+        }
         SC_LOG_ERROR(LABEL, "touch point is not in component rect = (%{public}f, %{public}f)" \
             "left top point of component rect = (%{public}f, %{public}f)" \
             "right bottom point of component rect = (%{public}f, %{public}f)",
@@ -97,18 +104,23 @@ int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
     return SC_OK;
 }
 
-int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo, std::string& message) const
+int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
+    const CrossAxisState crossAxisState, std::string& message) const
 {
     if (!WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_,
         componentInfo_->rect_, message)) {
         SC_LOG_ERROR(LABEL, "Component may be covered by other window");
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
+    if (componentInfo_->displayId_ == FOLD_VIRTUAL_DISPLAY_ID) {
+        clickInfo.point.touchY += superFoldOffsetY;
+        componentInfo_->rect_.y_ += superFoldOffsetY;
+    }
 
     int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     bool isScreenReadMode = IsScreenReadMode();
     if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && !isScreenReadMode) {
-        res = CheckPointEvent(clickInfo);
+        res = CheckPointEvent(clickInfo, superFoldOffsetY, crossAxisState);
     } else if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && isScreenReadMode) {
         SC_LOG_WARN(LABEL, "Device is in screen read mode, skip event check.");
         return SC_OK;

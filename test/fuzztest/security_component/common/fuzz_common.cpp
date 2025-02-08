@@ -97,6 +97,7 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -140,6 +141,7 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -183,6 +185,7 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
