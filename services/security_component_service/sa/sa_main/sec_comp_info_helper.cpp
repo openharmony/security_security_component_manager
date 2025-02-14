@@ -53,6 +53,9 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
 
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
+
+    comp->windowRect_.width_ *= scale;
+    comp->windowRect_.height_ *= scale;
 }
 
 SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
