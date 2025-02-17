@@ -322,7 +322,7 @@ bool FirstUseDialog::GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, 
     /* crossAxisState is CROSS */
     if (crossAxisState == CrossAxisState::STATE_CROSS) {
         height = info->GetPhysicalHeight();
-        offset = info->GetAvailableHeight() / DISPLAY_HALF_RATIO;
+        offset = static_cast<int32_t>(info->GetAvailableHeight()) / DISPLAY_HALF_RATIO;
     }
     SC_LOG_INFO(LABEL, "Display info width %{public}d height %{public}d, dialog offset %{public}d",
         width, height, offset);
