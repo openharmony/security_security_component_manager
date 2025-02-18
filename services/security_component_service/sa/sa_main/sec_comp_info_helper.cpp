@@ -136,8 +136,8 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    if (GreatOrEqual((rect.x_ + rect.width_), curScreenWidth) ||
-        GreatOrEqual((rect.y_ + rect.height_), curScreenHeight)) {
+    if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth) ||
+        GreatNotEqual((rect.y_ + rect.height_), curScreenHeight)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
