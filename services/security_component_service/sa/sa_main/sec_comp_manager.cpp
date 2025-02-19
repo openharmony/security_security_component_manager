@@ -19,6 +19,7 @@
 #include "display.h"
 #include "display_info.h"
 #include "display_manager.h"
+#include "first_use_dialog.h"
 #include "hisysevent.h"
 #include "i_sec_comp_service.h"
 #include "ipc_skeleton.h"
@@ -563,8 +564,10 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], report->displayId_,
-        report->crossAxisState_) == SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
+    const FirstUseDialog::DisplayInfo displayInfo = {report->displayId_, report->crossAxisState_, report->windowId_};
+
+    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], displayInfo) ==
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
