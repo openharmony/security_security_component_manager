@@ -48,6 +48,7 @@ const std::string GRANT_ABILITY_ABILITY_NAME = "com.ohos.permissionmanager.Secur
 const std::string TYPE_KEY = "ohos.user.security.type";
 const std::string TOKEN_KEY = "ohos.ability.params.token";
 const std::string CALLBACK_KEY = "ohos.ability.params.callback";
+const std::string WINDOW_ID_KEY = "ohos.ability.params.windowId";
 const std::string CALLER_UID_KEY = "ohos.caller.uid";
 const std::string DISPLAY_WIDTH = "ohos.display.width";
 const std::string DISPLAY_HEIGHT = "ohos.display.height";
@@ -334,7 +335,7 @@ bool FirstUseDialog::GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, 
 }
 
 void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
-    sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState)
+    sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
     int32_t typeNum;
     SecCompType type = entity->GetType();
@@ -359,9 +360,10 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     want.SetParam(TYPE_KEY, typeNum);
     want.SetParam(TOKEN_KEY, callerToken);
     want.SetParam(CALLBACK_KEY, srvCallback);
+    want.SetParam(WINDOW_ID_KEY, displayInfo.windowId);
     int32_t uid = IPCSkeleton::GetCallingUid();
     want.SetParam(CALLER_UID_KEY, uid);
-    if (!GetDialogInfo(want, displayId, crossAxisState)) {
+    if (!GetDialogInfo(want, displayInfo.displayId, displayInfo.crossAxisState)) {
         SC_LOG_ERROR(LABEL, "Get display info failed.");
         return;
     }
@@ -416,7 +418,7 @@ bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
 }
 
 int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
-    sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState)
+    sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
     if (entity == nullptr) {
         SC_LOG_ERROR(LABEL, "Entity is invalid.");
@@ -452,7 +454,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     auto iter = firstUseMap_.find(tokenId);
     if (iter == firstUseMap_.end()) {
         SC_LOG_INFO(LABEL, "has not use record, start dialog");
-        StartDialogAbility(entity, callerToken, dialogCallback, displayId, crossAxisState);
+        StartDialogAbility(entity, callerToken, dialogCallback, displayInfo);
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
 
@@ -461,7 +463,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
         SC_LOG_INFO(LABEL, "no need notify again.");
         return SC_OK;
     }
-    StartDialogAbility(entity, callerToken, dialogCallback, displayId, crossAxisState);
+    StartDialogAbility(entity, callerToken, dialogCallback, displayInfo);
     return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
 }
 

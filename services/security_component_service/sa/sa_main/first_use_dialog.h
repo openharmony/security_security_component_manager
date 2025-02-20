@@ -15,6 +15,7 @@
 #ifndef FIRST_USE_DIALOG_H
 #define FIRST_USE_DIALOG_H
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -51,11 +52,17 @@ private:
 
 class FirstUseDialog final {
 public:
+struct DisplayInfo {
+    const uint64_t displayId;
+    const CrossAxisState crossAxisState;
+    const int32_t windowId;
+};
+
     static FirstUseDialog& GetInstance();
 
     ~FirstUseDialog() = default;
     int32_t NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
-        sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState);
+        sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
     void Init(std::shared_ptr<SecEventHandler> secHandler);
     int32_t GrantDialogWaitEntity(int32_t scId);
     void RemoveDialogWaitEntitys(int32_t pid);
@@ -74,7 +81,7 @@ private:
     void LoadFirstUseRecord(void);
     void SaveFirstUseRecord(void);
     void StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
-        sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState);
+        sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
     bool GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState);
     void SendSaveEventHandler(void);
 
