@@ -81,7 +81,7 @@ private:
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();
-    void GetFoldOffsetY();
+    void GetFoldOffsetY(const CrossAxisState crossAxisState);
 
     OHOS::Utils::RWLock componentInfoLock_;
     std::mutex scIdMtx_;

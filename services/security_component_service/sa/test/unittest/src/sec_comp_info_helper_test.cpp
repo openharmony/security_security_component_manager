@@ -199,19 +199,19 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
     std::string message;
     ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
 
-    windowRect.x_ = g_testWidth + 1;
+    windowRect.x_ = g_testWidth + 2.0;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
     windowRect.x_ = g_testWidth;
 
-    windowRect.y_ = g_testHeight + 1;
+    windowRect.y_ = g_testHeight + 2.0;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
     windowRect.y_ = g_testHeight;
 
-    windowRect.width_ = g_testWidth - 1;
+    windowRect.width_ = g_testWidth - 2.0;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
     windowRect.width_ = g_testWidth;
 
-    windowRect.height_ = g_testHeight - 1;
+    windowRect.height_ = g_testHeight - 2.0;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID, message));
     windowRect.height_ = g_testHeight;
 

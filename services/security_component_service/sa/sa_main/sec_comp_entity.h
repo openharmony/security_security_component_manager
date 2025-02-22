@@ -48,6 +48,7 @@ public:
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
     int32_t CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY, const CrossAxisState crossAxisState,
         std::string& message) const;
+    bool IsInPCVirtualScreen(const CrossAxisState crossAxisState) const;
 
     std::shared_ptr<SecCompBase> componentInfo_;
     AccessToken::AccessTokenID tokenId_;

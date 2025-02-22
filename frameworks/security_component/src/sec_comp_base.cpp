@@ -294,7 +294,7 @@ bool SecCompBase::ParseCrossAxisState(const nlohmann::json& json, const std::str
     int32_t value = json.at(tag).get<int32_t>();
     if ((value < static_cast<int32_t>(CrossAxisState::STATE_INVALID)) ||
         (value > static_cast<int32_t>(CrossAxisState::STATE_NO_CROSS))) {
-        SC_LOG_ERROR(LABEL, "Cross axis state value is invalid.");
+        SC_LOG_ERROR(LABEL, "Cross axis state: %{public}d is invalid.", value);
         return false;
     }
     crossAxisState_ = static_cast<CrossAxisState>(value);

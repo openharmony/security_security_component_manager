@@ -73,6 +73,7 @@ int32_t SecCompEntity::CheckPointEvent(SecCompClickEvent& clickInfo, int32_t sup
         if ((crossAxisState == CrossAxisState::STATE_CROSS) &&
             componentInfo_->rect_.IsInRect(clickInfo.point.touchX, clickInfo.point.touchY + superFoldOffsetY)) {
             clickInfo.point.touchY += superFoldOffsetY;
+            SC_LOG_INFO(LABEL, "Fold PC cross state and component is in PC virtual screen.");
             return SC_OK;
         }
         SC_LOG_ERROR(LABEL, "touch point is not in component rect = (%{public}f, %{public}f)" \
@@ -104,17 +105,34 @@ int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
     return SC_OK;
 }
 
+bool SecCompEntity::IsInPCVirtualScreen(const CrossAxisState crossAxisState) const
+{
+    bool isInPCVirtualScreen = false;
+    if (componentInfo_->displayId_ == FOLD_VIRTUAL_DISPLAY_ID) {
+        if (crossAxisState == CrossAxisState::STATE_NO_CROSS) {
+            isInPCVirtualScreen = true;
+        } else {
+            SC_LOG_WARN(LABEL, "Security component maybe in PC virtual screen, the cross axis state is %{public}d",
+                static_cast<int32_t>(crossAxisState));
+        }
+    }
+    return isInPCVirtualScreen;
+}
+
 int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
     const CrossAxisState crossAxisState, std::string& message) const
 {
+    bool isInPCVirtualScreen = IsInPCVirtualScreen(crossAxisState);
+    SC_LOG_INFO(LABEL, "The cross axis state: %{public}d, the fold offset y: %{public}d.",
+        static_cast<int32_t>(crossAxisState), superFoldOffsetY);
+    if (isInPCVirtualScreen) {
+        clickInfo.point.touchY += superFoldOffsetY;
+        componentInfo_->rect_.y_ += superFoldOffsetY;
+    }
     if (!WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_,
         componentInfo_->rect_, message)) {
         SC_LOG_ERROR(LABEL, "Component may be covered by other window");
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
-    }
-    if (componentInfo_->displayId_ == FOLD_VIRTUAL_DISPLAY_ID) {
-        clickInfo.point.touchY += superFoldOffsetY;
-        componentInfo_->rect_.y_ += superFoldOffsetY;
     }
 
     int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
