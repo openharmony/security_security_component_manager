@@ -53,36 +53,38 @@ HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
     SaveButton button;
+    std::string message;
+    bool isClicked = true;
 
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
 
     auto& stylesJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
     stylesJson[JsonTagConstants::JSON_TEXT_TAG] = UNKNOWN_TEXT;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::DOWNLOAD;
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = UNKNOWN_ICON;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::LINE_ICON;
     stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::UNKNOWN_BG;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
     stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::MAX_LABEL_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_TEXT_TAG] = SaveDesc::DOWNLOAD;
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::MAX_ICON_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::LINE_ICON;
     stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     stylesJson[JsonTagConstants::JSON_ICON_TAG] = SaveIcon::PICTURE_ICON;
     stylesJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -97,10 +99,12 @@ HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level1)
     SaveButton button2;
 
     nlohmann::json jsonComponent;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
-    ASSERT_TRUE(button2.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
+    ASSERT_TRUE(button2.FromJson(jsonComponent, message, isClicked));
     ASSERT_TRUE(button1.CompareComponentBasicInfo(&button2, true));
 
     button1.text_ = UNKNOWN_TEXT;
@@ -129,7 +133,9 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
     nlohmann::json jsonComponent;
     SaveButton comp1;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp1.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+    ASSERT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     SaveButton comp2 = comp1;
 
     comp1.type_ = PASTE_COMPONENT;
@@ -162,8 +168,10 @@ HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level1)
     SaveButton button1;
     PasteButton button2;
     nlohmann::json jsonComponent;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, true));
 }

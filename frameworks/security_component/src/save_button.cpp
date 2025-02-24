@@ -26,15 +26,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SaveButton"};
 }
 
-bool SaveButton::IsTextIconTypeValid()
+bool SaveButton::IsTextIconTypeValid(std::string &message, bool isClicked)
 {
     if ((text_ <= UNKNOWN_TEXT) || (static_cast<SaveDesc>(text_) >= SaveDesc::MAX_LABEL_TYPE) ||
         (icon_ <= UNKNOWN_ICON) || (static_cast<SaveIcon>(icon_) >= SaveIcon::MAX_ICON_TYPE)) {
         return false;
     }
 
-    if ((static_cast<SaveIcon>(icon_) == SaveIcon::PICTURE_ICON) && !IsSystemAppCalling()) {
+    if (isClicked && (static_cast<SaveIcon>(icon_) == SaveIcon::PICTURE_ICON) && !IsSystemAppCalling()) {
         SC_LOG_ERROR(LABEL, "Picture icon only for system application.");
+        message = ", security component icon type = " + std::to_string(icon_) +
+            ", picture icon only for system application.";
         return false;
     }
 

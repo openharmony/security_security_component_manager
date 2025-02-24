@@ -454,7 +454,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller, std::string& message)
 {
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, Check security component", caller.pid);
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message, true);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
@@ -549,12 +549,11 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
-
     int32_t res = CheckClickSecurityComponentInfo(sc, info.scId, compJson, caller, message);
     if (res != SC_OK) {
         return res;
     }
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message, true);
     if (report == nullptr) {
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }

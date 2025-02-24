@@ -24,10 +24,10 @@ namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 template<typename T>
-T* ConstructComponent(const nlohmann::json& jsonComponent)
+T* ConstructComponent(const nlohmann::json& jsonComponent, std::string& message, bool isClicked)
 {
     T *componentPtr = new (std::nothrow)T();
-    if ((componentPtr != nullptr) && !componentPtr->FromJson(jsonComponent)) {
+    if ((componentPtr != nullptr) && !componentPtr->FromJson(jsonComponent, message, isClicked)) {
         delete componentPtr;
         return nullptr;
     }
@@ -36,7 +36,8 @@ T* ConstructComponent(const nlohmann::json& jsonComponent)
 
 class __attribute__((visibility("default"))) SecCompInfoHelper {
 public:
-    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent, std::string& message);
+    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
+        std::string& message, bool isClicked = false);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const uint64_t displayId,
         const CrossAxisState crossAxisState, std::string& message);

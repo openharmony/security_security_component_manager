@@ -59,18 +59,18 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
 }
 
 SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
-    std::string& message)
+    std::string& message, bool isClicked)
 {
     SecCompBase* comp = nullptr;
     switch (type) {
         case LOCATION_COMPONENT:
-            comp = ConstructComponent<LocationButton>(jsonComponent);
+            comp = ConstructComponent<LocationButton>(jsonComponent, message, isClicked);
             break;
         case PASTE_COMPONENT:
-            comp = ConstructComponent<PasteButton>(jsonComponent);
+            comp = ConstructComponent<PasteButton>(jsonComponent, message, isClicked);
             break;
         case SAVE_COMPONENT:
-            comp = ConstructComponent<SaveButton>(jsonComponent);
+            comp = ConstructComponent<SaveButton>(jsonComponent, message, isClicked);
             break;
         default:
             SC_LOG_ERROR(LABEL, "Parse component type unknown");

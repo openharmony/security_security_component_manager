@@ -53,32 +53,34 @@ HWTEST_F(PasteButtonTest, IsParamValid001, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildPasteComponentInfo(jsonComponent);
     PasteButton button;
+    std::string message;
+    bool isClicked = true;
 
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = UNKNOWN_TEXT;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::PASTE;
     styleJson[JsonTagConstants::JSON_ICON_TAG] = UNKNOWN_ICON;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::LINE_ICON;
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::UNKNOWN_BG;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::MAX_LABEL_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = PasteDesc::PASTE;
     styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::MAX_ICON_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_ICON_TAG] = PasteIcon::LINE_ICON;
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -94,9 +96,11 @@ HWTEST_F(PasteButtonTest, ComparePasteButton001, TestSize.Level1)
 
     nlohmann::json jsonComponent;
     TestCommon::BuildPasteComponentInfo(jsonComponent);
+    std::string message;
+    bool isClicked = true;
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
-    ASSERT_TRUE(button2.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
+    ASSERT_TRUE(button2.FromJson(jsonComponent, message, isClicked));
     ASSERT_TRUE(button1.CompareComponentBasicInfo(&button2, true));
 
     button1.text_ = UNKNOWN_TEXT;
@@ -124,8 +128,10 @@ HWTEST_F(PasteButtonTest, ComparePasteButton002, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     PasteButton comp1;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildPasteComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp1.FromJson(jsonComponent));
+    ASSERT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     PasteButton comp2 = comp1;
 
     comp1.type_ = SAVE_COMPONENT;
@@ -158,8 +164,10 @@ HWTEST_F(PasteButtonTest, ComparePasteButton003, TestSize.Level1)
     PasteButton button1;
     SaveButton button2;
     nlohmann::json jsonComponent;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildPasteComponentInfo(jsonComponent);
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, true));
 }

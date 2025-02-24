@@ -302,7 +302,7 @@ bool SecCompBase::ParseCrossAxisState(const nlohmann::json& json, const std::str
     return true;
 }
 
-bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
+bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, bool isClicked)
 {
     SC_LOG_DEBUG(LABEL, "Button info %{public}s.", jsonSrc.dump().c_str());
     if (!ParseType(jsonSrc, JsonTagConstants::JSON_SC_TYPE)) {
@@ -329,7 +329,7 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
     if (!ParseParent(jsonSrc, JsonTagConstants::JSON_PARENT_TAG)) {
         return false;
     }
-    if (!ParseStyle(jsonSrc, JsonTagConstants::JSON_STYLE_TAG)) {
+    if (!ParseStyle(jsonSrc, JsonTagConstants::JSON_STYLE_TAG, message, isClicked)) {
         return false;
     }
     if (!ParseValue(jsonSrc, JsonTagConstants::JSON_WINDOW_ID, windowId_)) {
@@ -436,7 +436,7 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
     return (leftValue == rightValue);
 }
 
-bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
+bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag, std::string& message, bool isClicked)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
         SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
@@ -460,7 +460,7 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag)
     }
     text_ = jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).get<int32_t>();
     icon_ = jsonStyle.at(JsonTagConstants::JSON_ICON_TAG).get<int32_t>();
-    if (!IsTextIconTypeValid()) {
+    if (!IsTextIconTypeValid(message, isClicked)) {
         SC_LOG_ERROR(LABEL, "text or icon is invalid.");
         return false;
     }
