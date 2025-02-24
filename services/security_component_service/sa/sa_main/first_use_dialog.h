@@ -82,7 +82,7 @@ private:
     void SaveFirstUseRecord(void);
     void StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
         sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
-    bool GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState);
+    bool SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState);
     void SendSaveEventHandler(void);
 
     std::mutex useMapMutex_;

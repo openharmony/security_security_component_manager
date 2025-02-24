@@ -136,8 +136,8 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth) ||
-        GreatNotEqual((rect.y_ + rect.height_), curScreenHeight)) {
+    if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + 1.0) ||
+        GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + 1.0)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
@@ -146,9 +146,9 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    if (GreatNotEqual(windowRect.x_, rect.x_) || GreatNotEqual(windowRect.y_, rect.y_) ||
-        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_) ||
-        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_)) {
+    if (GreatNotEqual(windowRect.x_, rect.x_ + 1.0) || GreatNotEqual(windowRect.y_, rect.y_ + 1.0) ||
+        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_ + 1.0) ||
+        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_ + 1.0)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         message = OUT_OF_WINDOW + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +

@@ -302,7 +302,7 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     return res;
 }
 
-bool FirstUseDialog::GetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState)
+bool FirstUseDialog::SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     sptr<OHOS::Rosen::Display> display =
         OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
@@ -363,8 +363,8 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     want.SetParam(WINDOW_ID_KEY, displayInfo.windowId);
     int32_t uid = IPCSkeleton::GetCallingUid();
     want.SetParam(CALLER_UID_KEY, uid);
-    if (!GetDialogInfo(want, displayInfo.displayId, displayInfo.crossAxisState)) {
-        SC_LOG_ERROR(LABEL, "Get display info failed.");
+    if (!SetDialogInfo(want, displayInfo.displayId, displayInfo.crossAxisState)) {
+        SC_LOG_ERROR(LABEL, "Set dialog info failed.");
         return;
     }
 

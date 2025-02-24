@@ -508,19 +508,27 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
-void SecCompManager::GetFoldOffsetY()
+void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
 {
+    if (crossAxisState == CrossAxisState::STATE_INVALID) {
+        return;
+    }
     if (superFoldOffsetY_ != 0) {
         return;
     }
     auto foldCreaseRegion = OHOS::Rosen::DisplayManager::GetInstance().GetCurrentFoldCreaseRegion();
-    if (foldCreaseRegion != nullptr) {
-        const auto& creaseRects = foldCreaseRegion->GetCreaseRects();
-        if (!creaseRects.empty()) {
-            const auto& rect = creaseRects.front();
-            superFoldOffsetY_ = rect.height_ + rect.posY_;
-        }
+    if (foldCreaseRegion == nullptr) {
+        SC_LOG_ERROR(LABEL, "foldCreaseRegion is nullptr");
+        return;
     }
+    const auto& creaseRects = foldCreaseRegion->GetCreaseRects();
+    if (creaseRects.empty()) {
+        SC_LOG_ERROR(LABEL, "creaseRects is empty");
+        return;
+    }
+    const auto& rect = creaseRects.front();
+    superFoldOffsetY_ = rect.height_ + rect.posY_;
+    SC_LOG_INFO(LABEL, "height: %{public}d, posY: %{public}d", rect.height_, rect.posY_);
 }
 
 int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, const nlohmann::json& compJson,
@@ -551,7 +559,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
 
-    GetFoldOffsetY();
+    GetFoldOffsetY(report->crossAxisState_);
 
     res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, report->crossAxisState_, message);
     if (res != SC_OK) {
