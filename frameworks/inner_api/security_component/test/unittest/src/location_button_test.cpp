@@ -54,8 +54,10 @@ HWTEST_F(LocationButtonTest, FromJson001, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton comp;
-    
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -68,7 +70,9 @@ HWTEST_F(LocationButtonTest, FromJson002, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -82,13 +86,15 @@ HWTEST_F(LocationButtonTest, FromJson003, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton comp;
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = 0;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -101,29 +107,31 @@ HWTEST_F(LocationButtonTest, FromJson004, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     nlohmann::json wrongJson = nlohmann::json::parse("{", nullptr, false);
     jsonComponent[JsonTagConstants::JSON_RECT] = wrongJson;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     auto& rectJson = jsonComponent[JsonTagConstants::JSON_RECT];
     rectJson[JsonTagConstants::JSON_RECT_X] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_X] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_Y] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_Y] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_WIDTH] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_WIDTH] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_HEIGHT] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -136,29 +144,31 @@ HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     nlohmann::json wrongJson = nlohmann::json::parse("{", nullptr, false);
     jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = wrongJson;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     auto& rectJson = jsonComponent[JsonTagConstants::JSON_WINDOW_RECT];
     rectJson[JsonTagConstants::JSON_RECT_X] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_X] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_Y] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_Y] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_WIDTH] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     rectJson[JsonTagConstants::JSON_RECT_WIDTH] = TestCommon::TEST_COORDINATE;
     rectJson[JsonTagConstants::JSON_RECT_HEIGHT] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -171,20 +181,22 @@ HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = TestCommon::TEST_SIZE;
     sizeJson[JsonTagConstants::JSON_ICON_SIZE_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     sizeJson[JsonTagConstants::JSON_ICON_SIZE_TAG] = TestCommon::TEST_SIZE;
     sizeJson[JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -197,17 +209,19 @@ HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
     paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = TestCommon::TEST_DIMENSION;
     paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -220,17 +234,19 @@ HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
     paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = TestCommon::TEST_DIMENSION;
     paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -243,19 +259,21 @@ HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp.FromJson(jsonComponent));
+    ASSERT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
 
     jsonComponent[JsonTagConstants::JSON_BORDER_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_BORDER_WIDTH_TAG, WRONG_TYPE },
     };
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_PARENT_EFFECT_TAG, WRONG_TYPE },
     };
-    ASSERT_FALSE(comp.FromJson(jsonComponent));
+    ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -269,19 +287,21 @@ HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton button;
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = LocationDesc::SELECT_LOCATION;
     styleJson[JsonTagConstants::JSON_ICON_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_ICON_TAG] = LocationIcon::LINE_ICON;
     styleJson[JsonTagConstants::JSON_BG_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -295,19 +315,21 @@ HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton button;
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    std::string message;
+    bool isClicked = true;
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
 
     auto& colorJson = jsonComponent[JsonTagConstants::JSON_COLORS_TAG];
     colorJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     colorJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = TestCommon::TEST_COLOR_RED;
     colorJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     colorJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = TestCommon::TEST_COLOR_BLUE;
     colorJson[JsonTagConstants::JSON_BG_COLOR_TAG] = WRONG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -321,32 +343,34 @@ HWTEST_F(LocationButtonTest, FromJson012, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton button;
+    std::string message;
+    bool isClicked = true;
 
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = UNKNOWN_TEXT;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = LocationDesc::SELECT_LOCATION;
     styleJson[JsonTagConstants::JSON_ICON_TAG] = UNKNOWN_ICON;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_ICON_TAG] = LocationIcon::LINE_ICON;
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::UNKNOWN_BG;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::CIRCLE;
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = LocationDesc::MAX_LABEL_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_TEXT_TAG] = LocationDesc::SELECT_LOCATION;
     styleJson[JsonTagConstants::JSON_ICON_TAG] = LocationIcon::MAX_ICON_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 
     styleJson[JsonTagConstants::JSON_ICON_TAG] = LocationIcon::LINE_ICON;
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::MAX_BG_TYPE;
-    ASSERT_FALSE(button.FromJson(jsonComponent));
+    ASSERT_FALSE(button.FromJson(jsonComponent, message, isClicked));
 }
 
 /**
@@ -360,8 +384,10 @@ HWTEST_F(LocationButtonTest, ToJsonStr001, TestSize.Level1)
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     LocationButton button;
+    std::string message;
+    bool isClicked = true;
 
-    ASSERT_TRUE(button.FromJson(jsonComponent));
+    ASSERT_TRUE(button.FromJson(jsonComponent, message, isClicked));
     ASSERT_EQ(jsonComponent.dump(), button.ToJsonStr());
 }
 
@@ -392,10 +418,12 @@ HWTEST_F(LocationButtonTest, CompareLocationButton001, TestSize.Level1)
     LocationButton button2;
 
     nlohmann::json jsonComponent;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
-    ASSERT_TRUE(button2.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
+    ASSERT_TRUE(button2.FromJson(jsonComponent, message, isClicked));
     ASSERT_TRUE(button1.CompareComponentBasicInfo(&button2, true));
 
     button1.text_ = UNKNOWN_TEXT;
@@ -423,8 +451,10 @@ HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level1)
 {
     nlohmann::json jsonComponent;
     LocationButton comp1;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
-    ASSERT_TRUE(comp1.FromJson(jsonComponent));
+    ASSERT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     LocationButton comp2 = comp1;
 
     comp1.type_ = SAVE_COMPONENT;
@@ -489,8 +519,10 @@ HWTEST_F(LocationButtonTest, CompareLocationButton003, TestSize.Level1)
     LocationButton button1;
     SaveButton button2;
     nlohmann::json jsonComponent;
+    std::string message;
+    bool isClicked = true;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
 
-    ASSERT_TRUE(button1.FromJson(jsonComponent));
+    ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, false));
 }

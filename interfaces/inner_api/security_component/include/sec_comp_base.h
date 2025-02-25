@@ -87,7 +87,7 @@ class __attribute__((visibility("default"))) SecCompBase {
 public:
     SecCompBase() = default;
     virtual ~SecCompBase() = default;
-    bool FromJson(const nlohmann::json& jsonSrc);
+    bool FromJson(const nlohmann::json& jsonSrc, std::string& message, bool isClicked);
     void ToJson(nlohmann::json& jsonRes) const;
     std::string ToJsonStr(void) const;
     virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const;
@@ -138,7 +138,7 @@ public:
     int32_t nodeId_ = 0;
     CrossAxisState crossAxisState_ = CrossAxisState::STATE_INVALID;
 protected:
-    virtual bool IsTextIconTypeValid() = 0;
+    virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;
 private:
     bool ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res);
@@ -151,7 +151,7 @@ private:
     bool ParseSize(const nlohmann::json& json, const std::string& tag);
     bool ParseParent(const nlohmann::json& json, const std::string& tag);
     bool ParseRect(const nlohmann::json& json, const std::string& tag, SecCompRect& rect);
-    bool ParseStyle(const nlohmann::json& json, const std::string& tag);
+    bool ParseStyle(const nlohmann::json& json, const std::string& tag, std::string& message, bool isClicked);
     bool ParseType(const nlohmann::json& json, const std::string& tag);
     bool ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value);
     bool ParseDisplayId(const nlohmann::json& json, const std::string& tag);

@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "LocationButton"};
 }
 
-bool LocationButton::IsTextIconTypeValid()
+bool LocationButton::IsTextIconTypeValid(std::string &message, bool isClicked)
 {
     if ((text_ <= UNKNOWN_TEXT) || (static_cast<LocationDesc>(text_) >= LocationDesc::MAX_LABEL_TYPE) ||
         (icon_ <= UNKNOWN_ICON) || (static_cast<LocationIcon>(icon_) >= LocationIcon::MAX_ICON_TYPE)) {

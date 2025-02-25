@@ -46,7 +46,7 @@ enum class LocationIcon : int32_t {
 
 class __attribute__((visibility("default"))) LocationButton : public SecCompBase {
 public:
-    virtual bool IsTextIconTypeValid() override;
+    virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) override;
     virtual bool IsCorrespondenceType() override;
     virtual bool CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const override;
 private:
