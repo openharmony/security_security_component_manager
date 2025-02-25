@@ -61,7 +61,7 @@ public:
         const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
-    void NotifyProcessDied(int32_t pid);
+    void NotifyProcessDied(int32_t pid, bool isProcessCached);
     void DumpSecComp(std::string& dumpStr);
     bool Initialize();
     void ExitSaProcess();

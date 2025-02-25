@@ -22,6 +22,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "AppStateObserver"};
+constexpr int32_t APP_STATE_CACHED = 100;
 }
 
 AppStateObserver::AppStateObserver()
@@ -85,11 +86,11 @@ void AppStateObserver::AddProcessToForegroundSet(const AppExecFwk::ProcessData &
     AddProcessToForegroundSet(processData.pid, proc);
 }
 
-void AppStateObserver::RemoveProcessFromForegroundSet(const AppExecFwk::ProcessData &processData)
+void AppStateObserver::RemoveProcessFromForegroundSet(const int32_t pid)
 {
     Utils::UniqueWriteGuard<Utils::RWLock> infoGuard(this->fgProcLock_);
     for (auto iter = foregrandProcList_.begin(); iter != foregrandProcList_.end(); ++iter) {
-        if (processData.pid == iter->pid) {
+        if (pid == iter->pid) {
             foregrandProcList_.erase(iter);
             return;
         }
@@ -102,7 +103,7 @@ void AppStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &proc
         AddProcessToForegroundSet(processData);
         SecCompManager::GetInstance().NotifyProcessForeground(processData.pid);
     } else if (processData.state == AppExecFwk::AppProcessState::APP_STATE_BACKGROUND) {
-        RemoveProcessFromForegroundSet(processData);
+        RemoveProcessFromForegroundSet(processData.pid);
         SecCompManager::GetInstance().NotifyProcessBackground(processData.pid);
     }
 }
@@ -111,8 +112,19 @@ void AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData& processData)
 {
     SC_LOG_INFO(LABEL, "OnProcessDied die %{public}s pid %{public}d",
         processData.bundleName.c_str(), processData.pid);
-    RemoveProcessFromForegroundSet(processData);
-    SecCompManager::GetInstance().NotifyProcessDied(processData.pid);
+    RemoveProcessFromForegroundSet(processData.pid);
+    SecCompManager::GetInstance().NotifyProcessDied(processData.pid, false);
+}
+
+void AppStateObserver::OnAppCacheStateChanged(const AppExecFwk::AppStateData &appStateData)
+{
+    SC_LOG_INFO(LABEL, "OnAppCacheStateChanged pid %{public}d",
+        appStateData.pid);
+    if (appStateData.state != APP_STATE_CACHED) {
+        return;
+    }
+    RemoveProcessFromForegroundSet(appStateData.pid);
+    SecCompManager::GetInstance().NotifyProcessDied(appStateData.pid, true);
 }
 
 void AppStateObserver::DumpProcess(std::string& dumpStr)

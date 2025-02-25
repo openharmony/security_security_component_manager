@@ -265,6 +265,7 @@ void FirstUseDialog::RemoveDialogWaitEntitys(int32_t pid)
         std::shared_ptr<SecCompEntity> entity = iter->second;
         if ((entity != nullptr) && (entity->pid_ == pid)) {
             iter = dialogWaitMap_.erase(iter);
+            SC_LOG_ERROR(LABEL, "dialog %{public}d is removed", pid);
         } else {
             ++iter;
         }
