@@ -277,7 +277,7 @@ HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level1)
     ASSERT_TRUE(SecCompManager::GetInstance().IsForegroundCompExist());
     SecCompManager::GetInstance().NotifyProcessBackground(ServiceTestCommon::TEST_PID_1);
     ASSERT_FALSE(SecCompManager::GetInstance().IsForegroundCompExist());
-    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_1, false);
     ASSERT_FALSE(SecCompManager::GetInstance().IsForegroundCompExist());
 }
 
@@ -313,11 +313,11 @@ HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level1)
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_2, 0, entity2));
 
-    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_3);
+    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_3, false);
     ASSERT_NE(nullptr, SecCompManager::GetInstance().GetSecurityComponentFromList(
         ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_SC_ID_1));
 
-    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().NotifyProcessDied(ServiceTestCommon::TEST_PID_1, false);
     ASSERT_EQ(nullptr, SecCompManager::GetInstance().GetSecurityComponentFromList(
         ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_SC_ID_1));
 }

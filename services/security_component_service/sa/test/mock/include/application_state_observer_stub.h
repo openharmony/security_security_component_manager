@@ -60,6 +60,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.appexecfwk.IApplicationStateObserver");
     virtual void OnProcessStateChanged(const ProcessData &processData) {}
     virtual void OnProcessDied(const ProcessData &processData) = 0;
+    virtual void OnAppCacheStateChanged(const AppExecFwk::AppStateData &appStateData) = 0;
 };
 
 class ApplicationStateObserverStub : public IRemoteStub<IApplicationStateObserver> {

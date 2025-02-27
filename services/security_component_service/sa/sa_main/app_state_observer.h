@@ -43,9 +43,10 @@ public:
     void AddProcessToForegroundSet(const AppExecFwk::ProcessData& processData);
     void AddProcessToForegroundSet(const AppExecFwk::AppStateData& stateData);
     void DumpProcess(std::string& dumpStr);
+    void OnAppCacheStateChanged(const AppExecFwk::AppStateData &appStateData) override;
 
 private:
-    void RemoveProcessFromForegroundSet(const AppExecFwk::ProcessData& processData);
+    void RemoveProcessFromForegroundSet(const int32_t pid);
     std::vector<SecCompProcessData> foregrandProcList_;
     OHOS::Utils::RWLock fgProcLock_;
 };

@@ -226,12 +226,13 @@ void SecCompManager::NotifyProcessBackground(int32_t pid)
     SC_LOG_INFO(LABEL, "App pid %{public}d to background", pid);
 }
 
-void SecCompManager::NotifyProcessDied(int32_t pid)
+void SecCompManager::NotifyProcessDied(int32_t pid, bool isProcessCached)
 {
+    if (!isProcessCached) {
     // notify enhance process died.
-    SecCompEnhanceAdapter::NotifyProcessDied(pid);
-
-    malicious_.RemoveAppFromMaliciousAppList(pid);
+        SecCompEnhanceAdapter::NotifyProcessDied(pid);
+        malicious_.RemoveAppFromMaliciousAppList(pid);
+    }
     OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     auto iter = componentMap_.find(pid);
     if (iter == componentMap_.end()) {

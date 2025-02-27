@@ -105,8 +105,8 @@ HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet001, TestSize.Level
     };
     observer_->AddProcessToForegroundSet(procData);
     ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
-    observer_->RemoveProcessFromForegroundSet(procData);
-    observer_->RemoveProcessFromForegroundSet(procData);
+    observer_->RemoveProcessFromForegroundSet(procData.pid);
+    observer_->RemoveProcessFromForegroundSet(procData.pid);
     ASSERT_FALSE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
 }
 
@@ -125,7 +125,7 @@ HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet002, TestSize.Level
     observer_->AddProcessToForegroundSet(procData);
     ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
     procData.pid = ServiceTestCommon::TEST_PID_2;
-    observer_->RemoveProcessFromForegroundSet(procData);
+    observer_->RemoveProcessFromForegroundSet(procData.pid);
     ASSERT_TRUE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
 }
 
