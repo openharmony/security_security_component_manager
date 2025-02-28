@@ -160,8 +160,8 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
             return true;
         }
 
-        if (GreatOrEqual((rect.x_ + rect.width_), curScreenWidth) ||
-            GreatOrEqual((rect.y_ + rect.height_), curScreenHeight)) {
+        if (GreatOrEqual((rect.x_ + rect.width_), curScreenWidth + 1.0) ||
+            GreatOrEqual((rect.y_ + rect.height_), curScreenHeight + 1.0)) {
             SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
             message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
                 ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
@@ -190,16 +190,6 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
     }
 
     if (IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo.isWearable)) {
-        return false;
-    }
-
-    if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + 1.0) ||
-        GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + 1.0)) {
-        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
-        message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
-            ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
-            "), current screen(width = " + std::to_string(curScreenWidth) +
-            ", height = " + std::to_string(curScreenHeight) + ")";
         return false;
     }
 
