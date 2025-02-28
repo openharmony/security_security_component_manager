@@ -87,6 +87,8 @@ public:
     static const std::string JSON_WINDOW_ID;
     static const std::string JSON_DISPLAY_ID;
     static const std::string JSON_CROSS_AXIS_STATE;
+    static const std::string JSON_NON_COMPATIBLE_CHANGE_TAG;
+    static const std::string JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG;
 };
 
 class __attribute__((visibility("default"))) SecCompBase {
@@ -140,6 +142,8 @@ public:
     int32_t icon_ = UNKNOWN_ICON;
     SecCompBackground bg_ = SecCompBackground::UNKNOWN_BG;
 
+    bool hasNonCompatileChange_ = false;
+    double blurRadius_ = 0.0;
     int32_t windowId_ = 0;
     uint64_t displayId_ = 0;
     int32_t nodeId_ = 0;
@@ -149,6 +153,7 @@ protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;
 private:
+    bool ParseNonCompatibleChange(const nlohmann::json& json);
     bool ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res);
     bool ParseColor(const nlohmann::json& json, const std::string& tag, SecCompColor& res);
     bool ParseBool(const nlohmann::json& json, const std::string& tag, bool& res);

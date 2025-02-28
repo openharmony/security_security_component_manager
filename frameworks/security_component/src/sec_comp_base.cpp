@@ -70,6 +70,24 @@ const std::string JsonTagConstants::JSON_BG_TAG = "bg";
 const std::string JsonTagConstants::JSON_WINDOW_ID = "windowId";
 const std::string JsonTagConstants::JSON_DISPLAY_ID = "displayId";
 const std::string JsonTagConstants::JSON_CROSS_AXIS_STATE = "crossAxisState";
+const std::string JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG = "hasNonCompatileChange";
+const std::string JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG = "blurRadius";
+
+bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
+{
+    std::string tag = JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG;
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_boolean()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+    hasNonCompatileChange_ = json.at(tag).get<bool>();
+
+    if (!ParseDimension(json, JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG, blurRadius_)) {
+        return false;
+    }
+
+    return true;
+}
 
 bool SecCompBase::ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res)
 {
@@ -389,6 +407,9 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, 
     if (!ParseCrossAxisState(jsonSrc, JsonTagConstants::JSON_CROSS_AXIS_STATE)) {
         return false;
     }
+    if (!ParseNonCompatibleChange(jsonSrc)) {
+        return false;
+    }
 
     return true;
 }
@@ -459,6 +480,8 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     jsonRes[JsonTagConstants::JSON_WINDOW_ID] = windowId_;
     jsonRes[JsonTagConstants::JSON_DISPLAY_ID] = displayId_;
     jsonRes[JsonTagConstants::JSON_CROSS_AXIS_STATE] = crossAxisState_;
+    jsonRes[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = hasNonCompatileChange_;
+    jsonRes[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = blurRadius_;
 }
 
 std::string SecCompBase::ToJsonStr() const
