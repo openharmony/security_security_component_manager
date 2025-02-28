@@ -135,8 +135,8 @@ bool SecCompInfoHelper::IsOutOfWatchScreen(const SecCompRect& rect, double radiu
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
-            "), current screen(width = " + std::to_string(radius) +
-            ", height = " + std::to_string(radius) + ")";
+            "), current screen(width = " + std::to_string(radius * NUMBER_TWO) +
+            ", height = " + std::to_string(radius * NUMBER_TWO) + ")";
         return true;
     }
     return false;
