@@ -229,7 +229,7 @@ void SecCompManager::NotifyProcessBackground(int32_t pid)
 void SecCompManager::NotifyProcessDied(int32_t pid, bool isProcessCached)
 {
     if (!isProcessCached) {
-    // notify enhance process died.
+        // notify enhance process died.
         SecCompEnhanceAdapter::NotifyProcessDied(pid);
         malicious_.RemoveAppFromMaliciousAppList(pid);
     }
@@ -475,8 +475,14 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        .displayId = report->displayId_,
+        .crossAxisState = report->crossAxisState_,
+        .isWearable = report->isWearableDevice_
+    };
+
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
-        report->displayId_, report->crossAxisState_, message))) {
+        screenInfo, message))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,

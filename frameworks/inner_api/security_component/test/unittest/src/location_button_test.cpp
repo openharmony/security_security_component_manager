@@ -216,11 +216,11 @@ HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = WRONG_TYPE;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = WRONG_TYPE;
     ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
-    paddingJson[JsonTagConstants::JSON_PADDING_TOP_TAG] = TestCommon::TEST_DIMENSION;
-    paddingJson[JsonTagConstants::JSON_PADDING_RIGHT_TAG] = WRONG_TYPE;
+    paddingJson[JsonTagConstants::JSON_TOP_TAG] = TestCommon::TEST_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = WRONG_TYPE;
     ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
@@ -241,11 +241,11 @@ HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
-    paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = WRONG_TYPE;
+    paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = WRONG_TYPE;
     ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 
-    paddingJson[JsonTagConstants::JSON_PADDING_BOTTOM_TAG] = TestCommon::TEST_DIMENSION;
-    paddingJson[JsonTagConstants::JSON_PADDING_LEFT_TAG] = WRONG_TYPE;
+    paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = TestCommon::TEST_DIMENSION;
+    paddingJson[JsonTagConstants::JSON_LEFT_TAG] = WRONG_TYPE;
     ASSERT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 

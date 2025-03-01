@@ -36,15 +36,25 @@ T* ConstructComponent(const nlohmann::json& jsonComponent, std::string& message,
 
 class __attribute__((visibility("default"))) SecCompInfoHelper {
 public:
+struct ScreenInfo {
+    uint64_t displayId;
+    CrossAxisState crossAxisState;
+    bool isWearable;
+};
+
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
         std::string& message, bool isClicked = false);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
-    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const uint64_t displayId,
-        const CrossAxisState crossAxisState, std::string& message);
+    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const ScreenInfo& screenInfo,
+        std::string& message);
 
 private:
     static float GetWindowScale(int32_t windowId);
     static void AdjustSecCompRect(SecCompBase* comp, float scale);
+    static double GetDistance(DimensionT x1, DimensionT y1, DimensionT x2, DimensionT y2);
+    static bool IsOutOfWatchScreen(const SecCompRect& rect, double radius, std::string& message);
+    static bool IsOutOfScreen(const SecCompRect& rect, double curScreenWidth, double curScreenHeight,
+        std::string& message, bool isWearable);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

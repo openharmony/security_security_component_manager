@@ -41,6 +41,7 @@ public:
     static const std::string JSON_RECT;
     static const std::string JSON_SC_TYPE;
     static const std::string JSON_NODE_ID;
+    static const std::string JSON_IS_WEARABLE;
     static const std::string JSON_RECT_X;
     static const std::string JSON_RECT_Y;
     static const std::string JSON_RECT_WIDTH;
@@ -51,10 +52,15 @@ public:
     static const std::string JSON_FONT_SIZE_TAG;
     static const std::string JSON_ICON_SIZE_TAG;
     static const std::string JSON_PADDING_SIZE_TAG;
-    static const std::string JSON_PADDING_LEFT_TAG;
-    static const std::string JSON_PADDING_TOP_TAG;
-    static const std::string JSON_PADDING_RIGHT_TAG;
-    static const std::string JSON_PADDING_BOTTOM_TAG;
+    static const std::string JSON_LEFT_TAG;
+    static const std::string JSON_TOP_TAG;
+    static const std::string JSON_RIGHT_TAG;
+    static const std::string JSON_BOTTOM_TAG;
+    static const std::string JSON_BORDER_RADIUS_TAG;
+    static const std::string JSON_LEFT_TOP_TAG;
+    static const std::string JSON_LEFT_BOTTOM_TAG;
+    static const std::string JSON_RIGHT_TOP_TAG;
+    static const std::string JSON_RIGHT_BOTTOM_TAG;
     static const std::string JSON_TEXT_ICON_PADDING_TAG;
     static const std::string JSON_RECT_WIDTH_TAG;
     static const std::string JSON_RECT_HEIGHT_TAG;
@@ -105,6 +111,7 @@ public:
     DimensionT fontSize_ = DEFAULT_DIMENSION;
     DimensionT iconSize_ = DEFAULT_DIMENSION;
     PaddingSize padding_;
+    BorderRadius borderRadius_;
     DimensionT textIconSpace_ = DEFAULT_DIMENSION;
 
     // color
@@ -137,6 +144,7 @@ public:
     uint64_t displayId_ = 0;
     int32_t nodeId_ = 0;
     CrossAxisState crossAxisState_ = CrossAxisState::STATE_INVALID;
+    bool isWearableDevice_ = false;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;
@@ -146,6 +154,7 @@ private:
     bool ParseBool(const nlohmann::json& json, const std::string& tag, bool& res);
     bool ParseString(const nlohmann::json& json, const std::string& tag, std::string& res);
     bool ParsePadding(const nlohmann::json& json, const std::string& tag, PaddingSize& res);
+    bool ParseBorderRadius(const nlohmann::json& json, const std::string& tag, BorderRadius& res);
     bool ParseColors(const nlohmann::json& json, const std::string& tag);
     bool ParseBorders(const nlohmann::json& json, const std::string& tag);
     bool ParseSize(const nlohmann::json& json, const std::string& tag);
@@ -156,6 +165,7 @@ private:
     bool ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value);
     bool ParseDisplayId(const nlohmann::json& json, const std::string& tag);
     bool ParseCrossAxisState(const nlohmann::json& json, const std::string& tag);
+    bool ParseWearable(const nlohmann::json& json, const std::string& tag);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

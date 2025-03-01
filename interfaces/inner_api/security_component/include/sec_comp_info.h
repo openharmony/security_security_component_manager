@@ -45,6 +45,13 @@ struct PaddingSize {
     DimensionT left = DEFAULT_DIMENSION;
 };
 
+struct BorderRadius {
+    DimensionT leftTop = DEFAULT_DIMENSION;
+    DimensionT rightTop = DEFAULT_DIMENSION;
+    DimensionT leftBottom = DEFAULT_DIMENSION;
+    DimensionT rightBottom = DEFAULT_DIMENSION;
+};
+
 enum SecCompType {
     UNKNOWN_SC_TYPE = 0,
     LOCATION_COMPONENT,
@@ -119,6 +126,7 @@ public:
     DimensionT y_ = 0.0;
     DimensionT width_ = 0.0;
     DimensionT height_ = 0.0;
+    BorderRadius borderRadius_;
 };
 
 struct ExtraInfo {

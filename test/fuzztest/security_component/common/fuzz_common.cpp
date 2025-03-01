@@ -63,10 +63,12 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     nlohmann::json jsonComponent;
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     SecCompRect window;
     PaddingSize padding;
     SecCompRect buttonRect;
-    ConstructWindowJson(jsonComponent, window, padding, buttonRect);
+    BorderRadius borderRadius;
+    ConstructWindowJson(jsonComponent, window, padding, borderRadius, buttonRect);
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, GetData<uint32_t>() },
@@ -107,10 +109,12 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     nlohmann::json jsonComponent;
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = SAVE_COMPONENT;
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     SecCompRect window;
     PaddingSize padding;
     SecCompRect buttonRect;
-    ConstructWindowJson(jsonComponent, window, padding, buttonRect);
+    BorderRadius borderRadius;
+    ConstructWindowJson(jsonComponent, window, padding, borderRadius, buttonRect);
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, GetData<uint32_t>() },
@@ -151,10 +155,12 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     nlohmann::json jsonComponent;
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = PASTE_COMPONENT;
     jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     SecCompRect window;
     PaddingSize padding;
     SecCompRect buttonRect;
-    ConstructWindowJson(jsonComponent, window, padding, buttonRect);
+    BorderRadius borderRadius;
+    ConstructWindowJson(jsonComponent, window, padding, borderRadius, buttonRect);
 
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, GetData<uint32_t>() },
@@ -209,8 +215,8 @@ void CompoRandomGenerator::ConstructButtonRect(
     padding.right = window.x_ + window.width_ - buttonRect.x_ - buttonRect.width_;
 }
 
-void CompoRandomGenerator::ConstructWindowJson(
-    nlohmann::json &jsonComponent, SecCompRect &window, PaddingSize &padding, SecCompRect &buttonRect)
+void CompoRandomGenerator::ConstructWindowJson(nlohmann::json &jsonComponent, SecCompRect &window,
+    PaddingSize &padding, BorderRadius &borderRadius, SecCompRect &buttonRect)
 {
     ConstructButtonRect(window, padding, buttonRect);
     jsonComponent[JsonTagConstants::JSON_RECT] =  nlohmann::json {
@@ -226,10 +232,17 @@ void CompoRandomGenerator::ConstructWindowJson(
         { JsonTagConstants::JSON_RECT_HEIGHT, window.height_ }
     };
     nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_PADDING_TOP_TAG, padding.top },
-        { JsonTagConstants::JSON_PADDING_RIGHT_TAG, padding.right },
-        { JsonTagConstants::JSON_PADDING_BOTTOM_TAG, padding.bottom },
-        { JsonTagConstants::JSON_PADDING_LEFT_TAG, padding.left },
+        { JsonTagConstants::JSON_TOP_TAG, padding.top },
+        { JsonTagConstants::JSON_RIGHT_TAG, padding.right },
+        { JsonTagConstants::JSON_BOTTOM_TAG, padding.bottom },
+        { JsonTagConstants::JSON_LEFT_TAG, padding.left },
+    };
+
+    nlohmann::json jsonBorderRadius = nlohmann::json {
+        { JsonTagConstants::JSON_LEFT_TOP_TAG, borderRadius.leftTop },
+        { JsonTagConstants::JSON_RIGHT_TOP_TAG, borderRadius.rightTop },
+        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, borderRadius.leftBottom },
+        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, borderRadius.rightBottom },
     };
 
     jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
@@ -237,6 +250,7 @@ void CompoRandomGenerator::ConstructWindowJson(
         { JsonTagConstants::JSON_ICON_SIZE_TAG, std::fabs(GetData<float>()) },
         { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, std::fabs(GetData<float>()) },
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
+        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius},
     };
 }
 }
