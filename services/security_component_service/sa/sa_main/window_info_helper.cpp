@@ -15,6 +15,7 @@
 #include "window_info_helper.h"
 
 #include <vector>
+#include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
 #include "window_manager.h"
 
@@ -78,6 +79,32 @@ static bool IsRectInWindRect(const Rosen::Rect& windRect, const SecCompRect& sec
     if ((secRect.y_ + secRect.height_ <= windRect.posY_) ||
         (secRect.y_ >= windRect.posY_ + static_cast<int32_t>(windRect.height_))) {
         return false;
+    }
+    if ((GreatOrEqual(windRect.posX_, secRect.x_ + secRect.width_ - secRect.borderRadius_.rightBottom) &&
+        GreatOrEqual(windRect.posY_, secRect.y_ + secRect.height_ - secRect.borderRadius_.rightBottom))) {
+        auto distance = SecCompInfoHelper::GetDistance(secRect.x_ + secRect.width_ - secRect.borderRadius_.rightBottom,
+            secRect.y_ + secRect.height_ - secRect.borderRadius_.rightBottom, windRect.posX_, windRect.posY_);
+        return !GreatNotEqual(distance, secRect.borderRadius_.rightBottom - 1.0);
+    }
+    if ((GreatOrEqual(secRect.x_ + secRect.borderRadius_.leftBottom, windRect.posX_ + windRect.width_) &&
+        GreatOrEqual(windRect.posY_, secRect.y_ + secRect.height_ - secRect.borderRadius_.leftBottom))) {
+        auto distance = SecCompInfoHelper::GetDistance(secRect.x_ + secRect.borderRadius_.leftBottom,
+            secRect.y_ + secRect.height_ - secRect.borderRadius_.leftBottom, windRect.posX_ + windRect.width_,
+            windRect.posY_);
+        return !GreatNotEqual(distance, secRect.borderRadius_.leftBottom - 1.0);
+    }
+    if ((GreatOrEqual(windRect.posX_, secRect.x_ + secRect.width_ - secRect.borderRadius_.rightTop) &&
+        GreatOrEqual(secRect.y_ + secRect.borderRadius_.rightTop, windRect.posY_ + windRect.height_))) {
+        auto distance = SecCompInfoHelper::GetDistance(secRect.x_ + secRect.width_ - secRect.borderRadius_.rightTop,
+            secRect.y_ + secRect.borderRadius_.rightTop, windRect.posX_, windRect.posY_ + windRect.height_);
+        return !GreatNotEqual(distance, secRect.borderRadius_.rightTop - 1.0);
+    }
+    if ((GreatOrEqual(secRect.x_ + secRect.borderRadius_.leftTop, windRect.posX_ + windRect.width_) &&
+        GreatOrEqual(secRect.y_ + secRect.borderRadius_.leftTop, windRect.posY_ + windRect.height_))) {
+        auto distance = SecCompInfoHelper::GetDistance(secRect.x_ + secRect.borderRadius_.leftTop,
+            secRect.y_ + secRect.borderRadius_.leftTop, windRect.posX_ + windRect.width_,
+            windRect.posY_ + windRect.height_);
+        return !GreatNotEqual(distance, secRect.borderRadius_.leftTop - 1.0);
     }
 
     return true;
