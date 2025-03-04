@@ -62,6 +62,8 @@ const std::string JsonTagConstants::JSON_TEXT_TAG = "text";
 const std::string JsonTagConstants::JSON_ICON_TAG = "icon";
 const std::string JsonTagConstants::JSON_BG_TAG = "bg";
 const std::string JsonTagConstants::JSON_WINDOW_ID = "windowId";
+const std::string JsonTagConstants::JSON_DISPLAY_ID = "displayId";
+const std::string JsonTagConstants::JSON_CROSS_AXIS_STATE = "crossAxisState";
 
 bool SecCompBase::ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res)
 {
@@ -244,15 +246,13 @@ bool SecCompBase::ParseRect(const nlohmann::json& json, const std::string& tag, 
     return true;
 }
 
-bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
+bool SecCompBase::ParseType(const nlohmann::json& json, const std::string& tag)
 {
-    SC_LOG_DEBUG(LABEL, "Button info %{public}s.", jsonSrc.dump().c_str());
-    if ((jsonSrc.find(JsonTagConstants::JSON_SC_TYPE) == jsonSrc.end()) ||
-        !jsonSrc.at(JsonTagConstants::JSON_SC_TYPE).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", JsonTagConstants::JSON_SC_TYPE.c_str());
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
-    int32_t value = jsonSrc.at(JsonTagConstants::JSON_SC_TYPE).get<int32_t>();
+    int32_t value = json.at(tag).get<int32_t>();
     if ((value <= static_cast<int32_t>(SecCompType::UNKNOWN_SC_TYPE)) ||
         (value >= static_cast<int32_t>(SecCompType::MAX_SC_TYPE))) {
         SC_LOG_ERROR(LABEL, "scType value is invalid.");
@@ -260,13 +260,57 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
     }
     type_ = static_cast<SecCompType>(value);
 
-    if ((jsonSrc.find(JsonTagConstants::JSON_NODE_ID) == jsonSrc.end()) ||
-        !jsonSrc.at(JsonTagConstants::JSON_NODE_ID).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", JsonTagConstants::JSON_NODE_ID.c_str());
+    return true;
+}
+
+bool SecCompBase::ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
-    nodeId_ = jsonSrc.at(JsonTagConstants::JSON_NODE_ID).get<int32_t>();
+    value = json.at(tag).get<int32_t>();
 
+    return true;
+}
+
+bool SecCompBase::ParseDisplayId(const nlohmann::json& json, const std::string& tag)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+    displayId_ = json.at(tag).get<uint64_t>();
+
+    return true;
+}
+
+bool SecCompBase::ParseCrossAxisState(const nlohmann::json& json, const std::string& tag)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
+        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+    int32_t value = json.at(tag).get<int32_t>();
+    if ((value < static_cast<int32_t>(CrossAxisState::STATE_INVALID)) ||
+        (value > static_cast<int32_t>(CrossAxisState::STATE_NO_CROSS))) {
+        SC_LOG_ERROR(LABEL, "Cross axis state: %{public}d is invalid.", value);
+        return false;
+    }
+    crossAxisState_ = static_cast<CrossAxisState>(value);
+
+    return true;
+}
+
+bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
+{
+    SC_LOG_DEBUG(LABEL, "Button info %{public}s.", jsonSrc.dump().c_str());
+    if (!ParseType(jsonSrc, JsonTagConstants::JSON_SC_TYPE)) {
+        return false;
+    }
+    if (!ParseValue(jsonSrc, JsonTagConstants::JSON_NODE_ID, nodeId_)) {
+        return false;
+    }
     if (!ParseRect(jsonSrc, JsonTagConstants::JSON_RECT, rect_)) {
         return false;
     }
@@ -288,13 +332,16 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc)
     if (!ParseStyle(jsonSrc, JsonTagConstants::JSON_STYLE_TAG)) {
         return false;
     }
-
-    if ((jsonSrc.find(JsonTagConstants::JSON_WINDOW_ID) == jsonSrc.end()) ||
-        !jsonSrc.at(JsonTagConstants::JSON_WINDOW_ID).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", JsonTagConstants::JSON_WINDOW_ID.c_str());
+    if (!ParseValue(jsonSrc, JsonTagConstants::JSON_WINDOW_ID, windowId_)) {
         return false;
     }
-    windowId_ = jsonSrc.at(JsonTagConstants::JSON_WINDOW_ID).get<int32_t>();
+    if (!ParseDisplayId(jsonSrc, JsonTagConstants::JSON_DISPLAY_ID)) {
+        return false;
+    }
+    if (!ParseCrossAxisState(jsonSrc, JsonTagConstants::JSON_CROSS_AXIS_STATE)) {
+        return false;
+    }
+
     return true;
 }
 
@@ -353,6 +400,8 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         { JsonTagConstants::JSON_BG_TAG, bg_ },
     };
     jsonRes[JsonTagConstants::JSON_WINDOW_ID] = windowId_;
+    jsonRes[JsonTagConstants::JSON_DISPLAY_ID] = displayId_;
+    jsonRes[JsonTagConstants::JSON_CROSS_AXIS_STATE] = crossAxisState_;
 }
 
 std::string SecCompBase::ToJsonStr() const

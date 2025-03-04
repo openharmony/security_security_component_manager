@@ -34,7 +34,7 @@ public:
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo);
     int32_t UnregisterSecurityComponent(int32_t scId);
     int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        const std::string& componentInfo, const SecCompClickEvent& clickInfo,
+        const std::string& componentInfo, SecCompClickEvent& clickInfo,
         sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
     sptr<IRemoteObject> GetEnhanceRemoteObject(bool doLoadSa);

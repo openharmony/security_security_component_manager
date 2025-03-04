@@ -23,7 +23,6 @@
 #include "save_button.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
-#include "sec_comp_service.h"
 #include "sec_comp_tool.h"
 #include "window_info_helper.h"
 
@@ -77,10 +76,10 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     return comp;
 }
 
-static bool GetScreenSize(double& width, double& height)
+static bool GetScreenSize(double& width, double& height, const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDefaultDisplaySync();
+        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;
@@ -93,17 +92,22 @@ static bool GetScreenSize(double& width, double& height)
     }
 
     width = static_cast<double>(info->GetWidth());
-    height = static_cast<double>(info->GetHeight());
+    if (crossAxisState == CrossAxisState::STATE_CROSS) {
+        height = static_cast<double>(info->GetPhysicalHeight());
+    } else {
+        height = static_cast<double>(info->GetHeight());
+    }
     SC_LOG_DEBUG(LABEL, "display manager Screen width %{public}f height %{public}f",
         width, height);
     return true;
 }
 
-bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect)
+bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect,
+    const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     double curScreenWidth = 0.0F;
     double curScreenHeight = 0.0F;
-    if (!GetScreenSize(curScreenWidth, curScreenHeight)) {
+    if (!GetScreenSize(curScreenWidth, curScreenHeight, displayId, crossAxisState)) {
         SC_LOG_ERROR(LABEL, "Get screen size is invalid");
         return false;
     }
@@ -119,15 +123,15 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    if (GreatOrEqual((rect.x_ + rect.width_), curScreenWidth) ||
-        GreatOrEqual((rect.y_ + rect.height_), curScreenHeight)) {
+    if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + 1.0) ||
+        GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + 1.0)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         return false;
     }
 
-    if (GreatNotEqual(windowRect.x_, rect.x_) || GreatNotEqual(windowRect.y_, rect.y_) ||
-        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_) ||
-        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_)) {
+    if (GreatNotEqual(windowRect.x_, rect.x_ + 1.0) || GreatNotEqual(windowRect.y_, rect.y_ + 1.0) ||
+        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_ + 1.0) ||
+        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_ + 1.0)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         return false;
     }
@@ -227,59 +231,6 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp)
     }
 
     return true;
-}
-
-int32_t SecCompInfoHelper::GrantTempPermission(AccessToken::AccessTokenID tokenId,
-    const std::shared_ptr<SecCompBase>& componentInfo)
-{
-    if ((tokenId <= 0) || (componentInfo == nullptr)) {
-        SC_LOG_ERROR(LABEL, "Grant component is null");
-        return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-    }
-
-    SecCompType type = componentInfo->type_;
-    int32_t res;
-    switch (type) {
-        case LOCATION_COMPONENT:
-            {
-                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId,
-                    "ohos.permission.APPROXIMATELY_LOCATION");
-                if (res != SC_OK) {
-                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-                }
-                res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.LOCATION");
-                if (res != SC_OK) {
-                    SecCompPermManager::GetInstance().RevokeAppPermission(
-                        tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
-                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-                }
-                SC_LOG_INFO(LABEL, "Grant location permission, scid = %{public}d.", componentInfo->nodeId_);
-                return SC_OK;
-            }
-        case PASTE_COMPONENT:
-            res = SecCompPermManager::GetInstance().GrantAppPermission(tokenId, "ohos.permission.SECURE_PASTE");
-            if (res != SC_OK) {
-                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-            }
-            SC_LOG_INFO(LABEL, "Grant paste permission, scid = %{public}d.", componentInfo->nodeId_);
-            return SC_OK;
-        case SAVE_COMPONENT:
-            if (IsDlpSandboxCalling(tokenId)) {
-                SC_LOG_INFO(LABEL, "Dlp sandbox app are not allowed to use save component.");
-                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-            }
-            SC_LOG_INFO(LABEL, "Grant save permission, scid = %{public}d.", componentInfo->nodeId_);
-            return SecCompPermManager::GetInstance().GrantTempSavePermission(tokenId);
-        default:
-            SC_LOG_ERROR(LABEL, "Parse component type unknown");
-            break;
-    }
-    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
-}
-
-inline bool SecCompInfoHelper::IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
-{
-    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

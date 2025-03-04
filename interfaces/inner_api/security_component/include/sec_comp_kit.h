@@ -30,7 +30,7 @@ public:
     static int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo);
     static int32_t UnregisterSecurityComponent(int32_t scId);
     static int32_t ReportSecurityComponentClickEvent(int32_t scId,
-        std::string& componentInfo, const SecCompClickEvent& clickInfo,
+        std::string& componentInfo, SecCompClickEvent& clickInfo,
         sptr<IRemoteObject> callerToken,
         OnFirstUseDialogCloseFunc&& callback);
     static bool VerifySavePermission(AccessToken::AccessTokenID tokenId);

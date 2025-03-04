@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-class SecEventHandler : public AppExecFwk::EventHandler {
+class __attribute__((visibility("default"))) SecEventHandler : public AppExecFwk::EventHandler {
 public:
     explicit SecEventHandler(const std::shared_ptr<AppExecFwk::EventRunner>& runner);
     ~SecEventHandler() override;

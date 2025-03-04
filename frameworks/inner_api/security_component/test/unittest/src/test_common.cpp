@@ -71,6 +71,8 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
 }
 
 void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
@@ -127,6 +129,8 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
 }
 
 void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
@@ -183,6 +187,8 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

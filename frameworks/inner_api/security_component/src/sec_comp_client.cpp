@@ -83,7 +83,7 @@ int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
 }
 
 int32_t SecCompClient::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
+    const std::string& componentInfo, SecCompClickEvent& clickInfo,
     sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
 {
     auto proxy = GetProxy(true);

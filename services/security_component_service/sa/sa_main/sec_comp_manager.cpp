@@ -16,6 +16,9 @@
 
 #include "bundle_mgr_client.h"
 #include "delay_exit_task.h"
+#include "display.h"
+#include "display_info.h"
+#include "display_manager.h"
 #include "hisysevent.h"
 #include "i_sec_comp_service.h"
 #include "ipc_skeleton.h"
@@ -460,7 +463,8 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
-    if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_))) {
+    if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
+        report->displayId_, report->crossAxisState_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
@@ -493,15 +497,35 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
 }
 
-int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
-    const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller,
-    const SecCompClickEvent& clickInfo, const std::vector<sptr<IRemoteObject>>& remote)
+void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
+{
+    if (crossAxisState == CrossAxisState::STATE_INVALID) {
+        return;
+    }
+    if (superFoldOffsetY_ != 0) {
+        return;
+    }
+    auto foldCreaseRegion = OHOS::Rosen::DisplayManager::GetInstance().GetCurrentFoldCreaseRegion();
+    if (foldCreaseRegion == nullptr) {
+        SC_LOG_ERROR(LABEL, "foldCreaseRegion is nullptr");
+        return;
+    }
+    const auto& creaseRects = foldCreaseRegion->GetCreaseRects();
+    if (creaseRects.empty()) {
+        SC_LOG_ERROR(LABEL, "creaseRects is empty");
+        return;
+    }
+    const auto& rect = creaseRects.front();
+    superFoldOffsetY_ = rect.height_ + rect.posY_;
+    SC_LOG_INFO(LABEL, "height: %{public}d, posY: %{public}d", rect.height_, rect.posY_);
+}
+
+int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& compJson,
+    const SecCompCallerInfo& caller, SecCompClickEvent& clickInfo, const std::vector<sptr<IRemoteObject>>& remote)
 {
     if (remote.size() < REPORT_REMOTE_OBJECT_SIZE) {
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
-    auto callerToken = remote[0];
-    auto dialogCallback = remote[1];
 
     if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
@@ -515,12 +539,18 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
 
-    int32_t res = CheckClickSecurityComponentInfo(sc, scId, jsonComponent, caller);
+    int32_t res = CheckClickSecurityComponentInfo(sc, scId, compJson, caller);
     if (res != SC_OK) {
         return res;
     }
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson);
+    if (report == nullptr) {
+        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+    }
 
-    res = sc->CheckClickInfo(clickInfo);
+    GetFoldOffsetY(report->crossAxisState_);
+
+    res = sc->CheckClickInfo(clickInfo, superFoldOffsetY_, report->crossAxisState_);
     if (res != SC_OK) {
         ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
             scId, sc->GetType());
@@ -531,8 +561,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(int32_t scId,
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, callerToken, dialogCallback) ==
-        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
+    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], report->displayId_,
+        report->crossAxisState_) == SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
@@ -586,7 +616,10 @@ bool SecCompManager::Initialize()
     }
 
     secHandler_ = std::make_shared<SecEventHandler>(secRunner_);
-    DelayExitTask::GetInstance().Init(secHandler_);
+    exitSaProcessFunc_ = []() {
+        SecCompManager::GetInstance().ExitSaProcess();
+    };
+    DelayExitTask::GetInstance().Init(secHandler_, exitSaProcessFunc_);
     FirstUseDialog::GetInstance().Init(secHandler_);
     SecCompEnhanceAdapter::EnableInputEnhance();
     SecCompPermManager::GetInstance().InitEventHandler(secHandler_);

@@ -230,7 +230,7 @@ int32_t SecCompProxy::SendReportClickEventRequest(MessageParcel& data)
 }
 
 int32_t SecCompProxy::ReportSecurityComponentClickEvent(int32_t scId,
-    const std::string& componentInfo, const SecCompClickEvent& clickInfo,
+    const std::string& componentInfo, SecCompClickEvent& clickInfo,
     sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
 {
     std::lock_guard<std::mutex> lock(useIPCMutex_);

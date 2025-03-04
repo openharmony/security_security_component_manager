@@ -44,7 +44,7 @@ public:
     };
 
     int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo,
-        const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCall) override
+        SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCall) override
     {
         return 0;
     };

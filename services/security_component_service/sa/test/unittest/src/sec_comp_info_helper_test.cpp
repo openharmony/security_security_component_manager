@@ -149,36 +149,36 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
 
     rect.x_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.x_ = g_testWidth;
 
     rect.y_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.y_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.x_ = g_testWidth;
 
     rect.y_ = g_curScreenHeight + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.y_ = g_testHeight;
 
     rect.width_ = g_curScreenWidth;
     rect.height_ = g_curScreenHeight;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.width_ = g_testWidth;
     rect.height_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth - g_testWidth;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.x_ = g_testWidth;
     rect.y_ = g_curScreenHeight - g_testHeight;
 
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     rect.y_ = g_testHeight;
 }
 
@@ -192,30 +192,30 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
-    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
 
-    windowRect.x_ = g_testWidth + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.x_ = g_testWidth + 2.0;
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.x_ = g_testWidth;
 
-    windowRect.y_ = g_testHeight + 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.y_ = g_testHeight + 2.0;
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.y_ = g_testHeight;
 
-    windowRect.width_ = g_testWidth - 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.width_ = g_testWidth - 2.0;
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.width_ = g_testWidth;
 
-    windowRect.height_ = g_testHeight - 1;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    windowRect.height_ = g_testHeight - 2.0;
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.height_ = g_testHeight;
 
     windowRect.width_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.width_ = g_testWidth;
 
     windowRect.height_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect));
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, 0, CrossAxisState::STATE_INVALID));
     windowRect.height_ = g_testHeight;
 }
 
@@ -597,35 +597,6 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level1)
 
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
     ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp));
-}
-
-/**
- * @tc.name: DLP-GrantTempPermission001
- * @tc.desc: Test DLP sandbox app grant save button
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompInfoHelperTest, GrantTempPermission001, TestSize.Level1)
-{
-    OHOS::Security::AccessToken::AccessTokenIDInner tokenInner = {
-        .tokenUniqueID = 0x00001,
-        .res = 1,
-        .dlpFlag = 1,
-        .type = OHOS::Security::AccessToken::TOKEN_HAP,
-        .version = 0,
-    };
-    OHOS::Security::AccessToken::AccessTokenID *tokenid =
-        reinterpret_cast<OHOS::Security::AccessToken::AccessTokenID *>(&tokenInner);
-    ASSERT_NE(0, *tokenid);
-
-    nlohmann::json jsonComponent;
-    ServiceTestCommon::BuildSaveComponentJson(jsonComponent);
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(SAVE_COMPONENT, jsonComponent);
-    ASSERT_NE(nullptr, comp);
-    std::shared_ptr<SecCompBase> shared_comp(comp);
-
-    EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
-        SecCompInfoHelper::GrantTempPermission(*tokenid, shared_comp));
 }
 
 /**

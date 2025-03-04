@@ -15,6 +15,7 @@
 #ifndef SECURITY_COMPONENT_MANAGER_H
 #define SECURITY_COMPONENT_MANAGER_H
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -57,7 +58,7 @@ public:
         const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t ReportSecurityComponentClickEvent(int32_t scId, const nlohmann::json& jsonComponent,
-        const SecCompCallerInfo& caller, const SecCompClickEvent& clickInfo,
+        const SecCompCallerInfo& caller, SecCompClickEvent& clickInfo,
         const std::vector<sptr<IRemoteObject>>& remote);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
@@ -81,17 +82,20 @@ private:
     void SendCheckInfoEnhanceSysEvent(int32_t scId,
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();
+    void GetFoldOffsetY(const CrossAxisState crossAxisState);
 
     OHOS::Utils::RWLock componentInfoLock_;
     std::mutex scIdMtx_;
     std::unordered_map<int32_t, ProcessCompInfos> componentMap_;
     int32_t scIdStart_;
     bool isSaExit_ = false;
+    int32_t superFoldOffsetY_ = 0;
 
     std::shared_ptr<AppExecFwk::EventRunner> secRunner_;
     std::shared_ptr<SecEventHandler> secHandler_;
     SecCompMaliciousApps malicious_;
 
+    std::function<void ()> exitSaProcessFunc_ = []() { return; };
     DISALLOW_COPY_AND_MOVE(SecCompManager);
 };
 }  // namespace SecurityComponent
