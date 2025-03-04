@@ -469,7 +469,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             sc->GetType());
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
-    if (report && (report->isClipped_)) {
+    if (report && (report->isClipped_ || report->hasNonCompatileChange_)) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLIP_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY,
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
