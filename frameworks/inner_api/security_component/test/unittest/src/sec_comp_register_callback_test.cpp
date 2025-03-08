@@ -61,7 +61,7 @@ static __attribute__((noinline)) int32_t RegisterSecurityComponent(
 
 static __attribute__((noinline)) int32_t ReportSecurityComponentClickEvent(
     int32_t scId, std::string& componentInfo,
-    const SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc dialogCall)
+    SecCompClickEvent& clickInfo, sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc dialogCall)
 {
     SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEvent enter");
     return SecCompKit::ReportSecurityComponentClickEvent(scId, componentInfo, clickInfo, callerToken,

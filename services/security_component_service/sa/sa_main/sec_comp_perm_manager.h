@@ -32,6 +32,8 @@ public:
     virtual ~SecCompPermManager() = default;
     static SecCompPermManager& GetInstance();
 
+    int32_t GrantTempPermission(AccessToken::AccessTokenID tokenId,
+        const std::shared_ptr<SecCompBase>& componentInfo);
     int32_t GrantTempSavePermission(AccessToken::AccessTokenID tokenId);
     void RevokeTempSavePermission(AccessToken::AccessTokenID tokenId);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
@@ -57,6 +59,7 @@ private:
         const std::string& permissionName);
     void RemoveAppGrantPermissionRecord(AccessToken::AccessTokenID tokenId,
         const std::string& permissionName);
+    bool IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId);
 
     std::unordered_map<AccessToken::AccessTokenID, int32_t> applySaveCountMap_;
     std::unordered_map<AccessToken::AccessTokenID, std::deque<std::string>> saveTaskDequeMap_;

@@ -23,7 +23,6 @@ ohos_fuzztest("UpdateSecurityComponentFuzzTest") {
 
   include_dirs = [
     "${sec_comp_dir}/frameworks/common/include",
-    "${sec_comp_dir}/services/security_component_service/sa/sa_main",
     "${sec_comp_dir}/test/fuzztest/security_component/common",
   ]
   cflags = [
@@ -41,8 +40,8 @@ ohos_fuzztest("UpdateSecurityComponentFuzzTest") {
   ]
 
   deps = [
-    "${sec_comp_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk",
-    "${sec_comp_dir}/services/security_component_service/sa:security_component_service",
+    "${sec_comp_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk",
+    "${sec_comp_dir}/services/security_component_service/sa:security_component_common",
   ]
 
   external_deps = [

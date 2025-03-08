@@ -62,6 +62,12 @@ union SecCompColor {
     uint32_t value;
 };
 
+enum CrossAxisState {
+    STATE_INVALID = 0,
+    STATE_CROSS,
+    STATE_NO_CROSS,
+};
+
 inline bool IsComponentTypeValid(int32_t type)
 {
     return (type > UNKNOWN_SC_TYPE && type < MAX_SC_TYPE);

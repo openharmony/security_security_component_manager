@@ -25,14 +25,17 @@ ohos_unittest("sec_comp_enhance_sdk_test") {
     debug = false
   }
   branch_protector_ret = "pac_ret"
-  include_dirs = [ "unittest/src" ]
+  include_dirs = [
+    "unittest/src",
+    "${sec_comp_root_dir}/frameworks/common/include",
+  ]
 
   sources = [ "unittest/src/sec_comp_enhance_test.cpp" ]
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
-  deps = [ "${sec_comp_root_dir}/interfaces/inner_api/security_component:libsecurity_component_sdk" ]
+  deps = [ "${sec_comp_root_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk" ]
 
   external_deps = [
     "c_utils:utils",

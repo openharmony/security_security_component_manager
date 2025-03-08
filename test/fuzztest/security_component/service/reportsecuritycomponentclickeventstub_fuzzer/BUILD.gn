@@ -39,7 +39,7 @@ ohos_fuzztest("ReportSecurityComponentClickEventStubFuzzTest") {
 
   sources += sc_service_sources
   sources += sc_mock_sources
-  sources += [ "${sec_comp_dir}/interfaces/inner_api/security_component/src/sec_comp_dialog_callback.cpp" ]
+  sources += [ "${sec_comp_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback.cpp" ]
 
   deps = sc_deps
 

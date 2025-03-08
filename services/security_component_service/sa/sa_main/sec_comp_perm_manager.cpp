@@ -260,6 +260,57 @@ void SecCompPermManager::InitEventHandler(const std::shared_ptr<SecEventHandler>
 {
     secHandler_ = secHandler;
 }
+
+int32_t SecCompPermManager::GrantTempPermission(AccessToken::AccessTokenID tokenId,
+    const std::shared_ptr<SecCompBase>& componentInfo)
+{
+    if ((tokenId <= 0) || (componentInfo == nullptr)) {
+        SC_LOG_ERROR(LABEL, "Grant component is null");
+        return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+    }
+
+    SecCompType type = componentInfo->type_;
+    int32_t res;
+    switch (type) {
+        case LOCATION_COMPONENT:
+            {
+                res = GrantAppPermission(tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
+                if (res != SC_OK) {
+                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+                }
+                res = GrantAppPermission(tokenId, "ohos.permission.LOCATION");
+                if (res != SC_OK) {
+                    RevokeAppPermission(tokenId, "ohos.permission.APPROXIMATELY_LOCATION");
+                    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+                }
+                SC_LOG_INFO(LABEL, "Grant location permission, scid = %{public}d.", componentInfo->nodeId_);
+                return SC_OK;
+            }
+        case PASTE_COMPONENT:
+            res = GrantAppPermission(tokenId, "ohos.permission.SECURE_PASTE");
+            if (res != SC_OK) {
+                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+            }
+            SC_LOG_INFO(LABEL, "Grant paste permission, scid = %{public}d.", componentInfo->nodeId_);
+            return SC_OK;
+        case SAVE_COMPONENT:
+            if (IsDlpSandboxCalling(tokenId)) {
+                SC_LOG_INFO(LABEL, "Dlp sandbox app are not allowed to use save component.");
+                return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+            }
+            SC_LOG_INFO(LABEL, "Grant save permission, scid = %{public}d.", componentInfo->nodeId_);
+            return GrantTempSavePermission(tokenId);
+        default:
+            SC_LOG_ERROR(LABEL, "Parse component type unknown");
+            break;
+    }
+    return SC_SERVICE_ERROR_PERMISSION_OPER_FAIL;
+}
+
+inline bool SecCompPermManager::IsDlpSandboxCalling(AccessToken::AccessTokenID tokenId)
+{
+    return AccessToken::AccessTokenKit::GetHapDlpFlag(tokenId) != 0;
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

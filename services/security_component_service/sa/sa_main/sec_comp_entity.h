@@ -46,7 +46,9 @@ public:
     }
 
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
-    int32_t CheckClickInfo(const SecCompClickEvent& clickInfo) const;
+    int32_t CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
+        const CrossAxisState crossAxisState) const;
+    bool IsInPCVirtualScreen(const CrossAxisState crossAxisState) const;
 
     std::shared_ptr<SecCompBase> componentInfo_;
     AccessToken::AccessTokenID tokenId_;
@@ -56,7 +58,8 @@ public:
 
 private:
     int32_t CheckKeyEvent(const SecCompClickEvent& clickInfo) const;
-    int32_t CheckPointEvent(const SecCompClickEvent& clickInfo) const;
+    int32_t CheckPointEvent(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
+        const CrossAxisState crossAxisState) const;
     bool isGrant_ = false;
 };
 }  // namespace SecurityComponent

@@ -102,7 +102,7 @@ int32_t SecCompKit::UnregisterSecurityComponent(int32_t scId)
 }
 
 int32_t SecCompKit::ReportSecurityComponentClickEvent(int32_t scId,
-    std::string& componentInfo, const SecCompClickEvent& clickInfo,
+    std::string& componentInfo, SecCompClickEvent& clickInfo,
     sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback)
 {
     if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(

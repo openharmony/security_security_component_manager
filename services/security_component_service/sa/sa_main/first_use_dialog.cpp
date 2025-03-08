@@ -22,13 +22,15 @@
 #include "ability_manager_client.h"
 #include "accesstoken_kit.h"
 #include "bundle_mgr_client.h"
+#include "display.h"
+#include "display_info.h"
+#include "display_manager.h"
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "sec_comp_dialog_callback_proxy.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
 #include "want_params_wrapper.h"
-#include "want.h"
 
 namespace OHOS {
 namespace Security {
@@ -47,7 +49,11 @@ const std::string TYPE_KEY = "ohos.user.security.type";
 const std::string TOKEN_KEY = "ohos.ability.params.token";
 const std::string CALLBACK_KEY = "ohos.ability.params.callback";
 const std::string CALLER_UID_KEY = "ohos.caller.uid";
+const std::string DISPLAY_WIDTH = "ohos.display.width";
+const std::string DISPLAY_HEIGHT = "ohos.display.height";
+const std::string DIALOG_OFFSET = "ohos.dialog.offset";
 
+constexpr int32_t DISPLAY_HALF_RATIO = 2;
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
@@ -288,8 +294,40 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     return res;
 }
 
-void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+bool FirstUseDialog::SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState)
+{
+    sptr<OHOS::Rosen::Display> display =
+        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
+    if (display == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get display manager failed");
+        return false;
+    }
+
+    auto info = display->GetDisplayInfo();
+    if (info == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get display info failed");
+        return false;
+    }
+    /* crossAxisState is INVALID or NO_CROSS */
+    int32_t width = info->GetWidth();
+    int32_t height = info->GetHeight();
+    int32_t offset = 0;
+    /* crossAxisState is CROSS */
+    if (crossAxisState == CrossAxisState::STATE_CROSS) {
+        height = info->GetPhysicalHeight();
+        offset = static_cast<int32_t>(info->GetAvailableHeight()) / DISPLAY_HALF_RATIO;
+    }
+    SC_LOG_INFO(LABEL, "Display info width %{public}d height %{public}d, dialog offset %{public}d",
+        width, height, offset);
+
+    want.SetParam(DISPLAY_WIDTH, width);
+    want.SetParam(DISPLAY_HEIGHT, height);
+    want.SetParam(DIALOG_OFFSET, offset);
+    return true;
+}
+
+void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+    sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     int32_t typeNum;
     SecCompType type = entity->GetType();
@@ -316,6 +354,11 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity,
     want.SetParam(CALLBACK_KEY, srvCallback);
     int32_t uid = IPCSkeleton::GetCallingUid();
     want.SetParam(CALLER_UID_KEY, uid);
+    if (!SetDialogInfo(want, displayId, crossAxisState)) {
+        SC_LOG_ERROR(LABEL, "Set dialog info failed.");
+        return;
+    }
+
     int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
     SC_LOG_INFO(LABEL, "start ability res %{public}d", startRes);
     if (startRes != 0) {
@@ -365,8 +408,8 @@ bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
     return true;
 }
 
-int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity,
-    sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback)
+int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+    sptr<IRemoteObject> dialogCallback, const uint64_t displayId, const CrossAxisState crossAxisState)
 {
     if (entity == nullptr) {
         SC_LOG_ERROR(LABEL, "Entity is invalid.");
@@ -402,7 +445,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     auto iter = firstUseMap_.find(tokenId);
     if (iter == firstUseMap_.end()) {
         SC_LOG_INFO(LABEL, "has not use record, start dialog");
-        StartDialogAbility(entity, callerToken, dialogCallback);
+        StartDialogAbility(entity, callerToken, dialogCallback, displayId, crossAxisState);
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
 
@@ -411,7 +454,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
         SC_LOG_INFO(LABEL, "no need notify again.");
         return SC_OK;
     }
-    StartDialogAbility(entity, callerToken, dialogCallback);
+    StartDialogAbility(entity, callerToken, dialogCallback, displayId, crossAxisState);
     return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
 }
 
