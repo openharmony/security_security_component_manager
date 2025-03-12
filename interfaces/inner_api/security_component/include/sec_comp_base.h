@@ -87,6 +87,8 @@ public:
     static const std::string JSON_WINDOW_ID;
     static const std::string JSON_DISPLAY_ID;
     static const std::string JSON_CROSS_AXIS_STATE;
+    static const std::string JSON_IS_ICON_EXCEEDED_TAG;
+    static const std::string JSON_IS_BORDER_COVERED_TAG;
     static const std::string JSON_NON_COMPATIBLE_CHANGE_TAG;
     static const std::string JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG;
 };
@@ -148,6 +150,8 @@ public:
     uint64_t displayId_ = 0;
     int32_t nodeId_ = 0;
     CrossAxisState crossAxisState_ = CrossAxisState::STATE_INVALID;
+    bool isIconExceeded_ = false;
+    bool isBorderCovered_ = false;
     bool isWearableDevice_ = false;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;

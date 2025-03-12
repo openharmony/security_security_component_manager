@@ -83,6 +83,8 @@ void ServiceTestCommon::BuildLocationComponentJson(nlohmann::json& jsonComponent
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_BORDER_COVERED_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
 }
@@ -152,6 +154,8 @@ void ServiceTestCommon::BuildSaveComponentJson(nlohmann::json& jsonComponent)
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_BORDER_COVERED_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
 }
@@ -221,6 +225,8 @@ void ServiceTestCommon::BuildPasteComponentJson(nlohmann::json& jsonComponent)
     jsonComponent[JsonTagConstants::JSON_WINDOW_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_DISPLAY_ID] = 0;
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_BORDER_COVERED_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
 }
