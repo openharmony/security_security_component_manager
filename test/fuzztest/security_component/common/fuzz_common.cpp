@@ -102,6 +102,9 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -150,6 +153,9 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -198,6 +204,9 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     jsonComponent[JsonTagConstants::JSON_CROSS_AXIS_STATE] = 0;
     jsonComponent[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG] = 0.0;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }

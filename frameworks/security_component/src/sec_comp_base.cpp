@@ -72,6 +72,9 @@ const std::string JsonTagConstants::JSON_DISPLAY_ID = "displayId";
 const std::string JsonTagConstants::JSON_CROSS_AXIS_STATE = "crossAxisState";
 const std::string JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG = "hasNonCompatileChange";
 const std::string JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG = "blurRadius";
+const std::string JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG = "foregroundBlurRadius";
+const std::string JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG = "isOverlayTextSet";
+const std::string JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG = "isOVerlayNodeCovered";
 
 bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
 {
@@ -83,6 +86,18 @@ bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
     hasNonCompatileChange_ = json.at(tag).get<bool>();
 
     if (!ParseDimension(json, JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG, blurRadius_)) {
+        return false;
+    }
+    
+    if (!ParseDimension(json, JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG, foregroundBlurRadius_)) {
+        return false;
+    }
+    
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG, isOverlayTextSet_)) {
+        return false;
+    }
+    
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG, isOverlayNodeCovered_)) {
         return false;
     }
 
@@ -482,6 +497,9 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     jsonRes[JsonTagConstants::JSON_CROSS_AXIS_STATE] = crossAxisState_;
     jsonRes[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = hasNonCompatileChange_;
     jsonRes[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = blurRadius_;
+    jsonRes[JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG] = foregroundBlurRadius_;
+    jsonRes[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = isOverlayTextSet_;
+    jsonRes[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = isOverlayNodeCovered_;
 }
 
 std::string SecCompBase::ToJsonStr() const
