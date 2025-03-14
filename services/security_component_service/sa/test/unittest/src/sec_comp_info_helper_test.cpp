@@ -190,6 +190,9 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
 
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
     rect.y_ = g_testHeight;
+
+    screenInfo.isWearable = true;
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message));
 }
 
 /**
