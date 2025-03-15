@@ -97,6 +97,11 @@ int32_t SecCompEntity::CheckClickInfo(const SecCompClickEvent& clickInfo) const
     }
 
     res = SecCompEnhanceAdapter::CheckExtraInfo(clickInfo);
+    if (res == SC_SERVICE_ERROR_CLICK_EVENT_INVALID) {
+        SC_LOG_ERROR(LABEL, "Click ExtraInfo is invalid");
+        return res;
+    }
+
     if ((res != SC_OK) && (res != SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE)) {
         SC_LOG_ERROR(LABEL, "HMAC checkout failed");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLICK_INFO_CHECK_FAILED",

@@ -100,6 +100,10 @@ int32_t SecCompEnhanceAdapter::CheckExtraInfo(const SecCompClickEvent& clickInfo
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
+        if (clickInfo.extraInfo.dataSize == 0 || clickInfo.extraInfo.data == nullptr) {
+            SC_LOG_ERROR(LABEL, "HMAC info is invalid");
+            return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+        }
         return srvHandler->CheckExtraInfo(clickInfo);
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
