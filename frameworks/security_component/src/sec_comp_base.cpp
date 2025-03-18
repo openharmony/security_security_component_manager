@@ -70,6 +70,8 @@ const std::string JsonTagConstants::JSON_BG_TAG = "bg";
 const std::string JsonTagConstants::JSON_WINDOW_ID = "windowId";
 const std::string JsonTagConstants::JSON_DISPLAY_ID = "displayId";
 const std::string JsonTagConstants::JSON_CROSS_AXIS_STATE = "crossAxisState";
+const std::string JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG = "isIconExceeded";
+const std::string JsonTagConstants::JSON_IS_BORDER_COVERED_TAG = "isBorderCovered";
 const std::string JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG = "hasNonCompatileChange";
 const std::string JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG = "blurRadius";
 
@@ -82,6 +84,12 @@ bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
     }
     hasNonCompatileChange_ = json.at(tag).get<bool>();
 
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG, isIconExceeded_)) {
+        return false;
+    }
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_BORDER_COVERED_TAG, isBorderCovered_)) {
+        return false;
+    }
     if (!ParseDimension(json, JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG, blurRadius_)) {
         return false;
     }
@@ -480,6 +488,8 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     jsonRes[JsonTagConstants::JSON_WINDOW_ID] = windowId_;
     jsonRes[JsonTagConstants::JSON_DISPLAY_ID] = displayId_;
     jsonRes[JsonTagConstants::JSON_CROSS_AXIS_STATE] = crossAxisState_;
+    jsonRes[JsonTagConstants::JSON_IS_ICON_EXCEEDED_TAG] = isIconExceeded_;
+    jsonRes[JsonTagConstants::JSON_IS_BORDER_COVERED_TAG] = isBorderCovered_;
     jsonRes[JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG] = hasNonCompatileChange_;
     jsonRes[JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG] = blurRadius_;
 }
