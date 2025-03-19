@@ -91,6 +91,9 @@ public:
     static const std::string JSON_IS_BORDER_COVERED_TAG;
     static const std::string JSON_NON_COMPATIBLE_CHANGE_TAG;
     static const std::string JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG;
+    static const std::string JSON_FOREGROUND_BLUR_RADIUS_TAG;
+    static const std::string JSON_IS_OVERLAY_TEXT_SET_TAG;
+    static const std::string JSON_IS_OVERLAY_NODE_SET_TAG;
 };
 
 class __attribute__((visibility("default"))) SecCompBase {
@@ -146,6 +149,9 @@ public:
 
     bool hasNonCompatileChange_ = false;
     double blurRadius_ = 0.0;
+    double foregroundBlurRadius_ = 0.0;
+    bool isOverlayTextSet_ = false;
+    bool isOverlayNodeCovered_ = false;
     int32_t windowId_ = 0;
     uint64_t displayId_ = 0;
     int32_t nodeId_ = 0;
