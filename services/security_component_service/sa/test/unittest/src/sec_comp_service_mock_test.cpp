@@ -75,7 +75,7 @@ void SecCompServiceMockTest::TearDown()
  * @tc.name: RegisterSecurityComponent001
  * @tc.desc: Test register security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
 {
@@ -124,7 +124,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
  * @tc.name: RegisterSecurityComponent002
  * @tc.desc: Test register security component check touch info failed
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
 {
@@ -159,7 +159,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
  * @tc.name: RegisterSecurityComponent003
  * @tc.desc: Test register security component permission grant failed
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
 {
@@ -200,7 +200,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
  * @tc.name: ReportSecurityComponentClickEvent001
  * @tc.desc: Test register security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
 {
@@ -261,7 +261,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
  * @tc.name: ReportSecurityComponentClickEvent002
  * @tc.desc: Test verify location permission
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
 {
