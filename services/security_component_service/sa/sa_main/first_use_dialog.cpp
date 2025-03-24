@@ -164,7 +164,7 @@ bool FirstUseDialog::ParseRecord(nlohmann::json& jsonRes,
     }
     id = jsonRes.at(TOKEN_ID_TAG).get<uint32_t>();
     if (id == AccessToken::INVALID_TOKENID) {
-        SC_LOG_ERROR(LABEL, "TokenId is not invalid.");
+        SC_LOG_ERROR(LABEL, "TokenId is invalid.");
         return false;
     }
 
