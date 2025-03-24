@@ -82,6 +82,7 @@ ohos_source_set("security_component_no_cfi_enhance_sdk_src_set") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
   ]
 
   cflags_cc = [

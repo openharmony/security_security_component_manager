@@ -94,9 +94,8 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
   ]
-
-  public_external_deps = [ "json:nlohmann_json_static" ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",
@@ -124,9 +123,8 @@ ohos_source_set("security_component_enhance_adapter_service_src_set") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
   ]
-
-  public_external_deps = [ "json:nlohmann_json_static" ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",
@@ -193,9 +191,8 @@ ohos_source_set("security_component_no_cfi_enhance_adapter_src_set") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
   ]
-
-  public_external_deps = [ "json:nlohmann_json_static" ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",

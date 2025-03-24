@@ -38,6 +38,7 @@ ohos_unittest("sec_comp_enhance_adapter_test") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "json:nlohmann_json_static",
   ]
 }
 
