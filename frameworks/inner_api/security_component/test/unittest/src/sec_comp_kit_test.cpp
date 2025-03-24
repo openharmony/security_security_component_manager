@@ -92,7 +92,7 @@ void SecCompKitTest::TearDown()
  * @tc.name: ExceptCall001
  * @tc.desc: do kit except call.
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
 {
@@ -140,7 +140,7 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
  * @tc.name: ExceptCall001
  * @tc.desc: test caller check.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JS
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level1)
 {
@@ -165,7 +165,7 @@ HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level1)
  * @tc.name: ExceptCall002
  * @tc.desc: test invalid caller register.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JS
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, TestCallerCheck002, TestSize.Level1)
 {
@@ -188,7 +188,7 @@ HWTEST_F(SecCompKitTest, TestCallerCheck002, TestSize.Level1)
  * @tc.name: RegisterWithoutCallback001
  * @tc.desc: test register without callback.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JM
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
 {
@@ -213,7 +213,7 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
  * @tc.name: FinishStartSAFail001
  * @tc.desc: Test update security component caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level1)
 {
@@ -228,7 +228,7 @@ HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level1)
  * @tc.name: OnLoadSystemAbilitySuccess001
  * @tc.desc: Test update security component caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompKitTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
 {

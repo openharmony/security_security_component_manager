@@ -65,7 +65,7 @@ void SecCompEntityTest::TearDown()
  * @tc.name: GrantTempPermission001
  * @tc.desc: Test grant location permission
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompEntityTest, GrantTempPermission001, TestSize.Level1)
 {
@@ -89,7 +89,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission001, TestSize.Level1)
  * @tc.name: GrantTempPermission002
  * @tc.desc: Test grant paste permission with invalid tokenId.
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
 {
@@ -106,7 +106,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
  * @tc.name: CheckClickInfo001
  * @tc.desc: Test touch info
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
 {
@@ -173,7 +173,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
  * @tc.name: CompareComponentBasicInfo001
  * @tc.desc: Test Basic info
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
 {
@@ -189,7 +189,7 @@ HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
  * @tc.name: CheckKeyEvent001
  * @tc.desc: Test CheckKeyEvent
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level1)
 {
