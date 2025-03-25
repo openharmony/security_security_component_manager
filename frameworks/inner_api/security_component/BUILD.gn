@@ -67,6 +67,7 @@ ohos_shared_library("libsecurity_component_sdk") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_core",
+    "json:nlohmann_json_static",
     "samgr:samgr_proxy",
   ]
 
