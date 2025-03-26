@@ -59,15 +59,30 @@ SecCompManager& SecCompManager::GetInstance()
     }
     return *instance;
 }
+bool SecCompManager::IsScIdExist(int32_t scId)
+{
+    OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
+    for (auto it = componentMap_.begin(); it != componentMap_.end(); ++it) {
+        for (auto iter = it->second.compList.begin(); iter != it->second.compList.end(); ++iter) {
+            std::shared_ptr<SecCompEntity> sc = *iter;
+            if (sc != nullptr && scId == sc->scId_) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 int32_t SecCompManager::CreateScId()
 {
     std::lock_guard<std::mutex> lock(scIdMtx_);
-    if (scIdStart_ == MAX_INT_NUM) {
-        scIdStart_ = SC_ID_START;
-    } else {
-        scIdStart_++;
-    }
+    do {
+        if (scIdStart_ == MAX_INT_NUM) {
+            scIdStart_ = SC_ID_START;
+        } else {
+            scIdStart_++;
+        }
+    } while (IsScIdExist(scIdStart_));
     return scIdStart_;
 }
 
