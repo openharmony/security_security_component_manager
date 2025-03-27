@@ -147,7 +147,7 @@ public:
     int32_t icon_ = UNKNOWN_ICON;
     SecCompBackground bg_ = SecCompBackground::UNKNOWN_BG;
 
-    bool hasNonCompatileChange_ = false;
+    bool hasNonCompatibleChange_ = false;
     double blurRadius_ = 0.0;
     double foregroundBlurRadius_ = 0.0;
     bool isOverlayTextSet_ = false;
