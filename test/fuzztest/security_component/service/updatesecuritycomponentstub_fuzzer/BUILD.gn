@@ -30,7 +30,10 @@ ohos_fuzztest("UpdateSecurityComponentStubFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  configs = [ "${sec_comp_dir}/config:coverage_flags" ]
+  configs = [
+    "${sec_comp_dir}/config:coverage_flags",
+    "${sec_comp_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
+  ]
 
   cflags_cc = [ "-DHILOG_ENABLE" ]
   cflags_cc += sc_cflags_cc

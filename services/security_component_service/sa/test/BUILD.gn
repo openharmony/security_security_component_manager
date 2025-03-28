@@ -20,6 +20,7 @@ ohos_unittest("sec_comp_service_test") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   module_out_path = part_name + "/" + part_name
+
   include_dirs = [
     "${sec_comp_root_dir}/frameworks/common/include",
     "${sec_comp_root_dir}/frameworks/enhance_adapter/include",
@@ -42,7 +43,6 @@ ohos_unittest("sec_comp_service_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_manager.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_perm_manager.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
-    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
@@ -59,7 +59,10 @@ ohos_unittest("sec_comp_service_test") {
     "unittest/src/window_info_helper_test.cpp",
   ]
 
-  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  configs = [
+    "${sec_comp_root_dir}/config:coverage_flags",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
+  ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
   if (security_component_enhance_enable) {
@@ -69,17 +72,15 @@ ohos_unittest("sec_comp_service_test") {
   deps = [
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_stub_no_cfi",
   ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "ability_runtime:runtime",
     "access_token:libtoken_setproc",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -89,7 +90,6 @@ ohos_unittest("sec_comp_service_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
-    "window_manager:libdm",
   ]
 }
 
@@ -125,7 +125,6 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_manager.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_perm_manager.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
-    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
@@ -138,21 +137,23 @@ ohos_unittest("sec_comp_service_mock_test") {
     "unittest/src/service_test_common.cpp",
   ]
 
-  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  configs = [
+    "${sec_comp_root_dir}/config:coverage_flags",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
+  ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
-  deps =
-      [ "${sec_comp_root_dir}/frameworks:security_component_framework_src_set" ]
+  deps = [
+    "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_stub",
+  ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "ability_runtime:runtime",
     "access_token:libtoken_setproc",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -162,7 +163,6 @@ ohos_unittest("sec_comp_service_mock_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
-    "window_manager:libdm",
   ]
 }
 

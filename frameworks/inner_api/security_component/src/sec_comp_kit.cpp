@@ -151,11 +151,6 @@ bool SecCompKit::VerifySavePermission(AccessToken::AccessTokenID tokenId)
     return res;
 }
 
-sptr<IRemoteObject> SecCompKit::GetEnhanceRemoteObject(bool isLoad)
-{
-    return SecCompClient::GetInstance().GetEnhanceRemoteObject(isLoad);
-}
-
 int32_t SecCompKit::PreRegisterSecCompProcess()
 {
     return SecCompClient::GetInstance().PreRegisterSecCompProcess();

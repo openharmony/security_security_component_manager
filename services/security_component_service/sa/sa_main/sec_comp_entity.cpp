@@ -20,7 +20,7 @@
 #include "hisysevent.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "sec_comp_err.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_info_helper.h"
@@ -44,6 +44,7 @@ constexpr const char *SETTINGS_DATASHARE_SEARCH_URI =
 constexpr const char *ADVANCED_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *ADVANCED_DATA_COLUMN_VALUE = "VALUE";
 constexpr const char *QUERY_KEYWORD = "accessibility_screenreader_enabled";
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 static bool IsScreenReadMode();
 }
 

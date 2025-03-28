@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,11 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef GET_ENHANCE_REMOTE_OBJECT_FUZZER_H
-#define GET_ENHANCE_REMOTE_OBJECT_FUZZER_H
+#ifndef SECURITY_COMPONENT_MANAGER_DISPLAY_MOCK_H
+#define SECURITY_COMPONENT_MANAGER_DISPLAY_MOCK_H
+#include "display_info.h"
+#include "refbase.h"
 
-#define FUZZ_PROJECT_NAME "securitycomponent_fuzzer"
-
-#include "sec_comp_kit.h"
-
-#endif
+namespace OHOS::Rosen {
+class Display : public RefBase {
+public:
+    sptr<DisplayInfo> GetDisplayInfo() const
+    {
+        return sptr<DisplayInfo>::MakeSptr();
+    }
+};
+}
+#endif // SECURITY_COMPONENT_MANAGER_DISPLAY_MOCK_H

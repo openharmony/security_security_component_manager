@@ -14,7 +14,7 @@
  */
 #include "sec_comp_load_callback.h"
 
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "sec_comp_client.h"
 #include "sec_comp_log.h"
 
@@ -23,6 +23,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClient"};
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 }  // namespace
 SecCompLoadCallback::SecCompLoadCallback() {}
 

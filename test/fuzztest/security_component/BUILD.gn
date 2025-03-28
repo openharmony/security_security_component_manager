@@ -16,7 +16,6 @@ group("fuzztest") {
   deps = []
 
   deps += [
-    "innerkits/getenhanceremoteobject_fuzzer:GetEnhanceRemoteObjectFuzzTest",
     "innerkits/getpointereventenhancedata_fuzzer:GetPointerEventEnhanceDataFuzzTest",
     "innerkits/registersecuritycomponent_fuzzer:RegisterSecurityComponentFuzzTest",
     "innerkits/reportsecuritycomponentclickevent_fuzzer:ReportSecurityComponentClickEventFuzzTest",
@@ -24,7 +23,6 @@ group("fuzztest") {
     "innerkits/unregistersecuritycomponent_fuzzer:UnregisterSecurityComponentFuzzTest",
     "innerkits/updatesecuritycomponent_fuzzer:UpdateSecurityComponentFuzzTest",
     "innerkits/verifysavepermission_fuzzer:VerifySavePermissionFuzzTest",
-    "service/getenhanceremoteobjectstub_fuzzer:GetEnhanceRemoteObjectStubFuzzTest",
     "service/preregisterseccompprocessstub_fuzzer:PreRegisterSecCompProcessStubFuzzTest",
     "service/registersecuritycomponentstub_fuzzer:RegisterSecurityComponentStubFuzzTest",
     "service/reportsecuritycomponentclickeventstub_fuzzer:ReportSecurityComponentClickEventStubFuzzTest",

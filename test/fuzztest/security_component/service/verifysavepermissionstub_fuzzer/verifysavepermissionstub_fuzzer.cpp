@@ -20,7 +20,7 @@
 #include <thread>
 #include "accesstoken_kit.h"
 #include "fuzz_common.h"
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_info.h"
 #include "sec_comp_service.h"
@@ -32,7 +32,7 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 static void VerifySavePermissionStubFuzzTest(const uint8_t *data, size_t size)
 {
-    uint32_t code = SecurityComponentServiceInterfaceCode::VERIFY_TEMP_SAVE_PERMISSION;
+    uint32_t code = static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_VERIFY_SAVE_PERMISSION);
     MessageParcel rawData;
     MessageParcel input;
     MessageParcel reply;
@@ -43,10 +43,9 @@ static void VerifySavePermissionStubFuzzTest(const uint8_t *data, size_t size)
     }
 
     uint32_t tokenid = generator.GetData<uint32_t>();
-    if (!rawData.WriteUint32(tokenid)) {
+    if (!input.WriteUint32(tokenid)) {
         return;
     }
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
 
     MessageOption option(MessageOption::TF_SYNC);
     auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);

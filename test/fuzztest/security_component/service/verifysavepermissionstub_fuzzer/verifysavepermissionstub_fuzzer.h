@@ -18,7 +18,7 @@
 
 #define FUZZ_PROJECT_NAME "securitycomponent_fuzzer"
 
-#include "sec_comp_stub.h"
+#include "sec_comp_service_stub.h"
 #include "sec_comp_service.h"
 
 #endif

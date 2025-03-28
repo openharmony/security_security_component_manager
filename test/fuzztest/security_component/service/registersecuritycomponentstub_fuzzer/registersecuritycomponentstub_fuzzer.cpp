@@ -21,7 +21,7 @@
 #include <vector>
 #include "accesstoken_kit.h"
 #include "fuzz_common.h"
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_info.h"
 #include "sec_comp_service.h"
@@ -35,9 +35,10 @@ namespace OHOS {
 static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
     uint32_t code =
-        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT;
+        static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_REGISTER_SECURITY_COMPONENT);
     MessageParcel rawData;
     MessageParcel input;
+    SecCompRawdata inputData;
     MessageParcel reply;
     CompoRandomGenerator generator(data, size);
 
@@ -53,7 +54,9 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
     if (!rawData.WriteString(compoInfo)) {
         return;
     }
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
+    input.WriteUint32(inputData.size);
+    input.WriteRawData(inputData.data, inputData.size);
     MessageOption option(MessageOption::TF_SYNC);
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);

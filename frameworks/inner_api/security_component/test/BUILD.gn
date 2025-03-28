@@ -36,7 +36,6 @@ ohos_unittest("sec_comp_sdk_test") {
     "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_dialog_callback_stub.cpp",
     "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_kit.cpp",
     "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_load_callback.cpp",
-    "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_proxy.cpp",
     "${sec_comp_root_dir}/frameworks/inner_api/security_component/src/sec_comp_ui_register.cpp",
     "unittest/src/location_button_test.cpp",
     "unittest/src/paste_button_test.cpp",
@@ -44,7 +43,10 @@ ohos_unittest("sec_comp_sdk_test") {
     "unittest/src/sec_comp_kit_test.cpp",
     "unittest/src/test_common.cpp",
   ]
-  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  configs = [
+    "${sec_comp_root_dir}/config:coverage_flags",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
+  ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
   if (security_component_enhance_enable) {
@@ -55,6 +57,7 @@ ohos_unittest("sec_comp_sdk_test") {
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_enhance_adapter_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
     "${sec_comp_root_dir}/frameworks/inner_api/enhance_kits:security_component_no_cfi_enhance_sdk_src_set",
+    "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_proxy",
   ]
 
   external_deps = [

@@ -16,9 +16,10 @@
 
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "sec_comp_click_event_parcel.h"
 #include "sec_comp_load_callback.h"
 #include "sec_comp_log.h"
-#include "sec_comp_proxy.h"
+#include "sec_comp_service_proxy.h"
 #include "tokenid_kit.h"
 
 namespace OHOS {
@@ -26,6 +27,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClient"};
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 static std::mutex g_instanceMutex;
 }  // namespace
 
@@ -55,6 +57,28 @@ SecCompClient::~SecCompClient()
     }
 }
 
+int32_t SecCompClient::RegisterWriteToRawdata(SecCompType type, const std::string& componentInfo,
+    SecCompRawdata& rawData)
+{
+    MessageParcel dataParcel;
+
+    if (!dataParcel.WriteUint32(type)) {
+        SC_LOG_ERROR(LABEL, "Register write type failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!dataParcel.WriteString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Register write componentInfo failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
+        SC_LOG_ERROR(LABEL, "Register serialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
 int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
     const std::string& componentInfo, int32_t& scId)
 {
@@ -64,7 +88,55 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    return proxy->RegisterSecurityComponent(type, componentInfo, scId);
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    SecCompRawdata rawData;
+    if (RegisterWriteToRawdata(type, componentInfo, rawData) != SC_OK) {
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    SecCompRawdata rawReply;
+    int32_t res = proxy->RegisterSecurityComponent(rawData, rawReply);
+    MessageParcel deserializedReply;
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "Register deserialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedReply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Register read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (res != SC_OK) {
+        scId = INVALID_SC_ID;
+        SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", res);
+        return res;
+    }
+
+    if (!deserializedReply.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Register read scId failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return res;
+}
+
+int32_t SecCompClient::UpdateWriteToRawdata(int32_t scId, const std::string& componentInfo, SecCompRawdata& rawData)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Update write scId failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    if (!dataParcel.WriteString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Update write componentInfo failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
+        SC_LOG_ERROR(LABEL, "Update serialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
 }
 
 int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& componentInfo)
@@ -75,7 +147,49 @@ int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& 
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    return proxy->UpdateSecurityComponent(scId, componentInfo);
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    SecCompRawdata rawData;
+    int32_t res = UpdateWriteToRawdata(scId, componentInfo, rawData);
+    if (res != SC_OK) {
+        return res;
+    }
+
+    SecCompRawdata rawReply;
+    res = proxy->UpdateSecurityComponent(rawData, rawReply);
+
+    MessageParcel deserializedReply;
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "Update deserialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedReply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Update read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Update request failed, result: %{public}d.", res);
+        return res;
+    }
+
+    return res;
+}
+
+int32_t SecCompClient::UnregisterWriteToRawdata(int32_t scId, SecCompRawdata& rawData)
+{
+    MessageParcel dataParcel;
+
+    if (!dataParcel.WriteInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Unregister write scId failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
+        SC_LOG_ERROR(LABEL, "Unregister serialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
 }
 
 int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
@@ -86,7 +200,64 @@ int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    return proxy->UnregisterSecurityComponent(scId);
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    SecCompRawdata rawData;
+    int32_t res = UnregisterWriteToRawdata(scId, rawData);
+    if (res != SC_OK) {
+        return res;
+    }
+
+    SecCompRawdata rawReply;
+    res = proxy->UnregisterSecurityComponent(rawData, rawReply);
+
+    MessageParcel deserializedReply;
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "Unregister deserialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedReply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Unregister read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Unregister request failed, result: %{public}d.", res);
+        return res;
+    }
+    return res;
+}
+
+int32_t SecCompClient::ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData)
+{
+    MessageParcel dataParcel;
+
+    if (!dataParcel.WriteInt32(secCompInfo.scId)) {
+        SC_LOG_ERROR(LABEL, "Report write scId failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!dataParcel.WriteString(secCompInfo.componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Report write componentInfo failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    sptr<SecCompClickEventParcel> parcel = new (std::nothrow) SecCompClickEventParcel();
+    if (parcel == nullptr) {
+        SC_LOG_ERROR(LABEL, "Report new click event parcel failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    parcel->clickInfoParams_ = secCompInfo.clickInfo;
+    if (!dataParcel.WriteParcelable(parcel)) {
+        SC_LOG_ERROR(LABEL, "Report write clickInfo failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
+        SC_LOG_ERROR(LABEL, "Unregister serialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
 }
 
 int32_t SecCompClient::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
@@ -98,7 +269,36 @@ int32_t SecCompClient::ReportSecurityComponentClickEvent(SecCompInfo& secCompInf
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
-    return proxy->ReportSecurityComponentClickEvent(secCompInfo, callerToken, dialogCallback, message);
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    SecCompRawdata rawData;
+    int32_t res = ReportWriteToRawdata(secCompInfo, rawData);
+    if (res != SC_OK) {
+        return res;
+    }
+
+    SecCompRawdata rawReply;
+    res = proxy->ReportSecurityComponentClickEvent(callerToken, dialogCallback, rawData, rawReply);
+    MessageParcel deserializedReply;
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "Report deserialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedReply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Report read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Report request failed, result: %{public}d.", res);
+        return res;
+    }
+
+    if (!deserializedReply.ReadString(message)) {
+        SC_LOG_ERROR(LABEL, "Report read error message failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return res;
 }
 
 bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
@@ -109,7 +309,13 @@ bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
         return false;
     }
 
-    return proxy->VerifySavePermission(tokenId);
+    bool isGranted;
+    int32_t res = proxy->VerifySavePermission(tokenId, isGranted);
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Verify save permission fail");
+        return false;
+    }
+    return isGranted;
 }
 
 bool SecCompClient::IsSystemAppCalling()
@@ -118,14 +324,15 @@ bool SecCompClient::IsSystemAppCalling()
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
 }
 
-sptr<IRemoteObject> SecCompClient::GetEnhanceRemoteObject(bool doLoadSa)
+int32_t SecCompClient::PreRegisterWriteToRawdata(SecCompRawdata& rawData)
 {
-    auto proxy = GetProxy(doLoadSa);
-    if (proxy == nullptr) {
-        return nullptr;
+    MessageParcel dataParcel;
+    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
+        SC_LOG_ERROR(LABEL, "PreRegister serialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    return proxy->GetEnhanceRemoteObject();
+    return SC_OK;
 }
 
 int32_t SecCompClient::PreRegisterSecCompProcess()
@@ -135,8 +342,31 @@ int32_t SecCompClient::PreRegisterSecCompProcess()
         SC_LOG_ERROR(LABEL, "Proxy is null");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    SecCompRawdata rawData;
+    int32_t res = PreRegisterWriteToRawdata(rawData);
+    if (res != SC_OK) {
+        return res;
+    }
 
-    return proxy->PreRegisterSecCompProcess();
+    SecCompRawdata rawReply;
+    res = proxy->PreRegisterSecCompProcess(rawData, rawReply);
+    MessageParcel deserializedReply;
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "PreRegister deserialize session info failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedReply.ReadInt32(res)) {
+        SC_LOG_ERROR(LABEL, "PreRegister read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "PreRegister request failed, result: %{public}d.", res);
+        return res;
+    }
+    return res;
 }
 
 bool SecCompClient::IsServiceExist()

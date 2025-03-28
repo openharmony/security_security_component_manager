@@ -19,7 +19,7 @@
 #include <thread>
 #include "accesstoken_kit.h"
 #include "fuzz_common.h"
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_info.h"
 #include "sec_comp_service.h"
@@ -33,10 +33,12 @@ namespace OHOS {
 static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& compoInfo)
 {
     uint32_t code =
-        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT;
+        static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_REGISTER_SECURITY_COMPONENT);
     MessageParcel rawData;
     MessageParcel input;
+    SecCompRawdata inputData;
     MessageParcel reply;
+    SecCompRawdata replyData;
 
     if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
         return 0;
@@ -48,14 +50,26 @@ static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& c
     if (!rawData.WriteString(compoInfo)) {
         return 0;
     }
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
+    input.WriteUint32(inputData.size);
+    input.WriteRawData(inputData.data, inputData.size);
     MessageOption option(MessageOption::TF_SYNC);
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     service->OnRemoteRequest(code, input, reply, option);
+    if (!reply.ReadUint32(replyData.size)) {
+        return 0;
+    }
+    auto readRawReply = reply.ReadRawData(replyData.size);
+    if (readRawReply == nullptr) {
+        return 0;
+    }
+    int32_t res = replyData.RawDataCpy(readRawReply);
+    if (res != SC_OK) {
+        return 0;
+    }
     MessageParcel deserializedReply;
-    SecCompEnhanceAdapter::EnhanceClientDeserialize(reply, deserializedReply);
-    int32_t res = 0;
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(replyData, deserializedReply);
     if (!deserializedReply.ReadInt32(res)) {
         return 0;
     }
@@ -68,9 +82,10 @@ static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& c
 
 static void UpdateSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
-    uint32_t code = SecurityComponentServiceInterfaceCode::UPDATE_SECURITY_COMPONENT;
+    uint32_t code = static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_UPDATE_SECURITY_COMPONENT);
     MessageParcel rawData;
     MessageParcel input;
+    SecCompRawdata inputData;
     MessageParcel reply;
     CompoRandomGenerator generator(data, size);
     if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
@@ -86,7 +101,9 @@ static void UpdateSecurityComponentStubFuzzTest(const uint8_t *data, size_t size
     if (!rawData.WriteString(compoInfo)) {
         return;
     }
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, input);
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
+    input.WriteUint32(inputData.size);
+    input.WriteRawData(inputData.data, inputData.size);
 
     MessageOption option(MessageOption::TF_SYNC);
     auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);

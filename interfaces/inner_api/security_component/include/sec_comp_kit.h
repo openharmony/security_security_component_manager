@@ -32,7 +32,6 @@ public:
     static int32_t ReportSecurityComponentClickEvent(SecCompInfo& SecCompInfo, sptr<IRemoteObject> callerToken,
         OnFirstUseDialogCloseFunc&& callback, std::string& message);
     static bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
-    static sptr<IRemoteObject> GetEnhanceRemoteObject(bool isLoad);
     static int32_t PreRegisterSecCompProcess();
     static bool IsServiceExist();
     static bool LoadService();

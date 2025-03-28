@@ -18,48 +18,43 @@
 
 #include <gtest/gtest.h>
 #define private public
-#include "sec_comp_stub.h"
+#include "access_token.h"
+#include "sec_comp_service_stub.h"
 #undef private
 
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 // stub is abstract class
-struct SecCompStubMock : public SecCompStub {
+struct SecCompStubMock : public SecCompServiceStub {
 public:
-    int32_t RegisterSecurityComponent(SecCompType type,
-        const std::string& componentInfo, int32_t& scId) override
+    int32_t RegisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
     };
 
-    int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo) override
+    int32_t UpdateSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
     };
 
-    int32_t UnregisterSecurityComponent(int32_t scId) override
+    int32_t UnregisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
     };
 
-    int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, sptr<IRemoteObject> callerToken,
-        sptr<IRemoteObject> dialogCall, std::string& message) override
+    int32_t ReportSecurityComponentClickEvent(const sptr<IRemoteObject>& callerToken,
+        const sptr<IRemoteObject>& dialogCall, const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
     };
 
-    bool VerifySavePermission(AccessToken::AccessTokenID tokenId) override
+    int32_t VerifySavePermission(AccessToken::AccessTokenID tokenId, bool& isGranted) override
     {
         return true;
     };
 
-    sptr<IRemoteObject> GetEnhanceRemoteObject() override
-    {
-        return nullptr;
-    };
-
-    int32_t PreRegisterSecCompProcess() override
+    int32_t PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
     };
