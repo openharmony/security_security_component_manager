@@ -75,11 +75,8 @@ ohos_unittest("sec_comp_service_test") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "ability_runtime:runtime",
     "access_token:libtoken_setproc",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -89,7 +86,6 @@ ohos_unittest("sec_comp_service_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
-    "window_manager:libdm",
   ]
 }
 
@@ -148,11 +144,8 @@ ohos_unittest("sec_comp_service_mock_test") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "ability_runtime:runtime",
     "access_token:libtoken_setproc",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "googletest:gmock_main",
@@ -162,7 +155,6 @@ ohos_unittest("sec_comp_service_mock_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
-    "window_manager:libdm",
   ]
 }
 
