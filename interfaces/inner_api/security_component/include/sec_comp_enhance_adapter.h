@@ -20,6 +20,7 @@
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
 #include "sec_comp_info.h"
+#include "sec_comp_rawdata.h"
 
 namespace OHOS {
 namespace Security {
@@ -57,9 +58,6 @@ public:
     virtual int32_t CheckComponentInfoEnhance(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
         const nlohmann::json& jsonComponent) = 0;
 
-    // get RemoteObject of enhance service to connect it
-    virtual sptr<IRemoteObject> GetEnhanceRemoteObject() = 0;
-
     // start enhance service
     virtual void StartEnhanceService() = 0;
 
@@ -72,9 +70,8 @@ public:
     // notify process registered
     virtual void AddSecurityComponentProcess(int32_t pid) = 0;
 
-    virtual bool EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output) = 0;
-    virtual bool EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
-        MessageParcel& reply) = 0;
+    virtual bool EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output) = 0;
+    virtual bool EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output) = 0;
 };
 
 // for client
@@ -84,10 +81,8 @@ public:
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, std::string& componentInfo) = 0;
     virtual bool EnhanceDataPreprocess(const uintptr_t caller, int32_t scId, std::string& componentInfo) = 0;
 
-    virtual bool EnhanceClientSerialize(const uintptr_t caller,
-        MessageParcel& input, MessageParcel& output) = 0;
-    virtual bool EnhanceClientDeserialize(const uintptr_t caller, MessageParcel& input,
-        MessageParcel& output) = 0;
+    virtual bool EnhanceClientSerialize(const uintptr_t caller, MessageParcel& input, SecCompRawdata& output) = 0;
+    virtual bool EnhanceClientDeserialize(const uintptr_t caller, SecCompRawdata& input, MessageParcel& output) = 0;
 
     // regiter scid to enhance client
     virtual void RegisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
@@ -111,23 +106,21 @@ public:
     static int32_t DisableInputEnhance();
     static int32_t CheckComponentInfoEnhance(int32_t pid, std::shared_ptr<SecCompBase>& compInfo,
         const nlohmann::json& jsonComponent);
-    static sptr<IRemoteObject> GetEnhanceRemoteObject();
     static void StartEnhanceService();
     static void ExitEnhanceService();
     static void NotifyProcessDied(int32_t pid);
 
     static bool EnhanceDataPreprocess(std::string& componentInfo);
     static bool EnhanceDataPreprocess(int32_t scId, std::string& componentInfo);
-    static bool EnhanceClientSerialize(MessageParcel& input, MessageParcel& output);
-    static bool EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output);
+    static bool EnhanceClientSerialize(MessageParcel& input, SecCompRawdata& output);
+    static bool EnhanceClientDeserialize(SecCompRawdata& input, MessageParcel& output);
     static void RegisterScIdEnhance(int32_t scId);
     static void UnregisterScIdEnhance(int32_t scId);
 
     static void AddSecurityComponentProcess(int32_t pid);
 
-    static bool EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output);
-    static bool EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
-        MessageParcel& reply);
+    static bool EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output);
+    static bool EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output);
     static __attribute__((visibility("default"))) SecCompInputEnhanceInterface* inputHandler;
     static bool isEnhanceInputHandlerInit;
 

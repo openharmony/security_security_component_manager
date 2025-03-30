@@ -19,9 +19,13 @@
 #include <condition_variable>
 #include <mutex>
 #include <string>
-#include "i_sec_comp_service.h"
+#include "access_token.h"
+#include "isec_comp_service.h"
 #include "sec_comp_death_recipient.h"
+#include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
+#include "sec_comp_info.h"
+#include "security_component_service_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Security {
@@ -30,13 +34,17 @@ class SecCompClient final {
 public:
     static SecCompClient& GetInstance();
 
+    int32_t RegisterWriteToRawdata(SecCompType type, const std::string& componentInfo, SecCompRawdata& rawData);
+    int32_t UpdateWriteToRawdata(int32_t scId, const std::string& componentInfo, SecCompRawdata& rawData);
+    int32_t UnregisterWriteToRawdata(int32_t scId, SecCompRawdata& rawData);
+    int32_t ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData);
+    int32_t PreRegisterWriteToRawdata(SecCompRawdata& rawData);
     int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId);
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo);
     int32_t UnregisterSecurityComponent(int32_t scId);
     int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
         sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message);
     bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
-    sptr<IRemoteObject> GetEnhanceRemoteObject(bool doLoadSa);
     int32_t PreRegisterSecCompProcess();
     bool IsServiceExist();
     bool LoadService();
@@ -45,6 +53,7 @@ public:
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();
     void OnRemoteDiedHandle();
+    std::mutex useIPCMutex_;
 
 private:
     SecCompClient();

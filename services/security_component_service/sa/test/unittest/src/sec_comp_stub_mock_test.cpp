@@ -16,8 +16,9 @@
 #include "sec_comp_stub_mock_test.h"
 
 #include "sec_comp_dialog_callback.h"
-#include "sec_comp_log.h"
+#include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
+#include "sec_comp_log.h"
 #include "sec_comp_click_event_parcel.h"
 #include "service_test_common.h"
 
@@ -65,204 +66,11 @@ HWTEST_F(SecCompStubMockTest, OnRemoteRequestMock001, TestSize.Level1)
     MessageOption option;
 
     data.WriteInterfaceToken(u"wrong");
-    ASSERT_EQ(SC_SERVICE_ERROR_IPC_REQUEST_FAIL, stub_->OnRemoteRequest(static_cast<uint32_t>(
-        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT), data, reply, option));
+    ASSERT_EQ(ERR_TRANSACTION_FAILED, stub_->OnRemoteRequest(static_cast<uint32_t>(
+        ISecCompServiceIpcCode::COMMAND_REGISTER_SECURITY_COMPONENT), data, reply, option));
     data.FlushBuffer();
     reply.FlushBuffer();
 
-    data.WriteInterfaceToken(u"ohos.security.ISecCompService");
+    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
     ASSERT_EQ(305, stub_->OnRemoteRequest(1000, data, reply, option));
-}
-
-/**
- * @tc.name: RegisterSecurityComponentInnerMock001
- * @tc.desc: Test register security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, RegisterSecurityComponentInnerMock001, TestSize.Level1)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->RegisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteUint32(UNKNOWN_SC_TYPE);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->RegisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteUint32(MAX_SC_TYPE);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->RegisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteUint32(LOCATION_COMPONENT);
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->RegisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteUint32(LOCATION_COMPONENT);
-    data.WriteString("");
-    ASSERT_EQ(SC_OK, stub_->RegisterSecurityComponentInner(data, reply));
-}
-
-/**
- * @tc.name: UpdateSecurityComponentInnerMock001
- * @tc.desc: Test update security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, UpdateSecurityComponentInnerMock001, TestSize.Level1)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UpdateSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteInt32(-1);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->UpdateSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteInt32(1);
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UpdateSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteInt32(1);
-    data.WriteString("");
-    ASSERT_EQ(SC_OK, stub_->UpdateSecurityComponentInner(data, reply));
-}
-
-/**
- * @tc.name: UnregisterSecurityComponentInnerMock001
- * @tc.desc: Test unregister security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, UnregisterSecurityComponentInnerMock001, TestSize.Level1)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UnregisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteInt32(-1);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->UnregisterSecurityComponentInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-
-    data.WriteInt32(1);
-    ASSERT_EQ(SC_OK, stub_->UnregisterSecurityComponentInner(data, reply));
-}
-
-/**
- * @tc.name: VerifySavePermissionInnerMock001
- * @tc.desc: Test VerifySavePermissionInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, VerifySavePermissionInnerMock001, TestSize.Level1)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    setuid(0);
-    ASSERT_TRUE(stub_->IsMediaLibraryCalling());
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->VerifySavePermissionInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-    data.WriteInt32(0);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, stub_->VerifySavePermissionInner(data, reply));
-    data.FlushBuffer();
-    reply.FlushBuffer();
-    data.WriteInt32(1);
-    ASSERT_EQ(SC_OK, stub_->VerifySavePermissionInner(data, reply));
-    ASSERT_NE(SC_OK, stub_->GetEnhanceRemoteObjectInner(data, reply));
-}
-
-/**
- * @tc.name: MarshallingMock001
- * @tc.desc: Test SecCompClickEventParcel::Marshalling
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, MarshallingMock001, TestSize.Level1)
-{
-    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
-    Parcel out;
-    EXPECT_FALSE(clickParcel->Marshalling(out));
-    clickParcel->clickInfoParams_.type = ClickEventType::UNKNOWN_EVENT_TYPE;
-    EXPECT_FALSE(clickParcel->Marshalling(out));
-
-    clickParcel->clickInfoParams_.extraInfo.dataSize = 1;
-    clickParcel->clickInfoParams_.type = ClickEventType::POINT_EVENT_TYPE;
-    EXPECT_FALSE(clickParcel->Marshalling(out));
-    clickParcel->clickInfoParams_.type = ClickEventType::KEY_EVENT_TYPE;
-    EXPECT_FALSE(clickParcel->Marshalling(out));
-
-    uint8_t data[32] = {0};
-    clickParcel->clickInfoParams_.extraInfo.dataSize = 32;
-    clickParcel->clickInfoParams_.extraInfo.data = data;
-    EXPECT_TRUE(clickParcel->Marshalling(out));
-}
-
-/**
- * @tc.name: UnmarshallingMock001
- * @tc.desc: Test SecCompClickEventParcel::Unmarshalling
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, UnmarshallingMock001, TestSize.Level1)
-{
-    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
-    Parcel in;
-    in.WriteInt32(1);
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(2);
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(0);
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-
-    in.WriteInt32(2);
-    in.WriteUint64(1);
-    in.WriteInt32(1);
-    int dataSize = MAX_EXTRA_SIZE + 1;
-    in.WriteUint32(dataSize);
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-
-    in.WriteInt32(2);
-    in.WriteUint64(1);
-    in.WriteInt32(1);
-    in.WriteUint32(1);
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-
-    in.WriteInt32(2);
-    in.WriteUint64(1);
-    in.WriteInt32(1);
-    in.WriteUint32(32);
-    uint8_t data[32] = {0};
-    in.WriteBuffer(data, 32);
-    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
-}
-
-/**
- * @tc.name: PreRegisterSecCompProcessMock001
- * @tc.desc: Test PreRegisterSecCompProcessInner
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubMockTest, PreRegisterSecCompProcessMock001, TestSize.Level1)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    data.FlushBuffer();
-    reply.FlushBuffer();
-    data.WriteInt32(1);
-    ASSERT_EQ(SC_OK, stub_->PreRegisterSecCompProcessInner(data, reply));
 }

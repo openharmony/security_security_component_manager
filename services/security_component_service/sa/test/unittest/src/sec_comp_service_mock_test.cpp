@@ -20,6 +20,7 @@
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
+#include "sec_comp_client.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
@@ -83,7 +84,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, "", scId));
+    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, "", scId));
     nlohmann::json jsonRes;
     ServiceTestCommon::BuildSaveComponentJson(jsonRes);
     std::string saveInfo = jsonRes.dump();
@@ -95,11 +96,12 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // wrong json
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, "{a=", scId));
+    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
+        secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, "{a=", scId));
 
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
-    EXPECT_EQ(SC_OK, secCompService_->UpdateSecurityComponent(scId, saveInfo));
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, secCompService_->UpdateSecurityComponentBody(scId, saveInfo));
     uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -115,8 +117,8 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
     };
     SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
-    EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
-    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
+    EXPECT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
@@ -141,7 +143,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, saveInfo, scId));
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
         .point.touchX = 100,
@@ -152,8 +154,8 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent002, TestSize.Level1)
     SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
-    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
+        secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
@@ -178,7 +180,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, saveInfo, scId));
     uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -195,8 +197,8 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent003, TestSize.Level1)
     SecCompInfo secCompInfo{ scId, saveInfo, touch };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL,
-        secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
-    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
+        secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
@@ -221,7 +223,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, saveInfo, scId));
     uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -237,35 +239,40 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
     };
     SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
     std::string message;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
 
     // test 10s valid
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    bool isGranted;
+    secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
+    ASSERT_TRUE(isGranted);
+    secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
+    ASSERT_TRUE(isGranted);
     sleep(11);
-    ASSERT_FALSE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
+    ASSERT_FALSE(isGranted);
 
     // test 10s multiple clicks
     secCompInfo.clickInfo.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
     sleep(3);
     secCompInfo.clickInfo.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
-    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
+    ASSERT_EQ(SC_OK, secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
     sleep(8);
-    ASSERT_TRUE(secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID));
+    secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
+    ASSERT_TRUE(isGranted);
     sleep(2);
-    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
 }
 
 /**
- * @tc.name: ReportSecurityComponentClickEvent002
+ * @tc.name: ReportSecurityComponentClickEventBody002
  * @tc.desc: Test verify location permission
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody002, TestSize.Level1)
 {
     SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEvent002");
     int32_t scId;
@@ -281,7 +288,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     // register security component ok
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(LOCATION_COMPONENT, locationInfo, scId));
     uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent clickInfo1 = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -298,7 +305,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
     SecCompInfo secCompInfo{ scId, locationInfo, clickInfo1 };
     std::string message;
     ASSERT_EQ(SC_OK,
-        secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
+        secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
 
     // test 10s valid
     ASSERT_EQ(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);

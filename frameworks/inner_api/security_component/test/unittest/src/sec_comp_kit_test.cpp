@@ -32,6 +32,7 @@ using namespace OHOS::Security::SecurityComponent;
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompKitTest"};
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 
 static void TestInCallerNotCheckList()
 {

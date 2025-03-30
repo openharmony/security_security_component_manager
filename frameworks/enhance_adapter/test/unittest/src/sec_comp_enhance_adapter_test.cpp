@@ -82,9 +82,6 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level1)
     SecCompEnhanceAdapter::EnhanceDataPreprocess(1, componentInfo);
 
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
-    ASSERT_EQ(nullptr, SecCompEnhanceAdapter::GetEnhanceRemoteObject());
-
-    SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
     SecCompEnhanceAdapter::StartEnhanceService();
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
     SecCompEnhanceAdapter::ExitEnhanceService();
@@ -101,14 +98,16 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level1)
     OHOS::MessageParcel input;
     OHOS::MessageParcel output;
     OHOS::MessageParcel reply;
+    SecCompRawdata inputData;
+    SecCompRawdata outputData;
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceClientSerialize(input, output);
+    SecCompEnhanceAdapter::EnhanceClientSerialize(input, outputData);
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceClientDeserialize(input, output);
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(inputData, output);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceSrvSerialize(input, output);
+    SecCompEnhanceAdapter::EnhanceSrvSerialize(input, outputData);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
-    SecCompEnhanceAdapter::EnhanceSrvDeserialize(input, output, reply);
+    SecCompEnhanceAdapter::EnhanceSrvDeserialize(inputData, output);
     std::shared_ptr<SecCompBase> compInfo;
     const nlohmann::json jsonComponent;
     ASSERT_EQ(SC_OK, SecCompEnhanceAdapter::CheckComponentInfoEnhance(0, compInfo, jsonComponent));

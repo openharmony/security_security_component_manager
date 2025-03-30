@@ -21,7 +21,7 @@
 #include "display_manager.h"
 #include "first_use_dialog.h"
 #include "hisysevent.h"
-#include "i_sec_comp_service.h"
+#include "isec_comp_service.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "sec_comp_enhance_adapter.h"
@@ -41,6 +41,7 @@ static constexpr int32_t MAX_SINGLE_PROC_COMP_SIZE = 500;
 static constexpr unsigned long REPORT_REMOTE_OBJECT_SIZE = 2UL;
 static std::mutex g_instanceMutex;
 const std::string START_DIALOG = "start dialog, onclick will be trap after dialog closed.";
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 }
 
 SecCompManager::SecCompManager()

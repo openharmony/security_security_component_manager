@@ -160,7 +160,7 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
     return true;
 }
 
-static bool WriteMessageParcel(MessageParcel& tmpData, MessageParcel& data)
+static bool WriteMessageParcel(MessageParcel& tmpData, SecCompRawdata& data)
 {
     size_t bufferLength = tmpData.GetDataSize();
     if (bufferLength == 0) {
@@ -174,27 +174,20 @@ static bool WriteMessageParcel(MessageParcel& tmpData, MessageParcel& data)
         return false;
     }
 
-    if (!data.WriteInt32(bufferLength)) {
-        SC_LOG_ERROR(LABEL, "Write bufferLength failed.");
-        return false;
-    }
-
-    if (!data.WriteRawData(reinterpret_cast<void *>(buffer), bufferLength)) {
-        SC_LOG_ERROR(LABEL, "Write data failed.");
+    data.size = bufferLength;
+    int32_t ret = data.RawDataCpy(reinterpret_cast<void *>(buffer));
+    if (ret != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Copy tmpData to rawdata failed.");
         return false;
     }
     return true;
 }
 
-static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
+static bool ReadMessageParcel(SecCompRawdata& tmpData, MessageParcel& data)
 {
-    int32_t size;
-    if (!tmpData.ReadInt32(size)) {
-        SC_LOG_ERROR(LABEL, "Read size failed.");
-        return false;
-    }
+    int32_t size = tmpData.size;
 
-    const void *iter = tmpData.ReadRawData(size);
+    const void *iter = tmpData.data;
     if (iter == nullptr) {
         SC_LOG_ERROR(LABEL, "Read const void failed.");
         return false;
@@ -208,7 +201,7 @@ static bool ReadMessageParcel(MessageParcel& tmpData, MessageParcel& data)
     return true;
 }
 
-bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, MessageParcel& output)
+bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, SecCompRawdata& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -222,7 +215,7 @@ bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, Message
     return WriteMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceClientDeserialize(MessageParcel& input, MessageParcel& output)
+bool SecCompEnhanceAdapter::EnhanceClientDeserialize(SecCompRawdata& input, MessageParcel& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -236,7 +229,7 @@ bool SecCompEnhanceAdapter::EnhanceClientDeserialize(MessageParcel& input, Messa
     return ReadMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, MessageParcel& output)
+bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
@@ -248,14 +241,13 @@ bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, MessagePar
     return WriteMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(MessageParcel& input, MessageParcel& output,
-    MessageParcel& reply)
+bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
     }
     if (srvHandler != nullptr) {
-        return srvHandler->EnhanceSrvDeserialize(input, output, reply);
+        return srvHandler->EnhanceSrvDeserialize(input, output);
     }
 
     return ReadMessageParcel(input, output);
@@ -347,18 +339,6 @@ int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhance(int32_t pid,
         return srvHandler->CheckComponentInfoEnhance(pid, compInfo, jsonComponent);
     }
     return SC_OK;
-}
-
-sptr<IRemoteObject> SecCompEnhanceAdapter::GetEnhanceRemoteObject()
-{
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        auto service = srvHandler->GetEnhanceRemoteObject();
-        return service;
-    }
-    return nullptr;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

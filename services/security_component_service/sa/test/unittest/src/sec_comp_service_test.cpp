@@ -201,29 +201,29 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo001, TestSize.Level1)
 }
 
 /**
- * @tc.name: UnregisterSecurityComponent001
+ * @tc.name: UnregisterSecurityComponentBody001
  * @tc.desc: Test unregister security component
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, UnregisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, UnregisterSecurityComponentBody001, TestSize.Level1)
 {
     // get caller fail
     EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_NOT_EXIST,
-        secCompService_->UnregisterSecurityComponent(ServiceTestCommon::TEST_SC_ID_1));
+        secCompService_->UnregisterSecurityComponentBody(ServiceTestCommon::TEST_SC_ID_1));
 }
 
 /**
- * @tc.name: UpdateSecurityComponent001
+ * @tc.name: UpdateSecurityComponentBody001
  * @tc.desc: Test update security component
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, UpdateSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, UpdateSecurityComponentBody001, TestSize.Level1)
 {
     // get caller fail
     EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, ""));
+        secCompService_->UpdateSecurityComponentBody(ServiceTestCommon::TEST_SC_ID_1, ""));
 
     ASSERT_EQ(0, SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID));
     AppExecFwk::AppStateData stateData = {
@@ -231,22 +231,22 @@ HWTEST_F(SecCompServiceTest, UpdateSecurityComponent001, TestSize.Level1)
     };
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
     EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, "{a"));
+        secCompService_->UpdateSecurityComponentBody(ServiceTestCommon::TEST_SC_ID_1, "{a"));
 }
 
 /**
- * @tc.name: ReportSecurityComponentClickEvent001
+ * @tc.name: ReportSecurityComponentClickEventBody001
  * @tc.desc: Test report security component
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEventBody001, TestSize.Level1)
 {
     auto uid = getuid();
     // get caller fail
     int32_t scId;
     EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->RegisterSecurityComponent(LOCATION_COMPONENT, "", scId));
+        secCompService_->RegisterSecurityComponentBody(LOCATION_COMPONENT, "", scId));
 
     nlohmann::json jsonRes;
     ServiceTestCommon::BuildLocationComponentJson(jsonRes);
@@ -261,7 +261,7 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
 
     EXPECT_EQ(SC_OK,
-        secCompService_->RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
+        secCompService_->RegisterSecurityComponentBody(LOCATION_COMPONENT, locationInfo, scId));
     uint8_t data[16] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -276,8 +276,8 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEvent001, TestSize.Leve
     SecCompInfo secCompInfo{ scId, locationInfo, touch };
     std::string message;
     EXPECT_EQ(SC_OK,
-        secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message));
-    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponent(scId));
+        secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     setuid(uid);
 }
 
@@ -362,12 +362,11 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
     nlohmann::json jsonRes;
     int32_t scId  = 0;
     EXPECT_EQ(secCompService_->ParseParams(componentInfo, caller, jsonRes), SC_SERVICE_ERROR_VALUE_INVALID);
-    EXPECT_NE(secCompService_->UnregisterSecurityComponent(scId), SC_SERVICE_ERROR_VALUE_INVALID);
+    EXPECT_NE(secCompService_->UnregisterSecurityComponentBody(scId), SC_SERVICE_ERROR_VALUE_INVALID);
 
     struct SecCompClickEvent touchInfo;
     SecCompInfo secCompInfo{ scId, componentInfo, touchInfo };
     std::string message;
-    EXPECT_EQ(secCompService_->ReportSecurityComponentClickEvent(secCompInfo, nullptr, nullptr, message),
+    EXPECT_EQ(secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message),
       SC_SERVICE_ERROR_VALUE_INVALID);
-    secCompService_->GetEnhanceRemoteObject();
 }

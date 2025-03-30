@@ -17,5 +17,5 @@
 #define REPORT_SECURITY_COMPONENT_CLICK_EVENT_STUB_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "securitycomponent_fuzzer"
-#include "sec_comp_stub.h"
+#include "sec_comp_service_stub.h"
 #endif

@@ -23,6 +23,7 @@
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "sec_comp_click_event_parcel.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_manager.h"
@@ -36,6 +37,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompService"};
 static const int32_t ROOT_UID = 0;
 static constexpr int32_t BASE_USER_RANGE = 200000;
+#ifndef SA_ID_SECURITY_COMPONENT_SERVICE
+constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
+#endif
 }
 
 REGISTER_SYSTEM_ABILITY_BY_ID(SecCompService, SA_ID_SECURITY_COMPONENT_SERVICE, true);
@@ -184,7 +188,49 @@ int32_t SecCompService::ParseParams(const std::string& componentInfo,
     return SC_OK;
 }
 
-int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
+int32_t SecCompService::WriteError(int32_t res, SecCompRawdata& rawReply)
+{
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteUint32(res)) {
+        SC_LOG_ERROR(LABEL, "Write error res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "Serialize error session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::RegisterReadFromRawdata(SecCompRawdata& rawData, SecCompType& type, std::string& componentInfo)
+{
+    MessageParcel deserializedData;
+    if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawData, deserializedData)) {
+        SC_LOG_ERROR(LABEL, "Register deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    uint32_t uintType;
+    if (!deserializedData.ReadUint32(uintType)) {
+        SC_LOG_ERROR(LABEL, "Register read component type failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (uintType <= UNKNOWN_SC_TYPE || uintType >= MAX_SC_TYPE) {
+        SC_LOG_ERROR(LABEL, "Register security component type invalid");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    type = static_cast<SecCompType>(uintType);
+
+    if (!deserializedData.ReadString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Register read component info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
     const std::string& componentInfo, int32_t& scId)
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentRegister");
@@ -224,7 +270,79 @@ int32_t SecCompService::RegisterSecurityComponent(SecCompType type,
     return res;
 }
 
-int32_t SecCompService::UpdateSecurityComponent(int32_t scId, const std::string& componentInfo)
+int32_t SecCompService::RegisterWriteToRawdata(int32_t res, int32_t scId, SecCompRawdata& rawReply)
+{
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Register security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!replyParcel.WriteInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Register security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "Register serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::RegisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply)
+{
+    SecCompType type;
+    std::string componentInfo;
+    int32_t res;
+    do {
+        res = RegisterReadFromRawdata(const_cast<SecCompRawdata&>(rawData), type, componentInfo);
+        if (res != SC_OK) {
+            break;
+        }
+        int32_t scId = INVALID_SC_ID;
+
+        res = RegisterSecurityComponentBody(type, componentInfo, scId);
+        if (res != SC_OK) {
+            break;
+        }
+        res = RegisterWriteToRawdata(res, scId, rawReply);
+    } while (0);
+    if (res != SC_OK) {
+        if (WriteError(res, rawReply) != SC_OK) {
+            SC_LOG_ERROR(LABEL, "Write rawReply error.");
+            return res;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UpdateReadFromRawdata(SecCompRawdata& rawData, int32_t& scId, std::string& componentInfo)
+{
+    MessageParcel deserializedData;
+    if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawData, deserializedData)) {
+        SC_LOG_ERROR(LABEL, "Update deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!deserializedData.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Update read component id failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (scId < 0) {
+        SC_LOG_ERROR(LABEL, "Update security component id invalid");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+
+    if (!deserializedData.ReadString(componentInfo)) {
+        SC_LOG_ERROR(LABEL, "Update read component info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UpdateSecurityComponentBody(int32_t scId, const std::string& componentInfo)
 {
     SecCompCallerInfo caller;
     nlohmann::json jsonRes;
@@ -234,7 +352,66 @@ int32_t SecCompService::UpdateSecurityComponent(int32_t scId, const std::string&
     return SecCompManager::GetInstance().UpdateSecurityComponent(scId, jsonRes, caller);
 }
 
-int32_t SecCompService::UnregisterSecurityComponent(int32_t scId)
+int32_t SecCompService::UpdateWriteToRawdata(int32_t res, SecCompRawdata& rawReply)
+{
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Update security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "Update serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UpdateSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply)
+{
+    int32_t scId;
+    std::string componentInfo;
+    int32_t res;
+    do {
+        res = UpdateReadFromRawdata(const_cast<SecCompRawdata&>(rawData), scId, componentInfo);
+        if (res != SC_OK) {
+            break;
+        }
+        res = UpdateSecurityComponentBody(scId, componentInfo);
+        if (res != SC_OK) {
+            break;
+        }
+        res = UpdateWriteToRawdata(res, rawReply);
+    } while (0);
+    if (res != SC_OK) {
+        if (WriteError(res, rawReply) != SC_OK) {
+            SC_LOG_ERROR(LABEL, "Write rawReply error.");
+            return res;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UnregisterReadFromRawdata(SecCompRawdata& rawData, int32_t& scId)
+{
+    MessageParcel deserializedData;
+    if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawData, deserializedData)) {
+        SC_LOG_ERROR(LABEL, "Unreigster deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    if (!deserializedData.ReadInt32(scId)) {
+        SC_LOG_ERROR(LABEL, "Unreigster read component id failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (scId < 0) {
+        SC_LOG_ERROR(LABEL, "Unreigster security component id invalid");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UnregisterSecurityComponentBody(int32_t scId)
 {
     SecCompCallerInfo caller;
     caller.tokenId = IPCSkeleton::GetCallingTokenID();
@@ -244,7 +421,47 @@ int32_t SecCompService::UnregisterSecurityComponent(int32_t scId)
     return SecCompManager::GetInstance().UnregisterSecurityComponent(scId, caller);
 }
 
-int32_t SecCompService::ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo,
+int32_t SecCompService::UnregisterWriteToRawdata(int32_t res, SecCompRawdata& rawReply)
+{
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Unregister security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "Unreigster serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::UnregisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply)
+{
+    int32_t scId;
+    int32_t res;
+    do {
+        res = UnregisterReadFromRawdata(const_cast<SecCompRawdata&>(rawData), scId);
+        if (res != SC_OK) {
+            break;
+        }
+
+        res = UnregisterSecurityComponentBody(scId);
+        if (res != SC_OK) {
+            break;
+        }
+        res = UnregisterWriteToRawdata(res, rawReply);
+    } while (0);
+    if (res != SC_OK) {
+        if (WriteError(res, rawReply) != SC_OK) {
+            SC_LOG_ERROR(LABEL, "Write rawReply error.");
+            return res;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::ReportSecurityComponentClickEventBody(SecCompInfo& secCompInfo,
     sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message)
 {
     StartTrace(HITRACE_TAG_ACCESS_CONTROL, "SecurityComponentClick");
@@ -262,7 +479,93 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(SecCompInfo& secCompIn
     return res;
 }
 
-int32_t SecCompService::PreRegisterSecCompProcess()
+int32_t SecCompService::ReportWriteToRawdata(int32_t res, std::string message, SecCompRawdata& rawReply)
+{
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "Report security component result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!replyParcel.WriteString(message)) {
+        SC_LOG_ERROR(LABEL, "Report security component error message failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "Report serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    return SC_OK;
+}
+
+int32_t SecCompService::ReportSecurityComponentClickEvent(const sptr<IRemoteObject>& callerToken,
+    const sptr<IRemoteObject>& dialogCallback, const SecCompRawdata& rawData, SecCompRawdata& rawReply)
+{
+    int32_t res;
+    do {
+        MessageParcel deserializedData;
+        if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(const_cast<SecCompRawdata&>(rawData), deserializedData)) {
+            SC_LOG_ERROR(LABEL, "Report deserialize session info failed");
+            res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+            break;
+        }
+
+        int32_t scId;
+        if (!deserializedData.ReadInt32(scId)) {
+            SC_LOG_ERROR(LABEL, "Report read component id failed");
+            res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+            break;
+        }
+
+        if (scId < 0) {
+            SC_LOG_ERROR(LABEL, "Report security component id invalid");
+            res = SC_SERVICE_ERROR_VALUE_INVALID;
+            break;
+        }
+
+        std::string componentInfo;
+        if (!deserializedData.ReadString(componentInfo)) {
+            SC_LOG_ERROR(LABEL, "Report read component info failed");
+            res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+            break;
+        }
+        sptr<SecCompClickEventParcel> clickInfoParcel = deserializedData.ReadParcelable<SecCompClickEventParcel>();
+        if (clickInfoParcel == nullptr) {
+            SC_LOG_ERROR(LABEL, "Report read clickInfo info failed");
+            res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+            break;
+        }
+
+        SecCompInfo secCompInfo{ scId, componentInfo, clickInfoParcel->clickInfoParams_ };
+        std::string message;
+        res = ReportSecurityComponentClickEventBody(secCompInfo, callerToken, dialogCallback, message);
+        if (res != SC_OK) {
+            break;
+        }
+        res = ReportWriteToRawdata(res, message, rawReply);
+    } while (0);
+    if (res != SC_OK) {
+        if (WriteError(res, rawReply) != SC_OK) {
+            SC_LOG_ERROR(LABEL, "Write rawReply error.");
+            return res;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::PreRegisterReadFromRawdata(SecCompRawdata& rawData)
+{
+    MessageParcel deserializedData;
+    if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawData, deserializedData)) {
+        SC_LOG_ERROR(LABEL, "preRegister deserialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::PreRegisterSecCompProcessBody()
 {
     SecCompCallerInfo caller;
     if (!GetCallerInfo(caller)) {
@@ -272,14 +575,73 @@ int32_t SecCompService::PreRegisterSecCompProcess()
     return SecCompManager::GetInstance().AddSecurityComponentProcess(caller);
 }
 
-bool SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId)
+int32_t SecCompService::PreRegisterWriteToRawdata(int32_t res, SecCompRawdata& rawReply)
 {
-    return SecCompPermManager::GetInstance().VerifySavePermission(tokenId);
+    MessageParcel replyParcel;
+    if (!replyParcel.WriteInt32(res)) {
+        SC_LOG_ERROR(LABEL, "preRegister write result failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
+        SC_LOG_ERROR(LABEL, "preRegister serialize session info failed");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return SC_OK;
 }
 
-sptr<IRemoteObject> SecCompService::GetEnhanceRemoteObject()
+int32_t SecCompService::PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply)
 {
-    return SecCompEnhanceAdapter::GetEnhanceRemoteObject();
+    int32_t res;
+    do {
+        res = PreRegisterReadFromRawdata(const_cast<SecCompRawdata&>(rawData));
+        if (res != SC_OK) {
+            break;
+        }
+
+        res = PreRegisterSecCompProcessBody();
+        if (res != SC_OK) {
+            break;
+        }
+        res = PreRegisterWriteToRawdata(res, rawReply);
+    } while (0);
+    if (res != SC_OK) {
+        if (WriteError(res, rawReply) != SC_OK) {
+            SC_LOG_ERROR(LABEL, "Write rawReply error.");
+            return res;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId, bool& isGranted)
+{
+    if (!IsMediaLibraryCalling()) {
+        SC_LOG_ERROR(LABEL, "Not medialibrary called");
+        return SC_SERVICE_ERROR_CALLER_INVALID;
+    }
+
+    if (tokenId == 0) {
+        SC_LOG_ERROR(LABEL, "Verify AccessTokenId invalid");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+    isGranted = SecCompPermManager::GetInstance().VerifySavePermission(tokenId);
+    return SC_OK;
+}
+
+bool SecCompService::IsMediaLibraryCalling()
+{
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    if (uid == ROOT_UID) {
+        return true;
+    }
+    int32_t userId = uid / BASE_USER_RANGE;
+    uint32_t tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (mediaLibraryTokenId_ != tokenCaller) {
+        mediaLibraryTokenId_ = AccessToken::AccessTokenKit::GetHapTokenID(
+            userId, "com.ohos.medialibrary.medialibrarydata", 0);
+    }
+    return tokenCaller == mediaLibraryTokenId_;
 }
 
 int SecCompService::Dump(int fd, const std::vector<std::u16string>& args)

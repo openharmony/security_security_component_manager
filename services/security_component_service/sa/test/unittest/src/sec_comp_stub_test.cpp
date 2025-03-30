@@ -64,12 +64,12 @@ HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
     MessageOption option;
 
     data.WriteInterfaceToken(u"wrong");
-    ASSERT_EQ(SC_SERVICE_ERROR_IPC_REQUEST_FAIL, stub_->OnRemoteRequest(static_cast<uint32_t>(
-        SecurityComponentServiceInterfaceCode::REGISTER_SECURITY_COMPONENT), data, reply, option));
+    ASSERT_EQ(ERR_TRANSACTION_FAILED, stub_->OnRemoteRequest(static_cast<uint32_t>(
+        ISecCompServiceIpcCode::COMMAND_REGISTER_SECURITY_COMPONENT), data, reply, option));
     data.FlushBuffer();
     reply.FlushBuffer();
 
-    data.WriteInterfaceToken(u"ohos.security.ISecCompService");
+    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
     ASSERT_EQ(305, stub_->OnRemoteRequest(1000, data, reply, option));
 }
 
@@ -83,8 +83,10 @@ HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
-
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->RegisterSecurityComponentInner(data, reply));
+    MessageOption option(MessageOption::TF_SYNC);
+    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
+    ASSERT_EQ(ERR_INVALID_DATA, stub_->OnRemoteRequest(static_cast<uint32_t>(
+        ISecCompServiceIpcCode::COMMAND_REGISTER_SECURITY_COMPONENT), data, reply, option));
 }
 
 /**
@@ -97,8 +99,10 @@ HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
-
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UpdateSecurityComponentInner(data, reply));
+    MessageOption option(MessageOption::TF_SYNC);
+    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
+    ASSERT_EQ(ERR_INVALID_DATA, stub_->OnRemoteRequest(static_cast<uint32_t>(
+        ISecCompServiceIpcCode::COMMAND_UPDATE_SECURITY_COMPONENT), data, reply, option));
 }
 
 /**
@@ -111,7 +115,10 @@ HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level1)
 {
     MessageParcel data;
     MessageParcel reply;
-    ASSERT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, stub_->UnregisterSecurityComponentInner(data, reply));
+    MessageOption option(MessageOption::TF_SYNC);
+    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
+    ASSERT_EQ(ERR_INVALID_DATA, stub_->OnRemoteRequest(static_cast<uint32_t>(
+        ISecCompServiceIpcCode::COMMAND_UNREGISTER_SECURITY_COMPONENT), data, reply, option));
 }
 
 /**

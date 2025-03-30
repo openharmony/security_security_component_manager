@@ -22,12 +22,13 @@ sc_include_dirs = [
   "${sec_comp_dir}/frameworks/inner_api/security_component/include",
   "${sec_comp_dir}/interfaces/inner_api/security_component_common",
   "${sec_comp_dir}/interfaces/inner_api/security_component/include",
+  "${sec_comp_dir}/services/security_component_service/sa:sec_comp_service_stub",
   "${sec_comp_dir}/services/security_component_service/sa/test/mock/include",
   "${sec_comp_dir}/test/fuzztest/security_component/common",
   "${sec_comp_dir}/test/fuzztest/security_component/mock",
 ]
 
-sc_deps = []
+sc_deps = [ "${sec_comp_dir}/services/security_component_service/sa:sec_comp_service_stub" ]
 
 sc_cflags_cc = [ "-DFUZZ_ENABLE" ]
 
@@ -71,7 +72,6 @@ sc_service_sources = [
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_manager.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_perm_manager.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
-  "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_stub.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
 ]
