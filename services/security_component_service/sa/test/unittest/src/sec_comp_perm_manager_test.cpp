@@ -100,7 +100,12 @@ HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermissionCount001, TestSize.Leve
 
     permMgr.applySaveCountMap_[id] = 1;
     permMgr.RevokeTempSavePermissionCount(static_cast<AccessTokenID>(0));
-    ASSERT_EQ(permMgr.applySaveCountMap_[id], 1);
+    permMgr.saveTaskDequeMap_[id].push_back("test");
+    permMgr.RevokeTempSavePermissionCount(static_cast<AccessTokenID>(0));
+
+    permMgr.secHandler_ = std::make_shared<SecEventHandler>(nullptr);
+    permMgr.RevokeTempSavePermissionCount(static_cast<AccessTokenID>(0));
+    ASSERT_EQ(permMgr.applySaveCountMap_[id], 0);
 }
 
 /**

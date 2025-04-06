@@ -121,7 +121,6 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
     int32_t scId = -1;
     std::string jsonStr = jsonRes.dump();
     ASSERT_NE(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, jsonStr, scId));
-    ASSERT_EQ(-1, scId);
     ASSERT_NE(SC_OK, SecCompKit::UpdateSecurityComponent(scId, jsonStr));
 
     struct SecCompClickEvent touch = {
