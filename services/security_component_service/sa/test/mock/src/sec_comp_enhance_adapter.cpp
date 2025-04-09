@@ -69,33 +69,46 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& com
 }
 
 #ifndef FUZZ_ENABLE
-static bool MessageParcelToRawdata(MessageParcel& input, SecCompRawdata& output)
+bool WriteMessageParcel(MessageParcel& tmpData, SecCompRawdata& data)
 {
-    if (!input.ReadUint32(output.size)) {
-        SC_LOG_ERROR(LABEL, "Read size failed.");
+    size_t bufferLength = tmpData.GetDataSize();
+    if (bufferLength == 0) {
+        SC_LOG_INFO(LABEL, "TmpData is empty.");
+        return true;
+    }
+
+    char* buffer = reinterpret_cast<char *>(tmpData.GetData());
+    if (buffer == nullptr) {
+        SC_LOG_ERROR(LABEL, "Get tmpData data failed.");
         return false;
     }
-    auto readrawReply = input.ReadRawData(output.size);
-    if (readrawReply == nullptr) {
-        SC_LOG_ERROR(LABEL, "Read data failed.");
-        return false;
-    }
-    int32_t res = output.RawDataCpy(readrawReply);
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Copy memory to output failed.");
+
+    data.size = bufferLength;
+    int32_t ret = data.RawDataCpy(reinterpret_cast<void *>(buffer));
+    if (ret != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Copy tmpData to rawdata failed.");
         return false;
     }
     return true;
 }
 
-static bool RawdataToMessageParcel(const SecCompRawdata& input, MessageParcel& output)
+bool ReadMessageParcel(SecCompRawdata& tmpData, MessageParcel& data)
 {
-    if (!output.WriteUint32(input.size)) {
-        SC_LOG_ERROR(LABEL, "Write size failed.");
+    int32_t size = tmpData.size;
+    if (size == 0) {
+        SC_LOG_INFO(LABEL, "Read tmpData length empty.");
+        return true;
+    }
+    
+    const void *iter = tmpData.data;
+    if (iter == nullptr) {
+        SC_LOG_ERROR(LABEL, "Read const void failed.");
         return false;
     }
-    if (!output.WriteRawData(input.data, input.size)) {
-        SC_LOG_ERROR(LABEL, "Write data failed.");
+    char* ptr = reinterpret_cast<char *>(const_cast<void *>(iter));
+
+    if (!data.WriteBuffer(reinterpret_cast<void *>(ptr), size)) {
+        SC_LOG_ERROR(LABEL, "Write buffer failed.");
         return false;
     }
     return true;
@@ -104,25 +117,25 @@ static bool RawdataToMessageParcel(const SecCompRawdata& input, MessageParcel& o
 bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, SecCompRawdata& output)
 {
     SC_LOG_DEBUG(LABEL, "EnhanceClientSerialize successful.");
-    return MessageParcelToRawdata(input, output);
+    return WriteMessageParcel(input, output);
 }
 
 bool SecCompEnhanceAdapter::EnhanceClientDeserialize(SecCompRawdata& input, MessageParcel& output)
 {
     SC_LOG_DEBUG(LABEL, "EnhanceClientDeserialize successful.");
-    return RawdataToMessageParcel(input, output);
+    return ReadMessageParcel(input, output);
 }
 
 bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output)
 {
     SC_LOG_DEBUG(LABEL, "EnhanceSrvSerialize successful.");
-    return MessageParcelToRawdata(input, output);
+    return WriteMessageParcel(input, output);
 }
 
 bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output)
 {
     SC_LOG_DEBUG(LABEL, "EnhanceSrvDeserialize successful.");
-    return RawdataToMessageParcel(input, output);
+    return ReadMessageParcel(input, output);
 }
 #else
 bool WriteMessageParcel(MessageParcel& tmpData, SecCompRawdata& data)
