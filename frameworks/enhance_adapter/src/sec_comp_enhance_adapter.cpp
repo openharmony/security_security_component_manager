@@ -185,7 +185,7 @@ static bool WriteMessageParcel(MessageParcel& tmpData, SecCompRawdata& data)
 
 static bool ReadMessageParcel(SecCompRawdata& tmpData, MessageParcel& data)
 {
-    int32_t size = tmpData.size;
+    uint32_t size = tmpData.size;
 
     const void *iter = tmpData.data;
     if (iter == nullptr) {

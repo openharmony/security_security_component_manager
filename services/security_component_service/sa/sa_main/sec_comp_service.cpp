@@ -191,7 +191,7 @@ int32_t SecCompService::ParseParams(const std::string& componentInfo,
 int32_t SecCompService::WriteError(int32_t res, SecCompRawdata& rawReply)
 {
     MessageParcel replyParcel;
-    if (!replyParcel.WriteUint32(res)) {
+    if (!replyParcel.WriteInt32(res)) {
         SC_LOG_ERROR(LABEL, "Write error res failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
@@ -541,9 +541,6 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(const sptr<IRemoteObje
         SecCompInfo secCompInfo{ scId, componentInfo, clickInfoParcel->clickInfoParams_ };
         std::string message;
         res = ReportSecurityComponentClickEventBody(secCompInfo, callerToken, dialogCallback, message);
-        if (res != SC_OK) {
-            break;
-        }
         res = ReportWriteToRawdata(res, message, rawReply);
     } while (0);
     if (res != SC_OK) {
