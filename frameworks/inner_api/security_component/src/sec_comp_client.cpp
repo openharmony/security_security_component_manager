@@ -102,15 +102,20 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!deserializedReply.ReadInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Register read res failed.");
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", res);
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (res != SC_OK) {
+    int32_t serviceRes;
+    if (!deserializedReply.ReadInt32(serviceRes)) {
+        SC_LOG_ERROR(LABEL, "Register read serviceRes failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (serviceRes != SC_OK) {
         scId = INVALID_SC_ID;
-        SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", res);
-        return res;
+        return serviceRes;
     }
 
     if (!deserializedReply.ReadInt32(scId)) {
@@ -163,17 +168,18 @@ int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& 
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!deserializedReply.ReadInt32(res)) {
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Update request failed, result: %{public}d.", res);
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    int32_t serviceRes;
+    if (!deserializedReply.ReadInt32(serviceRes)) {
         SC_LOG_ERROR(LABEL, "Update read res failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Update request failed, result: %{public}d.", res);
-        return res;
-    }
-
-    return res;
+    return serviceRes;
 }
 
 int32_t SecCompClient::UnregisterWriteToRawdata(int32_t scId, SecCompRawdata& rawData)
@@ -216,16 +222,18 @@ int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!deserializedReply.ReadInt32(res)) {
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Unregister request failed, result: %{public}d.", res);
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    int32_t serviceRes;
+    if (!deserializedReply.ReadInt32(serviceRes)) {
         SC_LOG_ERROR(LABEL, "Unregister read res failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Unregister request failed, result: %{public}d.", res);
-        return res;
-    }
-    return res;
+    return serviceRes;
 }
 
 int32_t SecCompClient::ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData)
@@ -284,21 +292,22 @@ int32_t SecCompClient::ReportSecurityComponentClickEvent(SecCompInfo& secCompInf
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!deserializedReply.ReadInt32(res)) {
-        SC_LOG_ERROR(LABEL, "Report read res failed.");
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Report request failed, result: %{public}d.", res);
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Report request failed, result: %{public}d.", res);
-        return res;
+    int32_t serviceRes;
+    if (!deserializedReply.ReadInt32(serviceRes)) {
+        SC_LOG_ERROR(LABEL, "Report read res failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (!deserializedReply.ReadString(message)) {
         SC_LOG_ERROR(LABEL, "Report read error message failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
-    return res;
+    return serviceRes;
 }
 
 bool SecCompClient::VerifySavePermission(AccessToken::AccessTokenID tokenId)
@@ -357,16 +366,18 @@ int32_t SecCompClient::PreRegisterSecCompProcess()
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
-    if (!deserializedReply.ReadInt32(res)) {
-        SC_LOG_ERROR(LABEL, "PreRegister read res failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
     if (res != SC_OK) {
         SC_LOG_ERROR(LABEL, "PreRegister request failed, result: %{public}d.", res);
         return res;
     }
-    return res;
+
+    int32_t serviceRes;
+    if (!deserializedReply.ReadInt32(serviceRes)) {
+        SC_LOG_ERROR(LABEL, "PreRegister read serviceRes failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    return serviceRes;
 }
 
 bool SecCompClient::IsServiceExist()
