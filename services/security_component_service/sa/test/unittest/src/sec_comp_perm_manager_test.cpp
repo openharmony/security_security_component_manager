@@ -51,7 +51,7 @@ void SecCompPermManagerTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, DelaySaveRevokePermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, DelaySaveRevokePermission001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     permMgr.secHandler_ = nullptr;
@@ -64,7 +64,7 @@ HWTEST_F(SecCompPermManagerTest, DelaySaveRevokePermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, RevokeSavePermissionTask001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, RevokeSavePermissionTask001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     permMgr.secHandler_ = nullptr;
@@ -77,7 +77,7 @@ HWTEST_F(SecCompPermManagerTest, RevokeSavePermissionTask001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, GrantTempSavePermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, GrantTempSavePermission001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     permMgr.secHandler_ = nullptr;
@@ -91,7 +91,7 @@ HWTEST_F(SecCompPermManagerTest, GrantTempSavePermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermissionCount001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermissionCount001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     permMgr.secHandler_ = nullptr;
@@ -114,7 +114,7 @@ HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermissionCount001, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermission001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     permMgr.secHandler_ = nullptr;
@@ -136,7 +136,7 @@ HWTEST_F(SecCompPermManagerTest, RevokeTempSavePermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, RemoveAppGrantPermissionRecord001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, RemoveAppGrantPermissionRecord001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     AccessTokenID id = 0;
@@ -153,7 +153,7 @@ HWTEST_F(SecCompPermManagerTest, RemoveAppGrantPermissionRecord001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, RevokeAppPermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, RevokeAppPermission001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     AccessTokenID id = 0;
@@ -166,7 +166,7 @@ HWTEST_F(SecCompPermManagerTest, RevokeAppPermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, VerifyPermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, VerifyPermission001, TestSize.Level0)
 {
     SecCompPermManager permMgr;
     AccessTokenID id = 1000;
@@ -182,7 +182,7 @@ HWTEST_F(SecCompPermManagerTest, VerifyPermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompPermManagerTest, GrantTempPermission001, TestSize.Level1)
+HWTEST_F(SecCompPermManagerTest, GrantTempPermission001, TestSize.Level0)
 {
     OHOS::Security::AccessToken::AccessTokenIDInner tokenInner = {
         .tokenUniqueID = 0x00001,

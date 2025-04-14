@@ -48,7 +48,7 @@ void SaveButtonTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
+HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildSaveComponentInfo(jsonComponent);
@@ -93,7 +93,7 @@ HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level1)
+HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level0)
 {
     SaveButton button1;
     SaveButton button2;
@@ -128,7 +128,7 @@ HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
+HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     SaveButton comp1;
@@ -163,7 +163,7 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level1)
+HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level0)
 {
     SaveButton button1;
     PasteButton button2;

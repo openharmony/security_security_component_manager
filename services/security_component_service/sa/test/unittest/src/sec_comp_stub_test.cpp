@@ -57,7 +57,7 @@ void SecCompStubTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level0)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -79,7 +79,7 @@ HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level0)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -95,7 +95,7 @@ HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level0)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -111,7 +111,7 @@ HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level0)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -127,7 +127,7 @@ HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level0)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
     Parcel out;
@@ -153,7 +153,7 @@ HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level1)
+HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level0)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
     Parcel in;

@@ -55,7 +55,7 @@ void AppStateObserverTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, IsProcessForeground001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, IsProcessForeground001, TestSize.Level0)
 {
     ASSERT_FALSE(observer_->IsProcessForeground(ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_UID_1));
     AppExecFwk::AppStateData stateData = {
@@ -72,7 +72,7 @@ HWTEST_F(AppStateObserverTest, IsProcessForeground001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet001, TestSize.Level0)
 {
     AppExecFwk::AppStateData stateData = {
         .pid = ServiceTestCommon::TEST_PID_1,
@@ -97,7 +97,7 @@ HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet001, TestSize.Level0)
 {
     AppExecFwk::ProcessData procData = {
         .pid = ServiceTestCommon::TEST_PID_1,
@@ -116,7 +116,7 @@ HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet001, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet002, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet002, TestSize.Level0)
 {
     AppExecFwk::ProcessData procData = {
         .pid = ServiceTestCommon::TEST_PID_1,
@@ -135,7 +135,7 @@ HWTEST_F(AppStateObserverTest, RemoveProcessFromForegroundSet002, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, OnProcessStateChanged001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, OnProcessStateChanged001, TestSize.Level0)
 {
     AppExecFwk::ProcessData processData;
     processData.state = AppExecFwk::AppProcessState::APP_STATE_CREATE;
@@ -159,7 +159,7 @@ HWTEST_F(AppStateObserverTest, OnProcessStateChanged001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, OnProcessStateChanged002, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, OnProcessStateChanged002, TestSize.Level0)
 {
     AppExecFwk::ProcessData processData;
     processData.state = AppExecFwk::AppProcessState::APP_STATE_FOREGROUND;
@@ -179,7 +179,7 @@ HWTEST_F(AppStateObserverTest, OnProcessStateChanged002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, OnProcessDied001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, OnProcessDied001, TestSize.Level0)
 {
     AppExecFwk::ProcessData processData;
     processData.state = AppExecFwk::AppProcessState::APP_STATE_FOREGROUND;
@@ -204,7 +204,7 @@ HWTEST_F(AppStateObserverTest, OnProcessDied001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet002, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet002, TestSize.Level0)
 {
     AppExecFwk::ProcessData procData = {
         .pid = ServiceTestCommon::TEST_UID_1,
@@ -225,7 +225,7 @@ HWTEST_F(AppStateObserverTest, AddProcessToForegroundSet002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(AppStateObserverTest, DumpProcess001, TestSize.Level1)
+HWTEST_F(AppStateObserverTest, DumpProcess001, TestSize.Level0)
 {
     AppExecFwk::AppStateData stateData = {
         .pid = ServiceTestCommon::TEST_PID_1,

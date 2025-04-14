@@ -79,7 +79,7 @@ void SecCompServiceMockTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, WriteError001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, WriteError001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -93,7 +93,7 @@ HWTEST_F(SecCompServiceMockTest, WriteError001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterReadFromRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterReadFromRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -145,7 +145,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterReadFromRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody001, TestSize.Level0)
 {
     // get caller fail
     int32_t scId;
@@ -195,7 +195,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody001, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody002, TestSize.Level0)
 {
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
@@ -232,7 +232,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody002, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody003, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody003, TestSize.Level0)
 {
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
@@ -275,7 +275,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody003, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterWriteToRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterWriteToRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -291,7 +291,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterWriteToRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -345,7 +345,7 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UpdateReadFromRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UpdateReadFromRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -383,7 +383,7 @@ HWTEST_F(SecCompServiceMockTest, UpdateReadFromRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UpdateWriteToRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UpdateWriteToRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -398,7 +398,7 @@ HWTEST_F(SecCompServiceMockTest, UpdateWriteToRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -434,7 +434,7 @@ HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent002, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -464,7 +464,7 @@ HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UnregisterReadFromRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UnregisterReadFromRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -502,7 +502,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterReadFromRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UnregisterWriteToRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UnregisterWriteToRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -517,7 +517,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterWriteToRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -551,7 +551,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent002, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -580,7 +580,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent002, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, PreRegisterReadFromRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, PreRegisterReadFromRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -605,7 +605,7 @@ HWTEST_F(SecCompServiceMockTest, PreRegisterReadFromRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, PreRegisterWriteToRawdata001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, PreRegisterWriteToRawdata001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -620,7 +620,7 @@ HWTEST_F(SecCompServiceMockTest, PreRegisterWriteToRawdata001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, PreRegisterSecCompProcess001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, PreRegisterSecCompProcess001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -653,7 +653,7 @@ HWTEST_F(SecCompServiceMockTest, PreRegisterSecCompProcess001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestSize.Level0)
 {
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
@@ -717,7 +717,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody002, TestSize.Level0)
 {
     SC_LOG_INFO(LABEL, "ReportSecurityComponentClickEventBody002");
     int32_t scId;
@@ -777,7 +777,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody002, TestS
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->Initialize();
@@ -810,7 +810,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent001, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.Level0)
 {
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;

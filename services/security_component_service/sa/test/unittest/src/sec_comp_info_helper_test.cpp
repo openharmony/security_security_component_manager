@@ -85,7 +85,7 @@ void SecCompInfoHelperTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -101,7 +101,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     std::string message;
@@ -118,7 +118,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent003, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent003, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     std::string message;
@@ -149,7 +149,7 @@ static SecCompRect GetDefaultRect(void)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level0)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
@@ -201,7 +201,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level0)
 {
     SecCompRect rect = GetDefaultRect();
     SecCompRect windowRect = GetDefaultRect();
@@ -244,7 +244,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -272,7 +272,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -303,7 +303,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -329,7 +329,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -355,7 +355,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -380,7 +380,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -403,7 +403,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -433,7 +433,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -465,7 +465,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     std::string message;
@@ -499,7 +499,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -527,7 +527,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -550,7 +550,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -573,7 +573,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -592,7 +592,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -622,7 +622,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -639,7 +639,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompInfoHelperTest, IsColorSimilar001, TestSize.Level1)
+HWTEST_F(SecCompInfoHelperTest, IsColorSimilar001, TestSize.Level0)
 {
     SecCompColor color1 = {
         .argb = {

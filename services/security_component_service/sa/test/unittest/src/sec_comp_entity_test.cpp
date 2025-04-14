@@ -67,7 +67,7 @@ void SecCompEntityTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, GrantTempPermission001, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, GrantTempPermission001, TestSize.Level0)
 {
     entity_->isGrant_ = false;
     entity_->componentInfo_->type_ = UNKNOWN_SC_TYPE;
@@ -91,7 +91,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level0)
 {
     std::shared_ptr<PasteButton> pasteComponent = std::make_shared<PasteButton>();
     ASSERT_NE(nullptr, pasteComponent);
@@ -108,7 +108,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level0)
 {
     SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -147,7 +147,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level0)
 {
     SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -175,7 +175,7 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
@@ -191,7 +191,7 @@ HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level1)
+HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level0)
 {
     SecCompClickEvent clickInfo;
     clickInfo.type = ClickEventType::KEY_EVENT_TYPE;

@@ -49,7 +49,7 @@ void LocationButtonTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson001, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -66,7 +66,7 @@ HWTEST_F(LocationButtonTest, FromJson001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson002, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -81,7 +81,7 @@ HWTEST_F(LocationButtonTest, FromJson002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson003, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson003, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -103,7 +103,7 @@ HWTEST_F(LocationButtonTest, FromJson003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson004, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson004, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -140,7 +140,7 @@ HWTEST_F(LocationButtonTest, FromJson004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -177,7 +177,7 @@ HWTEST_F(LocationButtonTest, FromJson005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -205,7 +205,7 @@ HWTEST_F(LocationButtonTest, FromJson006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -230,7 +230,7 @@ HWTEST_F(LocationButtonTest, FromJson007, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -255,7 +255,7 @@ HWTEST_F(LocationButtonTest, FromJson008, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp;
@@ -282,7 +282,7 @@ HWTEST_F(LocationButtonTest, FromJson009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -310,7 +310,7 @@ HWTEST_F(LocationButtonTest, FromJson010, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -338,7 +338,7 @@ HWTEST_F(LocationButtonTest, FromJson011, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, FromJson012, TestSize.Level1)
+HWTEST_F(LocationButtonTest, FromJson012, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -379,7 +379,7 @@ HWTEST_F(LocationButtonTest, FromJson012, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, ToJsonStr001, TestSize.Level1)
+HWTEST_F(LocationButtonTest, ToJsonStr001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -397,7 +397,7 @@ HWTEST_F(LocationButtonTest, ToJsonStr001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, CompareComponentBasicInfo001, TestSize.Level1)
+HWTEST_F(LocationButtonTest, CompareComponentBasicInfo001, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     TestCommon::BuildLocationComponentInfo(jsonComponent);
@@ -412,7 +412,7 @@ HWTEST_F(LocationButtonTest, CompareComponentBasicInfo001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, CompareLocationButton001, TestSize.Level1)
+HWTEST_F(LocationButtonTest, CompareLocationButton001, TestSize.Level0)
 {
     LocationButton button1;
     LocationButton button2;
@@ -447,7 +447,7 @@ HWTEST_F(LocationButtonTest, CompareLocationButton001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level1)
+HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     LocationButton comp1;
@@ -514,7 +514,7 @@ HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(LocationButtonTest, CompareLocationButton003, TestSize.Level1)
+HWTEST_F(LocationButtonTest, CompareLocationButton003, TestSize.Level0)
 {
     LocationButton button1;
     SaveButton button2;

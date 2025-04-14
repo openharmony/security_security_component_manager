@@ -71,7 +71,7 @@ void SecCompEnhanceTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level1)
+HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level0)
 {
     uint8_t cfgData[SEC_COMP_ENHANCE_CFG_SIZE] = { 0 };
     int32_t result = SecCompEnhanceKit::SetEnhanceCfg(cfgData, SEC_COMP_ENHANCE_CFG_SIZE);
@@ -88,7 +88,7 @@ HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEnhanceTest, GetPoniterEventEnhanceData001, TestSize.Level1)
+HWTEST_F(SecCompEnhanceTest, GetPoniterEventEnhanceData001, TestSize.Level0)
 {
     uint8_t originData[16] = { 0 };
     uint32_t dataLen = 16;
