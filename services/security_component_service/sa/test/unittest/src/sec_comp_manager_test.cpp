@@ -130,7 +130,7 @@ void SecCompManagerTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, CreateScId001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, CreateScId001, TestSize.Level0)
 {
     SecCompManager::GetInstance().scIdStart_ = ServiceTestCommon::MAX_INT_NUM;
     ASSERT_EQ(ServiceTestCommon::SC_ID_START, SecCompManager::GetInstance().CreateScId());
@@ -145,7 +145,7 @@ HWTEST_F(SecCompManagerTest, CreateScId001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, CreateScId002, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, CreateScId002, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -168,7 +168,7 @@ HWTEST_F(SecCompManagerTest, CreateScId002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -200,7 +200,7 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, AddSecurityComponentToList002, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList002, TestSize.Level0)
 {
     bool isSaExit = SecCompManager::GetInstance().isSaExit_;
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
@@ -220,7 +220,7 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList001, TestSize.Level0)
 {
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_NOT_EXIST, SecCompManager::GetInstance().DeleteSecurityComponentFromList(
         ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_SC_ID_1));
@@ -250,7 +250,7 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, GetSecurityComponentFromList001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, GetSecurityComponentFromList001, TestSize.Level0)
 {
     ASSERT_EQ(nullptr, SecCompManager::GetInstance().GetSecurityComponentFromList(
         ServiceTestCommon::TEST_PID_1, ServiceTestCommon::TEST_SC_ID_1));
@@ -278,7 +278,7 @@ HWTEST_F(SecCompManagerTest, GetSecurityComponentFromList001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level0)
 {
     SecCompManager::GetInstance().NotifyProcessBackground(ServiceTestCommon::TEST_PID_1);
 
@@ -310,7 +310,7 @@ HWTEST_F(SecCompManagerTest, NotifyProcessBackground001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -351,7 +351,7 @@ HWTEST_F(SecCompManagerTest, NotifyProcessDied001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level0)
 {
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
@@ -385,7 +385,7 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level0)
 {
     SecCompManager::GetInstance().malicious_.maliciousAppList_.insert(ServiceTestCommon::TEST_PID_1);
     nlohmann::json jsonValid;
@@ -427,7 +427,7 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, UnregisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, UnregisterSecurityComponent001, TestSize.Level0)
 {
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
@@ -444,7 +444,7 @@ HWTEST_F(SecCompManagerTest, UnregisterSecurityComponent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Level0)
 {
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
@@ -468,7 +468,7 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level0)
 {
     std::shared_ptr<SecCompManager> managerInstance = std::make_shared<SecCompManager>();
     managerInstance->isSaExit_ = false;
@@ -490,7 +490,7 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level0)
 {
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
@@ -532,7 +532,7 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, AddSecurityComponentToList003, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, AddSecurityComponentToList003, TestSize.Level0)
 {
     SecCompManager::GetInstance().isSaExit_ = true;
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
@@ -550,7 +550,7 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -575,7 +575,7 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level0)
 {
     nlohmann::json jsonValid;
     SecCompCallerInfo caller = {
@@ -598,7 +598,7 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -641,7 +641,7 @@ HWTEST_F(SecCompManagerTest, ExitSaProcess001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -684,7 +684,7 @@ HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level0)
 {
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
     ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsMaliciousAppListEmpty());
@@ -700,7 +700,7 @@ HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, DumpSecComp001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, DumpSecComp001, TestSize.Level0)
 {
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, compPtr);
@@ -724,7 +724,7 @@ HWTEST_F(SecCompManagerTest, DumpSecComp001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, TransformCallBackResult001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, TransformCallBackResult001, TestSize.Level0)
 {
     int32_t scId = INVALID_SC_ID;
     const std::string scene = "REGISTER";
@@ -748,7 +748,7 @@ HWTEST_F(SecCompManagerTest, TransformCallBackResult001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompManagerTest, AddSecurityComponentProcess001, TestSize.Level1)
+HWTEST_F(SecCompManagerTest, AddSecurityComponentProcess001, TestSize.Level0)
 {
     bool isSaExit = SecCompManager::GetInstance().isSaExit_;
     SecCompManager::GetInstance().isSaExit_ = true;

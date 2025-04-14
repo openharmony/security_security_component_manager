@@ -89,7 +89,7 @@ void FirstUseDialogTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord001, TestSize.Level0)
 {
     FirstUseDialog diag;
     diag.LoadFirstUseRecord();
@@ -102,7 +102,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord002, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord002, TestSize.Level0)
 {
     std::string cmdline = "dd if=/dev/random of=" + SEC_COMP_SRV_CFG_FILE + " bs=101k count=1";
     system(cmdline.c_str());
@@ -117,7 +117,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord003, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord003, TestSize.Level0)
 {
     std::string cmdline = "echo {x=\\\' > " + SEC_COMP_SRV_CFG_FILE;
     system(cmdline.c_str());
@@ -132,7 +132,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord004, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord004, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"x\\\":1} > " + SEC_COMP_SRV_CFG_FILE;
     system(cmdline.c_str());
@@ -147,7 +147,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord005, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord005, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"CompType\\\":1}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -163,7 +163,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord006, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord006, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"CompType\\\":1,\\\"TokenId\\\":\\\"kk\\\"}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -179,7 +179,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord007, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord007, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"CompType\\\":1,\\\"TokenId\\\":0}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -195,7 +195,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord007, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord008, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord008, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"TokenId\\\":1}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -211,7 +211,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord008, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord009, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord009, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"CompType\\\":\\\"k\\\",\\\"TokenId\\\":1}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -227,7 +227,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord009, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord010, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord010, TestSize.Level0)
 {
     std::string cmdline = "echo {\\\"FirstUseRecord\\\":[{\\\"CompType\\\":1,\\\"TokenId\\\":1}]} > "
          + SEC_COMP_SRV_CFG_FILE;
@@ -244,7 +244,7 @@ HWTEST_F(FirstUseDialogTest, LoadFirstUseRecord010, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord001, TestSize.Level0)
 {
     std::string cmdline = "rm " + SEC_COMP_SRV_CFG_PATH + " -rf";
     system(cmdline.c_str());
@@ -264,7 +264,7 @@ HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord002, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord002, TestSize.Level0)
 {
     std::string cmdline = "rm " + SEC_COMP_SRV_CFG_PATH + " -rf && touch " + SEC_COMP_SRV_CFG_PATH;
     system(cmdline.c_str());
@@ -285,7 +285,7 @@ HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord003, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord003, TestSize.Level0)
 {
     FirstUseDialog diag;
     OHOS::Security::AccessToken::AccessTokenKit::getHapTokenInfoRes = -1;
@@ -303,7 +303,7 @@ HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord004, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SaveFirstUseRecord004, TestSize.Level0)
 {
     FirstUseDialog diag;
     diag.firstUseMap_[1] = 1;
@@ -359,7 +359,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level0)
 {
     FirstUseDialog diag;
     std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
@@ -401,7 +401,7 @@ HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
 {
     FirstUseDialog diag;
     diag.secHandler_ = nullptr;
@@ -465,7 +465,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level0)
 {
     FirstUseDialog diag;
     EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_COMPONENT_NOT_EXIST);
@@ -494,7 +494,7 @@ HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, RemoveDialogWaitEntitys001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, RemoveDialogWaitEntitys001, TestSize.Level0)
 {
     FirstUseDialog diag;
     std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
@@ -511,7 +511,7 @@ HWTEST_F(FirstUseDialogTest, RemoveDialogWaitEntitys001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(FirstUseDialogTest, SecCompDialogSrvCallback001, TestSize.Level1)
+HWTEST_F(FirstUseDialogTest, SecCompDialogSrvCallback001, TestSize.Level0)
 {
     SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(0, nullptr, nullptr);
     sptr<SecCompDialogSrvCallback> srvCallback = call;

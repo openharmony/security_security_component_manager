@@ -57,7 +57,7 @@ public:
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -111,7 +111,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -136,7 +136,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -161,7 +161,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp004, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp004, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -194,7 +194,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp004, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp005, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp005, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -227,7 +227,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp005, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp006, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp006, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;
@@ -260,7 +260,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp006, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp007, TestSize.Level1)
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp007, TestSize.Level0)
 {
     WindowManager::GetInstance().result_ = WMError::WM_OK;
     std::vector<sptr<UnreliableWindowInfo>> list;

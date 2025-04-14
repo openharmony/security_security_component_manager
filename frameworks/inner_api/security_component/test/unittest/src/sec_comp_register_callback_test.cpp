@@ -128,7 +128,7 @@ void SecCompRegisterCallbackTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Level0)
 {
     sleep(1);
     nlohmann::json jsonRes;
@@ -150,7 +150,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildLocationComponentInfo(jsonRes);
@@ -177,7 +177,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildLocationComponentInfo(jsonRes);
@@ -196,7 +196,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -234,7 +234,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -271,7 +271,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildSaveComponentInfo(jsonRes);
@@ -287,7 +287,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Lev
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -325,7 +325,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -367,7 +367,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildSaveComponentInfo(jsonRes);
@@ -407,7 +407,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent004, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent004, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildSaveComponentInfo(jsonRes);
@@ -442,7 +442,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent004, Test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -482,7 +482,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -526,7 +526,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -563,7 +563,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
@@ -600,7 +600,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildSaveComponentInfo(jsonRes);
@@ -618,7 +618,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildSaveComponentInfo(jsonRes);
@@ -641,7 +641,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompRegisterCallbackTest, CheckCipherPrint001, TestSize.Level1)
+HWTEST_F(SecCompRegisterCallbackTest, CheckCipherPrint001, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildLocationComponentInfo(jsonRes);

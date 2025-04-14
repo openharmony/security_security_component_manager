@@ -59,7 +59,7 @@ void SecCompStubMockTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompStubMockTest, OnRemoteRequestMock001, TestSize.Level1)
+HWTEST_F(SecCompStubMockTest, OnRemoteRequestMock001, TestSize.Level0)
 {
     MessageParcel data;
     MessageParcel reply;

@@ -55,7 +55,7 @@ void SecCompEnhanceAdapterTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level1)
+HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level0)
 {
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
     EXPECT_EQ(SecCompEnhanceAdapter::EnableInputEnhance(), SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE);

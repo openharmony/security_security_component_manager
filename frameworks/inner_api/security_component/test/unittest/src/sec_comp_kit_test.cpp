@@ -95,7 +95,7 @@ void SecCompKitTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
+HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level0)
 {
     LocationButton comp;
     comp.fontSize_ = TestCommon::TEST_SIZE;
@@ -142,7 +142,7 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level1)
+HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level0)
 {
     std::vector<uintptr_t> callerList = {
         reinterpret_cast<uintptr_t>(TestInCallerCheckList),
@@ -167,7 +167,7 @@ HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, TestCallerCheck002, TestSize.Level1)
+HWTEST_F(SecCompKitTest, TestCallerCheck002, TestSize.Level0)
 {
     std::vector<uintptr_t> callerList;
     SecCompUiRegister registerCallback(callerList, nullptr);
@@ -190,7 +190,7 @@ HWTEST_F(SecCompKitTest, TestCallerCheck002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
+HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level0)
 {
     nlohmann::json jsonRes;
     TestCommon::BuildLocationComponentInfo(jsonRes);
@@ -215,7 +215,7 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level1)
+HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level0)
 {
     SecCompClient::GetInstance().FinishStartSAFail();
     EXPECT_TRUE(SecCompClient::GetInstance().readyFlag_);
@@ -230,7 +230,7 @@ HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompKitTest, OnLoadSystemAbilitySuccess001, TestSize.Level1)
+HWTEST_F(SecCompKitTest, OnLoadSystemAbilitySuccess001, TestSize.Level0)
 {
     std::shared_ptr<SecCompLoadCallback> loadCallback = std::make_shared<SecCompLoadCallback>();
     EXPECT_NE(nullptr, loadCallback);

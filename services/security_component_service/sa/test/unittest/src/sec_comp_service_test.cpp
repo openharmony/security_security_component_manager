@@ -79,7 +79,7 @@ void SecCompServiceTest::TearDown()
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, OnStart001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, OnStart001, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
     secCompService_->appStateObserver_ = nullptr;
@@ -101,7 +101,7 @@ HWTEST_F(SecCompServiceTest, OnStart001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, RegisterAppStateObserver001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, RegisterAppStateObserver001, TestSize.Level0)
 {
     // GetSystemAbilityManager get failed
     secCompService_->appStateObserver_ = nullptr;
@@ -164,7 +164,7 @@ HWTEST_F(SecCompServiceTest, RegisterAppStateObserver001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, UnregisterAppStateObserver001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, UnregisterAppStateObserver001, TestSize.Level0)
 {
     // GetSystemAbilityManager get failed
     secCompService_->appStateObserver_ = nullptr;
@@ -181,7 +181,7 @@ HWTEST_F(SecCompServiceTest, UnregisterAppStateObserver001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, GetCallerInfo001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, GetCallerInfo001, TestSize.Level0)
 {
     // not root uid
     setuid(1);
@@ -206,7 +206,7 @@ HWTEST_F(SecCompServiceTest, GetCallerInfo001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, UnregisterSecurityComponentBody001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, UnregisterSecurityComponentBody001, TestSize.Level0)
 {
     // get caller fail
     EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_NOT_EXIST,
@@ -219,7 +219,7 @@ HWTEST_F(SecCompServiceTest, UnregisterSecurityComponentBody001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, UpdateSecurityComponentBody001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, UpdateSecurityComponentBody001, TestSize.Level0)
 {
     // get caller fail
     EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
@@ -240,7 +240,7 @@ HWTEST_F(SecCompServiceTest, UpdateSecurityComponentBody001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEventBody001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEventBody001, TestSize.Level0)
 {
     auto uid = getuid();
     // get caller fail
@@ -287,7 +287,7 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEventBody001, TestSize.
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, Dump001, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, Dump001, TestSize.Level0)
 {
     int fd = -1;
     std::vector<std::u16string> args;
@@ -330,7 +330,7 @@ HWTEST_F(SecCompServiceTest, Dump001, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, OnStart002, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, OnStart002, TestSize.Level0)
 {
     secCompService_->state_ = ServiceRunningState::STATE_NOT_START;
     secCompService_->appStateObserver_ = nullptr;
@@ -350,7 +350,7 @@ HWTEST_F(SecCompServiceTest, OnStart002, TestSize.Level1)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level1)
+HWTEST_F(SecCompServiceTest, GetCallerInfo002, TestSize.Level0)
 {
     SecCompCallerInfo caller;
     setuid(1);
