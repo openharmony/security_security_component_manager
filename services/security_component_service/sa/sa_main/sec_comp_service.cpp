@@ -396,16 +396,16 @@ int32_t SecCompService::UnregisterReadFromRawdata(SecCompRawdata& rawData, int32
 {
     MessageParcel deserializedData;
     if (!SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawData, deserializedData)) {
-        SC_LOG_ERROR(LABEL, "Unreigster deserialize session info failed");
+        SC_LOG_ERROR(LABEL, "Unregister deserialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     if (!deserializedData.ReadInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Unreigster read component id failed");
+        SC_LOG_ERROR(LABEL, "Unregister read component id failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
     if (scId < 0) {
-        SC_LOG_ERROR(LABEL, "Unreigster security component id invalid");
+        SC_LOG_ERROR(LABEL, "Unregister security component id invalid");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
     return SC_OK;
@@ -430,7 +430,7 @@ int32_t SecCompService::UnregisterWriteToRawdata(int32_t res, SecCompRawdata& ra
     }
 
     if (!SecCompEnhanceAdapter::EnhanceSrvSerialize(replyParcel, rawReply)) {
-        SC_LOG_ERROR(LABEL, "Unreigster serialize session info failed");
+        SC_LOG_ERROR(LABEL, "Unregister serialize session info failed");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
     return SC_OK;
