@@ -76,7 +76,7 @@ const std::string JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG = "hasNonComp
 const std::string JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG = "blurRadius";
 const std::string JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG = "foregroundBlurRadius";
 const std::string JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG = "isOverlayTextSet";
-const std::string JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG = "isOVerlayNodeCovered";
+const std::string JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG = "isOverlayNodeCovered";
 
 bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
 {
