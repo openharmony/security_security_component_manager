@@ -35,7 +35,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompInfoHelper"};
-static constexpr double MAX_RECT_PERCENT = 0.1F; // 10%
+static constexpr double MAX_RECT_PERCENT = 0.3F; // 30%
 static constexpr double ZERO_OFFSET = 0.0F;
 const std::string OUT_OF_SCREEN = ", security component is out of screen, security component(x = ";
 const std::string OUT_OF_WINDOW = ", security component is out of window, security component(x = ";
@@ -205,13 +205,9 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    // check rect > 10%
+    // check rect > 30%
     if (GreatOrEqual((rect.width_ * rect.height_), (curScreenWidth * curScreenHeight * MAX_RECT_PERCENT))) {
-        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is larger than 10 percent of screen");
-        message = SECURITY_COMPONENT_IS_TOO_LARGER + std::to_string(rect.width_) +
-            ", height = " + std::to_string(rect.height_) + "), current screen(width = "
-            + std::to_string(curScreenWidth) + ", height = " + std::to_string(curScreenHeight) + ")";
-        return false;
+        SC_LOG_INFO(LABEL, "security component is larger than 30 percent of screen");
     }
     SC_LOG_DEBUG(LABEL, "check component rect success.");
     return true;
