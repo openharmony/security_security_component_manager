@@ -43,6 +43,7 @@ static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t si
     if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
         return;
     }
+    rawData.WriteUint32(1);
     SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
     input.WriteUint32(inputData.size);
     input.WriteRawData(inputData.data, inputData.size);
@@ -50,6 +51,8 @@ static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t si
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     service->OnRemoteRequest(code, input, reply, option);
+    service->OnStart();
+    service->OnStop();
 }
 } // namespace OHOS
 
