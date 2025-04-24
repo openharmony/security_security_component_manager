@@ -126,7 +126,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterWithoutPreprocess001, TestSize.Lev
  * @tc.name: RegisterSecurityComponent001
  * @tc.desc: test register security component success.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JM
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Level1)
 {
@@ -147,7 +147,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent001, TestSize.Lev
  * @tc.name: RegisterSecurityComponent002
  * @tc.desc: test register callback failed.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JM
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Level1)
 {
@@ -174,7 +174,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent002, TestSize.Lev
  * @tc.name: RegisterSecurityComponent003
  * @tc.desc: test register in MaliciousAppList.
  * @tc.type: FUNC
- * @tc.require: AR000HO9JM
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Level1)
 {
@@ -193,7 +193,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent003, TestSize.Lev
  * @tc.name: RegisterSecurityComponent004
  * @tc.desc: Test register security component check touch info failed
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Level1)
 {
@@ -228,7 +228,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
  * @tc.name: RegisterSecurityComponent005
  * @tc.desc: Test register security component permission grant failed
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Level1)
 {
@@ -262,7 +262,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
  * @tc.name: RegisterSecurityComponent006
  * @tc.desc: Test register security component permission grant failed caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Level1)
 {
@@ -278,7 +278,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent006, TestSize.Lev
  * @tc.name: ReportSecurityComponentClickEvent001
  * @tc.desc: Test register security component success
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, TestSize.Level1)
 {
@@ -315,7 +315,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
  * @tc.name: ReportSecurityComponentClickEvent002
  * @tc.desc: Test report security component caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, TestSize.Level1)
 {
@@ -353,7 +353,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
  * @tc.name: ReportSecurityComponentClickEvent003
  * @tc.desc: Test report security component data is empty
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, TestSize.Level1)
 {
@@ -384,7 +384,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
  * @tc.name: ReportClickWithoutHmac001
  * @tc.desc: Test report click event permission denied
  * @tc.type: FUNC
- * @tc.require: AR000HO9JM
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1)
 {
@@ -421,7 +421,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level1
  * @tc.name: VerifySavePermission001
  * @tc.desc: Test register security component wrong hap
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
 {
@@ -461,7 +461,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level1)
  * @tc.name: VerifySavePermission002
  * @tc.desc: Test register security component invalid tokenId
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
 {
@@ -496,7 +496,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level1)
  * @tc.name: UnregisterSecurityComponent001
  * @tc.desc: Test unregister security component caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.Level1)
 {
@@ -530,7 +530,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
  * @tc.name: UpdateSecurityComponent001
  * @tc.desc: Test update security component success
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level1)
 {
@@ -548,7 +548,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level
  * @tc.name: UpdateSecurityComponent002
  * @tc.desc: Test update security component caller error
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level1)
 {

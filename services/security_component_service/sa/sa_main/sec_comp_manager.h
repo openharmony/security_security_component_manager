@@ -71,6 +71,7 @@ private:
     SecCompManager();
     bool IsForegroundCompExist();
     bool IsCompExist();
+    bool IsScIdExist(int32_t scId);
     int32_t AddSecurityComponentToList(int32_t pid,
         AccessToken::AccessTokenID tokenId, const SecCompEntity& newEntity);
     int32_t DeleteSecurityComponentFromList(int32_t pid, int32_t scId);

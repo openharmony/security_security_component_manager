@@ -46,7 +46,7 @@ void SaveButtonTest::TearDown()
  * @tc.name: IsParamValid001
  * @tc.desc: Test save button from wrong value params json
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
 {
@@ -85,7 +85,7 @@ HWTEST_F(SaveButtonTest, IsParamValid001, TestSize.Level1)
  * @tc.name: CompareSaveButton001
  * @tc.desc: Test compare save button
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level1)
 {
@@ -118,7 +118,7 @@ HWTEST_F(SaveButtonTest, CompareSaveButton001, TestSize.Level1)
  * @tc.name: CompareSaveButton002
  * @tc.desc: Test SaveButton compare
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
 {
@@ -151,7 +151,7 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level1)
  * @tc.name: CompareSaveButton003
  * @tc.desc: Test SaveButton compare
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level1)
 {

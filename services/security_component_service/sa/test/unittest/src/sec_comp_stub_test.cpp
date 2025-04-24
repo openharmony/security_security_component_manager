@@ -55,7 +55,7 @@ void SecCompStubTest::TearDown()
  * @tc.name: OnRemoteRequest001
  * @tc.desc: Test on remote request
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
 {
@@ -79,7 +79,7 @@ HWTEST_F(SecCompStubTest, OnRemoteRequest001, TestSize.Level1)
  * @tc.name: RegisterSecurityComponentInner001
  * @tc.desc: Test register security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
 {
@@ -106,7 +106,7 @@ HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level1)
  * @tc.name: UpdateSecurityComponentInner001
  * @tc.desc: Test update security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
 {
@@ -130,7 +130,7 @@ HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level1)
  * @tc.name: UnregisterSecurityComponentInner001
  * @tc.desc: Test unregister security component
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level1)
 {
@@ -203,7 +203,7 @@ HWTEST_F(SecCompStubTest, VerifySavePermissionInner001, TestSize.Level1)
  * @tc.name: Marshalling001
  * @tc.desc: Test SecCompClickEventParcel::Marshalling
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
 {
@@ -229,7 +229,7 @@ HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level1)
  * @tc.name: Unmarshalling001
  * @tc.desc: Test SecCompClickEventParcel::Unmarshalling
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level1)
 {
