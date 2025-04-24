@@ -80,7 +80,7 @@ void SecCompInfoHelperTest::TearDown()
  * @tc.name: ParseComponent001
  * @tc.desc: Test parse component info success
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level1)
 {
@@ -95,7 +95,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level1)
  * @tc.name: ParseComponent002
  * @tc.desc: Test parse component info with empty json
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level1)
 {
@@ -111,7 +111,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level1)
  * @tc.name: ParseComponent003
  * @tc.desc: Test parse component info with invalid type
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent003, TestSize.Level1)
 {
@@ -141,7 +141,7 @@ static SecCompRect GetDefaultRect(void)
  * @tc.name: ParseComponent004
  * @tc.desc: Test parse component info with invalid rect
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
 {
@@ -184,7 +184,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level1)
  * @tc.name: ParseComponent005
  * @tc.desc: Test parse component info with windowRect invalid
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
 {
@@ -221,7 +221,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level1)
  * @tc.name: ParseComponent006
  * @tc.desc: Test parse component info with parentEffect active
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level1)
 {
@@ -242,7 +242,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level1)
  * @tc.name: ParseComponent007
  * @tc.desc: Test parse component info with invalid size
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level1)
 {
@@ -272,7 +272,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level1)
  * @tc.name: ParseComponent008
  * @tc.desc: Test parse component info with invalid size
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level1)
 {
@@ -297,7 +297,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level1)
  * @tc.name: ParseComponent009
  * @tc.desc: Test parse component info with invalid size
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level1)
 {
@@ -322,7 +322,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level1)
  * @tc.name: ParseComponent010
  * @tc.desc: Test parse component info with invalid color
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level1)
 {
@@ -346,7 +346,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level1)
  * @tc.name: ParseComponent011
  * @tc.desc: Test parse component info with invalid style
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level1)
 {
@@ -368,7 +368,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level1)
  * @tc.name: ParseComponent012
  * @tc.desc: Test parse component info with invalid style
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level1)
 {
@@ -397,7 +397,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level1)
  * @tc.name: ParseComponent013
  * @tc.desc: Test parse component info with invalid style
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level1)
 {
@@ -428,7 +428,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level1)
  * @tc.name: ParseComponent014
  * @tc.desc: Test parse component info with invalid style
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
 {
@@ -461,7 +461,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level1)
  * @tc.name: ParseComponent015
  * @tc.desc: Test parse component info with similar color
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level1)
 {
@@ -488,7 +488,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level1)
  * @tc.name: CheckComponentValid001
  * @tc.desc: Test CheckComponentValid with invalid color
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level1)
 {
@@ -510,7 +510,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level1)
  * @tc.name: CheckComponentValid002
  * @tc.desc: Test CheckComponentValid with invalid text or icon
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level1)
 {
@@ -532,7 +532,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level1)
  * @tc.name: CheckComponentValid003
  * @tc.desc: Test CheckComponentValid with invalid type
  * @tc.type: FUNC
- * @tc.require: AR000HO9J7
+ * @tc.require:
  */
 HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level1)
 {

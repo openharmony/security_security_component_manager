@@ -46,7 +46,7 @@ void PasteButtonTest::TearDown()
  * @tc.name: IsParamValid001
  * @tc.desc: Test paste button from wrong value params json
  * @tc.type: FUNC
- * @tc.require: AR000HO9JB
+ * @tc.require:
  */
 HWTEST_F(PasteButtonTest, IsParamValid001, TestSize.Level1)
 {
@@ -85,7 +85,7 @@ HWTEST_F(PasteButtonTest, IsParamValid001, TestSize.Level1)
  * @tc.name: ComparePasteButton001
  * @tc.desc: Test compare paste button
  * @tc.type: FUNC
- * @tc.require: AR000HO9JB
+ * @tc.require:
  */
 HWTEST_F(PasteButtonTest, ComparePasteButton001, TestSize.Level1)
 {
@@ -118,7 +118,7 @@ HWTEST_F(PasteButtonTest, ComparePasteButton001, TestSize.Level1)
  * @tc.name: ComparePasteButton002
  * @tc.desc: Test PasteButton compare
  * @tc.type: FUNC
- * @tc.require: AR000HO9JB
+ * @tc.require:
  */
 HWTEST_F(PasteButtonTest, ComparePasteButton002, TestSize.Level1)
 {
@@ -151,7 +151,7 @@ HWTEST_F(PasteButtonTest, ComparePasteButton002, TestSize.Level1)
  * @tc.name: ComparePasteButton003
  * @tc.desc: Test PasteButton compare
  * @tc.type: FUNC
- * @tc.require: AR000HO9JB
+ * @tc.require:
  */
 HWTEST_F(PasteButtonTest, ComparePasteButton003, TestSize.Level1)
 {
