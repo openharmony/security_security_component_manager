@@ -559,7 +559,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
     if (res != SC_OK) {
         return res;
     }
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message, true);
+    SecCompBase* reportComponentInfo = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message, true);
+    std::shared_ptr<SecCompBase> report(reportComponentInfo);
     if (report == nullptr) {
         return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
     }
