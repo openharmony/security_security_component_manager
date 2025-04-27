@@ -59,6 +59,26 @@ ohos_source_set("sec_comp_service_proxy") {
   part_name = "security_component_manager"
 }
 
+ohos_source_set("sec_comp_no_cfi_service_proxy") {
+  output_values = get_target_outputs(":sec_comp_service_interface")
+
+  include_dirs = [ "${sec_comp_root_dir}/frameworks/common/include" ]
+
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
+
+  deps = [ ":sec_comp_service_interface" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+}
+
 ohos_source_set("sec_comp_service_stub") {
   sanitize = {
     cfi = true
