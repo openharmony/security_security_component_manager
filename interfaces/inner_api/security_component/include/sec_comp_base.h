@@ -181,6 +181,8 @@ private:
     bool ParseDisplayId(const nlohmann::json& json, const std::string& tag);
     bool ParseCrossAxisState(const nlohmann::json& json, const std::string& tag);
     bool ParseWearable(const nlohmann::json& json, const std::string& tag);
+    void ToJsonRect(nlohmann::json& jsonRes) const;
+    void ToJsonSize(nlohmann::json& jsonRes) const;
 };
 }  // namespace SecurityComponent
 }  // namespace Security
