@@ -437,11 +437,8 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, 
     return true;
 }
 
-void SecCompBase::ToJson(nlohmann::json& jsonRes) const
+void SecCompBase::ToJsonRect(nlohmann::json& jsonRes) const
 {
-    jsonRes[JsonTagConstants::JSON_SC_TYPE] = type_;
-    jsonRes[JsonTagConstants::JSON_NODE_ID] = nodeId_;
-    jsonRes[JsonTagConstants::JSON_IS_WEARABLE] = isWearableDevice_;
     jsonRes[JsonTagConstants::JSON_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, rect_.x_},
         {JsonTagConstants::JSON_RECT_Y, rect_.y_},
@@ -454,6 +451,10 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         {JsonTagConstants::JSON_RECT_WIDTH, windowRect_.width_},
         {JsonTagConstants::JSON_RECT_HEIGHT, windowRect_.height_}
     };
+}
+
+void SecCompBase::ToJsonSize(nlohmann::json& jsonRes) const
+{
     nlohmann::json jsonPadding = nlohmann::json {
         { JsonTagConstants::JSON_TOP_TAG, padding_.top },
         { JsonTagConstants::JSON_RIGHT_TAG, padding_.right },
@@ -475,6 +476,16 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
         { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
         { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius },
     };
+}
+
+void SecCompBase::ToJson(nlohmann::json& jsonRes) const
+{
+    jsonRes[JsonTagConstants::JSON_SC_TYPE] = type_;
+    jsonRes[JsonTagConstants::JSON_NODE_ID] = nodeId_;
+    jsonRes[JsonTagConstants::JSON_IS_WEARABLE] = isWearableDevice_;
+    
+    ToJsonRect(jsonRes);
+    ToJsonSize(jsonRes);
 
     jsonRes[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, fontColor_.value },

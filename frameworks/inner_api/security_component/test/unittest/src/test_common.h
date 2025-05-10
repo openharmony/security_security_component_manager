@@ -36,6 +36,7 @@ public:
     static constexpr uint32_t MAX_HMAC_SIZE = 64;
     static constexpr size_t MAX_CALLER_SIZE = 10;
 
+    static void BuildComponentCommonInfo(nlohmann::json& jsonComponent);
     static void BuildLocationComponentInfo(nlohmann::json& jsonComponent);
     static void BuildSaveComponentInfo(nlohmann::json& jsonComponent);
     static void BuildPasteComponentInfo(nlohmann::json& jsonComponent);

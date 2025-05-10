@@ -17,17 +17,8 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
+void TestCommon::BuildComponentCommonInfo(nlohmann::json& jsonComponent)
 {
-    jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
-    jsonComponent[JsonTagConstants::JSON_RECT] = nlohmann::json {
-        {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
-    };
-    jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
-    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
     jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = nlohmann::json {
         {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
@@ -74,6 +65,20 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
         { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
         { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
+}
+
+void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
+{
+    jsonComponent[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    jsonComponent[JsonTagConstants::JSON_RECT] = nlohmann::json {
+        {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
+        {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
+        {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
+        {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
+    };
+    jsonComponent[JsonTagConstants::JSON_NODE_ID] = 0;
+    jsonComponent[JsonTagConstants::JSON_IS_WEARABLE] = false;
+    BuildComponentCommonInfo(jsonComponent);
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, LocationDesc::SELECT_LOCATION },
         { JsonTagConstants::JSON_ICON_TAG, LocationIcon::LINE_ICON },
@@ -102,52 +107,7 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
-    jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = nlohmann::json {
-        {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
-    };
-    nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_TOP_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_LEFT_TAG, TestCommon::TEST_DIMENSION },
-    };
-
-    nlohmann::json jsonBorderRadius = nlohmann::json {
-        { JsonTagConstants::JSON_LEFT_TOP_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_TOP_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, TEST_DIMENSION },
-    };
-
-    jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_FONT_SIZE_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_ICON_SIZE_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
-        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius}
-    };
-
-    jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_FONT_COLOR_TAG, TestCommon::TEST_COLOR_RED },
-        { JsonTagConstants::JSON_ICON_COLOR_TAG, TestCommon::TEST_COLOR_BLUE },
-        { JsonTagConstants::JSON_BG_COLOR_TAG, TestCommon::TEST_COLOR_YELLOW }
-    };
-
-    jsonComponent[JsonTagConstants::JSON_BORDER_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_BORDER_WIDTH_TAG, TestCommon::TEST_SIZE },
-    };
-    jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
-        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
-        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
-    };
+    BuildComponentCommonInfo(jsonComponent);
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, SaveDesc::DOWNLOAD },
         { JsonTagConstants::JSON_ICON_TAG, SaveIcon::LINE_ICON },
@@ -176,52 +136,7 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
         {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
         {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
     };
-    jsonComponent[JsonTagConstants::JSON_WINDOW_RECT] = nlohmann::json {
-        {JsonTagConstants::JSON_RECT_X, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_Y, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_WIDTH, TestCommon::TEST_COORDINATE },
-        {JsonTagConstants::JSON_RECT_HEIGHT, TestCommon::TEST_COORDINATE }
-    };
-    nlohmann::json jsonPadding = nlohmann::json {
-        { JsonTagConstants::JSON_TOP_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_BOTTOM_TAG, TestCommon::TEST_DIMENSION },
-        { JsonTagConstants::JSON_LEFT_TAG, TestCommon::TEST_DIMENSION },
-    };
-
-    nlohmann::json jsonBorderRadius = nlohmann::json {
-        { JsonTagConstants::JSON_LEFT_TOP_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_TOP_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_LEFT_BOTTOM_TAG, TEST_DIMENSION },
-        { JsonTagConstants::JSON_RIGHT_BOTTOM_TAG, TEST_DIMENSION },
-    };
-
-    jsonComponent[JsonTagConstants::JSON_SIZE_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_FONT_SIZE_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_ICON_SIZE_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG, TestCommon::TEST_SIZE },
-        { JsonTagConstants::JSON_PADDING_SIZE_TAG, jsonPadding },
-        { JsonTagConstants::JSON_BORDER_RADIUS_TAG, jsonBorderRadius},
-    };
-
-    jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_FONT_COLOR_TAG, TestCommon::TEST_COLOR_RED },
-        { JsonTagConstants::JSON_ICON_COLOR_TAG, TestCommon::TEST_COLOR_BLUE },
-        { JsonTagConstants::JSON_BG_COLOR_TAG, TestCommon::TEST_COLOR_YELLOW }
-    };
-
-    jsonComponent[JsonTagConstants::JSON_BORDER_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_BORDER_WIDTH_TAG, TestCommon::TEST_SIZE },
-    };
-    jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
-        { JsonTagConstants::JSON_PARENT_EFFECT_TAG, false },
-        { JsonTagConstants::JSON_IS_CLIPPED_TAG, false },
-        { JsonTagConstants::JSON_TOP_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_BOTTOM_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_LEFT_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
-        { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
-    };
+    BuildComponentCommonInfo(jsonComponent);
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_TEXT_TAG, PasteDesc::PASTE },
         { JsonTagConstants::JSON_ICON_TAG, PasteIcon::LINE_ICON },
