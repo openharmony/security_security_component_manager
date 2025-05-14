@@ -36,6 +36,7 @@ public:
     static bool IsServiceExist();
     static bool LoadService();
     static bool IsSystemAppCalling();
+    static bool HasCustomPermissionForSecComp();
 };
 }  // namespace SecurityComponent
 }  // namespace Security

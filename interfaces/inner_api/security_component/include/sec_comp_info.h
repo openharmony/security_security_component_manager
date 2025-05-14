@@ -76,6 +76,16 @@ enum CrossAxisState {
     STATE_NO_CROSS,
 };
 
+enum TipPosition {
+    ABOVE_BOTTOM = 0,
+    BELOW_TOP,
+};
+
+enum NotifyType {
+    DIALOG = 0,
+    TOAST,
+};
+
 inline bool IsComponentTypeValid(int32_t type)
 {
     return (type > UNKNOWN_SC_TYPE && type < MAX_SC_TYPE);

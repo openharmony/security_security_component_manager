@@ -170,6 +170,11 @@ bool SecCompKit::IsSystemAppCalling()
 {
     return SecCompClient::GetInstance().IsSystemAppCalling();
 }
+
+bool SecCompKit::HasCustomPermissionForSecComp()
+{
+    return SecCompClient::GetInstance().HasCustomPermissionForSecComp();
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

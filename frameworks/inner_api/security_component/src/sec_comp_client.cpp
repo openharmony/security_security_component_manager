@@ -14,6 +14,7 @@
  */
 #include "sec_comp_client.h"
 
+#include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "sec_comp_click_event_parcel.h"
@@ -236,7 +237,7 @@ int32_t SecCompClient::UnregisterSecurityComponent(int32_t scId)
     return serviceRes;
 }
 
-int32_t SecCompClient::ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData)
+int32_t SecCompClient::ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData, std::string& message)
 {
     MessageParcel dataParcel;
 
@@ -247,6 +248,11 @@ int32_t SecCompClient::ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRaw
 
     if (!dataParcel.WriteString(secCompInfo.componentInfo)) {
         SC_LOG_ERROR(LABEL, "Report write componentInfo failed.");
+        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+
+    if (!dataParcel.WriteString(message)) {
+        SC_LOG_ERROR(LABEL, "Report write message failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -279,7 +285,7 @@ int32_t SecCompClient::ReportSecurityComponentClickEvent(SecCompInfo& secCompInf
 
     std::lock_guard<std::mutex> lock(useIPCMutex_);
     SecCompRawdata rawData;
-    int32_t res = ReportWriteToRawdata(secCompInfo, rawData);
+    int32_t res = ReportWriteToRawdata(secCompInfo, rawData, message);
     if (res != SC_OK) {
         return res;
     }
@@ -331,6 +337,25 @@ bool SecCompClient::IsSystemAppCalling()
 {
     auto selfToken = IPCSkeleton::GetSelfTokenID();
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
+}
+
+bool SecCompClient::HasCustomPermissionForSecComp()
+{
+    auto proxy = GetProxy(true);
+    if (proxy == nullptr) {
+        SC_LOG_ERROR(LABEL, "Proxy is null");
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(useIPCMutex_);
+    bool hasCustomPermission;
+    int32_t res = proxy->HasCustomPermissionForSecComp(hasCustomPermission);
+    if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Get custom permission status failed, result: %{public}d.", res);
+        return false;
+    }
+
+    return hasCustomPermission;
 }
 
 int32_t SecCompClient::PreRegisterWriteToRawdata(SecCompRawdata& rawData)

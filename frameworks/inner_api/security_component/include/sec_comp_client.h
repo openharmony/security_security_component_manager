@@ -37,7 +37,7 @@ public:
     int32_t RegisterWriteToRawdata(SecCompType type, const std::string& componentInfo, SecCompRawdata& rawData);
     int32_t UpdateWriteToRawdata(int32_t scId, const std::string& componentInfo, SecCompRawdata& rawData);
     int32_t UnregisterWriteToRawdata(int32_t scId, SecCompRawdata& rawData);
-    int32_t ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData);
+    int32_t ReportWriteToRawdata(SecCompInfo& secCompInfo, SecCompRawdata& rawData, std::string& message);
     int32_t PreRegisterWriteToRawdata(SecCompRawdata& rawData);
     int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId);
     int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo);
@@ -49,6 +49,7 @@ public:
     bool IsServiceExist();
     bool LoadService();
     bool IsSystemAppCalling();
+    bool HasCustomPermissionForSecComp();
 
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();

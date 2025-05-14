@@ -57,6 +57,12 @@ public:
     {
         return 0;
     };
+
+    int32_t HasCustomPermissionForSecComp(bool& hasCustomPermission) override
+    {
+        hasCustomPermission = false;
+        return 0;
+    };
 };
 
 class SecCompStubTest : public testing::Test {

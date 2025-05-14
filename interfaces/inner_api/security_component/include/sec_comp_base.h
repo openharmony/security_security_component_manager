@@ -94,6 +94,8 @@ public:
     static const std::string JSON_FOREGROUND_BLUR_RADIUS_TAG;
     static const std::string JSON_IS_OVERLAY_TEXT_SET_TAG;
     static const std::string JSON_IS_OVERLAY_NODE_SET_TAG;
+    static const std::string JSON_IS_CUSTOMIZABLE;
+    static const std::string JSON_TIP_POSITION;
 };
 
 class __attribute__((visibility("default"))) SecCompBase {
@@ -159,6 +161,8 @@ public:
     bool isIconExceeded_ = false;
     bool isBorderCovered_ = false;
     bool isWearableDevice_ = false;
+    TipPosition tipPosition_ = TipPosition::ABOVE_BOTTOM;
+    bool isCustomizable_ = false;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;
@@ -180,9 +184,14 @@ private:
     bool ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value);
     bool ParseDisplayId(const nlohmann::json& json, const std::string& tag);
     bool ParseCrossAxisState(const nlohmann::json& json, const std::string& tag);
+    bool ParseTipPosition(const nlohmann::json& json, const std::string& tag);
     bool ParseWearable(const nlohmann::json& json, const std::string& tag);
     void ToJsonRect(nlohmann::json& jsonRes) const;
     void ToJsonSize(nlohmann::json& jsonRes) const;
+    bool ParseComponentInfo(const nlohmann::json& json, std::string& message, bool isClicked);
+    bool ParseWindowInfo(const nlohmann::json& json);
+    bool ParseDisplayInfo(const nlohmann::json& json);
+    bool ParseCustomInfo(const nlohmann::json& json);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

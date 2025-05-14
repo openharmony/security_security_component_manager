@@ -121,7 +121,7 @@ bool SecCompEntity::IsInPCVirtualScreen(const CrossAxisState crossAxisState) con
 }
 
 int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
-    const CrossAxisState crossAxisState, std::string& message) const
+    const CrossAxisState crossAxisState, std::string& message)
 {
     bool isInPCVirtualScreen = IsInPCVirtualScreen(crossAxisState);
     SC_LOG_INFO(LABEL, "The cross axis state: %{public}d, the fold offset y: %{public}d.",
@@ -130,10 +130,13 @@ int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t supe
         clickInfo.point.touchY += superFoldOffsetY;
         componentInfo_->rect_.y_ += superFoldOffsetY;
     }
+    message.clear();
     if (!WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_,
         componentInfo_->rect_, message)) {
         SC_LOG_ERROR(LABEL, "Component may be covered by other window");
-        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+        if (!AllowToBypassSecurityCheck(message)) {
+            return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+        }
     }
 
     int32_t res = SC_SERVICE_ERROR_CLICK_EVENT_INVALID;

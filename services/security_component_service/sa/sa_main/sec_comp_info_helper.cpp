@@ -64,6 +64,7 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     std::string& message, bool isClicked)
 {
     SecCompBase* comp = nullptr;
+    message.clear();
     switch (type) {
         case LOCATION_COMPONENT:
             comp = ConstructComponent<LocationButton>(jsonComponent, message, isClicked);
@@ -189,6 +190,7 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
+    message.clear();
     if (IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo.isWearable)) {
         return false;
     }

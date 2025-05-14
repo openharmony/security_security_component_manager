@@ -241,3 +241,25 @@ HWTEST_F(SecCompKitTest, OnLoadSystemAbilitySuccess001, TestSize.Level0)
     loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, nullptr);
     loadCallback->OnLoadSystemAbilityFail(systemAbilityId);
 }
+
+/**
+ * @tc.name: IsSystemAppCalling001
+ * @tc.desc: Test whether the app is system app.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, IsSystemAppCalling001, TestSize.Level0)
+{
+    EXPECT_EQ(false, SecCompKit::IsSystemAppCalling());
+}
+
+/**
+ * @tc.name: HasCustomPermissionForSecComp001
+ * @tc.desc: Test whether the app has custom permission for security component.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, HasCustomPermissionForSecComp001, TestSize.Level0)
+{
+    EXPECT_EQ(false, SecCompKit::HasCustomPermissionForSecComp());
+}

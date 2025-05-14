@@ -52,13 +52,21 @@ const std::string WINDOW_ID_KEY = "ohos.ability.params.windowId";
 const std::string CALLER_UID_KEY = "ohos.caller.uid";
 const std::string DISPLAY_WIDTH = "ohos.display.width";
 const std::string DISPLAY_HEIGHT = "ohos.display.height";
+const std::string DISPLAY_TOP = "ohos.display.top";
 const std::string DIALOG_OFFSET = "ohos.dialog.offset";
+const std::string NOTIFY_TYPE = "ohos.ability.notify.type";
+const std::string TOAST_POSITION = "ohos.toast.position";
+const std::string TOAST_OFFSET = "ohos.toast.offset";
 
 constexpr int32_t DISPLAY_HALF_RATIO = 2;
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
+constexpr int32_t ABOVE_BOTTOM_OFFSET = 80;
+constexpr int32_t BELOW_TOP_OFFSET = 112;
 static std::mutex g_instanceMutex;
+static std::unordered_map<TipPosition, int32_t> tipPositionsMap = {{TipPosition::ABOVE_BOTTOM, ABOVE_BOTTOM_OFFSET},
+    {TipPosition::BELOW_TOP, BELOW_TOP_OFFSET}};
 }
 
 void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
@@ -302,10 +310,10 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     return res;
 }
 
-bool FirstUseDialog::SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, const CrossAxisState crossAxisState)
+bool FirstUseDialog::SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displayInfo)
 {
     sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
+        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayInfo.displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;
@@ -321,7 +329,7 @@ bool FirstUseDialog::SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, 
     int32_t height = info->GetHeight();
     int32_t offset = 0;
     /* crossAxisState is CROSS */
-    if (crossAxisState == CrossAxisState::STATE_CROSS) {
+    if (displayInfo.crossAxisState == CrossAxisState::STATE_CROSS) {
         height = info->GetPhysicalHeight();
         offset = static_cast<int32_t>(info->GetAvailableHeight()) / DISPLAY_HALF_RATIO;
     }
@@ -334,6 +342,36 @@ bool FirstUseDialog::SetDialogInfo(AAFwk::Want& want, const uint64_t displayId, 
     return true;
 }
 
+void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> entity,
+    const sptr<IRemoteObject> callerToken, const DisplayInfo& displayInfo)
+{
+    if (!entity->AllowToShowToast()) {
+        return;
+    }
+    bool needToShow = AccessToken::AccessTokenKit::IsToastShownNeeded(entity->pid_);
+    if (!needToShow) {
+        SC_LOG_INFO(LABEL, "Process pid=%{public}d needs not to show", entity->pid_);
+        return;
+    }
+    AAFwk::Want want;
+    want.SetElementName(GRANT_ABILITY_BUNDLE_NAME, GRANT_ABILITY_ABILITY_NAME);
+    want.SetParam(NOTIFY_TYPE, NotifyType::TOAST);
+    want.SetParam(TOAST_POSITION, entity->componentInfo_->tipPosition_);
+    want.SetParam(TOAST_OFFSET, tipPositionsMap[entity->componentInfo_->tipPosition_]);
+    int32_t superFoldOffsetY = 0;
+    if (entity->IsInPCVirtualScreen(displayInfo.crossAxisState)) {
+        superFoldOffsetY = displayInfo.superFoldOffsetY;
+    }
+    want.SetParam(DISPLAY_TOP, superFoldOffsetY);
+    if (!SetDisplayInfo(want, displayInfo)) {
+        SC_LOG_ERROR(LABEL, "Set display info failed.");
+        return;
+    }
+
+    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
+    SC_LOG_INFO(LABEL, "Start toast ability res %{public}d", startRes);
+}
+
 void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
     sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
@@ -344,7 +382,7 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     } else if (type == SAVE_COMPONENT) {
         typeNum = 1;
     } else {
-        SC_LOG_ERROR(LABEL, "unknown type.");
+        SC_LOG_ERROR(LABEL, "Unknown type.");
         return;
     }
     int32_t scId = entity->scId_;
@@ -361,15 +399,16 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     want.SetParam(TOKEN_KEY, callerToken);
     want.SetParam(CALLBACK_KEY, srvCallback);
     want.SetParam(WINDOW_ID_KEY, displayInfo.windowId);
+    want.SetParam(NOTIFY_TYPE, NotifyType::DIALOG);
     int32_t uid = IPCSkeleton::GetCallingUid();
     want.SetParam(CALLER_UID_KEY, uid);
-    if (!SetDialogInfo(want, displayInfo.displayId, displayInfo.crossAxisState)) {
-        SC_LOG_ERROR(LABEL, "Set dialog info failed.");
+    if (!SetDisplayInfo(want, displayInfo)) {
+        SC_LOG_ERROR(LABEL, "Set display info failed.");
         return;
     }
 
     int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
-    SC_LOG_INFO(LABEL, "start ability res %{public}d", startRes);
+    SC_LOG_INFO(LABEL, "Start ability res %{public}d", startRes);
     if (startRes != 0) {
         dialogWaitMap_.erase(scId);
     }
@@ -460,7 +499,8 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
 
     uint64_t compTypes = firstUseMap_[tokenId];
     if ((compTypes & typeMask) == typeMask) {
-        SC_LOG_INFO(LABEL, "no need notify again.");
+        SC_LOG_INFO(LABEL, "no need notify dialog again.");
+        StartToastAbility(entity, callerToken, displayInfo);
         return SC_OK;
     }
     StartDialogAbility(entity, callerToken, dialogCallback, displayInfo);
