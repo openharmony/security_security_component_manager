@@ -69,7 +69,7 @@ void SecCompEnhanceTest::TearDown()
  * @tc.name: SetEnhanceCfg001
  * @tc.desc: test SetEnhanceCfg
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level1)
 {
@@ -86,7 +86,7 @@ HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level1)
  * @tc.name: GetPoniterEventEnhanceData001
  * @tc.desc: test GetPoniterEventEnhanceData
  * @tc.type: FUNC
- * @tc.require: AR000HO9IN
+ * @tc.require:
  */
 HWTEST_F(SecCompEnhanceTest, GetPoniterEventEnhanceData001, TestSize.Level1)
 {
