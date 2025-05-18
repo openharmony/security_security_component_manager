@@ -460,6 +460,50 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
 }
 
 /*
+ * @tc.name: NotifyFirstUseDialog002
+ * @tc.desc: Test NotifyFirstUseDialog
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog002, TestSize.Level0)
+{
+    FirstUseDialog diag;
+    diag.secHandler_ = nullptr;
+
+    const FirstUseDialog::DisplayInfo displayInfo = {0, CrossAxisState::STATE_INVALID, 0};
+
+    // entity
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(nullptr, runner);
+    // handler
+    std::shared_ptr<SecEventHandler> handler = std::make_shared<SecEventHandler>(runner);
+    diag.secHandler_ = handler;
+
+    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
+    // first use save button
+    entity->componentInfo_ = std::make_shared<SaveButton>();
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    entity->tokenId_ = 0;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+    EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
+
+    // second use save button
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+    EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
+
+    entity->isCustomAuthorized_ = true;
+    std::string message = "message";
+    EXPECT_EQ(true, entity->AllowToBypassSecurityCheck(message));
+    diag.StartToastAbility(entity, testRemoteObject, displayInfo);
+
+    // wait for event handler done
+    sleep(3);
+}
+
+/*
  * @tc.name: GrantDialogWaitEntity001
  * @tc.desc: Test GrantDialogWaitEntity
  * @tc.type: FUNC

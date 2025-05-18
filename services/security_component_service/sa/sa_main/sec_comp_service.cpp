@@ -531,6 +531,12 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(const sptr<IRemoteObje
             res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
             break;
         }
+        std::string message;
+        if (!deserializedData.ReadString(message)) {
+            SC_LOG_ERROR(LABEL, "Report read message failed");
+            res = SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+            break;
+        }
         sptr<SecCompClickEventParcel> clickInfoParcel = deserializedData.ReadParcelable<SecCompClickEventParcel>();
         if (clickInfoParcel == nullptr) {
             SC_LOG_ERROR(LABEL, "Report read clickInfo info failed");
@@ -539,7 +545,6 @@ int32_t SecCompService::ReportSecurityComponentClickEvent(const sptr<IRemoteObje
         }
 
         SecCompInfo secCompInfo{ scId, componentInfo, clickInfoParcel->clickInfoParams_ };
-        std::string message;
         res = ReportSecurityComponentClickEventBody(secCompInfo, callerToken, dialogCallback, message);
         res = ReportWriteToRawdata(res, message, rawReply);
     } while (0);
@@ -623,6 +628,12 @@ int32_t SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId,
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
     isGranted = SecCompPermManager::GetInstance().VerifySavePermission(tokenId);
+    return SC_OK;
+}
+
+int32_t SecCompService::HasCustomPermissionForSecComp(bool& hasCustomPermission)
+{
+    hasCustomPermission = SecCompManager::GetInstance().HasCustomPermissionForSecComp();
     return SC_OK;
 }
 

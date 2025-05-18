@@ -844,6 +844,8 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEvent002, TestSize.
     MessageParcel data;
     data.WriteInt32(scId);
     data.WriteString(locationInfo);
+    std::string message = "";
+    data.WriteString(message);
     sptr<SecCompClickEventParcel> parcel = new (std::nothrow) SecCompClickEventParcel();
     ASSERT_NE(nullptr, parcel);
     parcel->clickInfoParams_ = clickInfo1;

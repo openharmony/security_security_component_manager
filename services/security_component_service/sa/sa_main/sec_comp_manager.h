@@ -59,6 +59,7 @@ public:
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message);
+    int32_t CheckClickEventParams(const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote);
     void NotifyProcessForeground(int32_t pid);
     void NotifyProcessBackground(int32_t pid);
     void NotifyProcessDied(int32_t pid, bool isProcessCached);
@@ -67,6 +68,7 @@ public:
     void ExitSaProcess();
     void ExitWhenAppMgrDied();
     int32_t AddSecurityComponentProcess(const SecCompCallerInfo& caller);
+    bool HasCustomPermissionForSecComp();
 
 private:
     SecCompManager();

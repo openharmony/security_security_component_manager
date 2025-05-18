@@ -42,6 +42,7 @@ static constexpr unsigned long REPORT_REMOTE_OBJECT_SIZE = 2UL;
 static std::mutex g_instanceMutex;
 const std::string START_DIALOG = "start dialog, onclick will be trap after dialog closed.";
 constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
+const std::string CUSTOMIZE_SAVE_BUTTON = "ohos.permission.CUSTOMIZE_SAVE_BUTTON";
 }
 
 SecCompManager::SecCompManager()
@@ -403,6 +404,8 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     int32_t registerId = CreateScId();
     std::shared_ptr<SecCompEntity> entity =
         std::make_shared<SecCompEntity>(component, caller.tokenId, registerId, caller.pid, caller.uid);
+    bool isCustomAuthorized = SecCompManager::GetInstance().HasCustomPermissionForSecComp();
+    entity->SetCustomAuthorizationStatus(isCustomAuthorized);
     int32_t ret = AddSecurityComponentToList(caller.pid, caller.tokenId, entity);
     if (ret == SC_OK) {
         scId = registerId;
@@ -483,7 +486,13 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
             sc->GetType());
-        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        /**
+         * If the ptr of reportComponentInfo is not nullptr, the string of message is not empty only when the icon of
+         * save button is picture.
+         */
+        if (!(reportComponentInfo && sc->AllowToBypassSecurityCheck(message))) {
+            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        }
     }
     if (report && (report->isClipped_ || report->hasNonCompatibleChange_)) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLIP_CHECK_FAILED",
@@ -491,12 +500,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
-    SecCompInfoHelper::ScreenInfo screenInfo = {
-        .displayId = report->displayId_,
-        .crossAxisState = report->crossAxisState_,
-        .isWearable = report->isWearableDevice_
-    };
-
+    SecCompInfoHelper::ScreenInfo screenInfo = {report->displayId_, report->crossAxisState_, report->isWearableDevice_};
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
         screenInfo, message))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
@@ -504,7 +508,9 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
             sc->GetType());
-        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        if (!sc->AllowToBypassSecurityCheck(message)) {
+            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        }
     }
     int32_t enhanceRes =
         SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, reportComponentInfo, jsonComponent);
@@ -554,8 +560,8 @@ void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
     SC_LOG_INFO(LABEL, "height: %{public}d, posY: %{public}d", rect.height_, rect.posY_);
 }
 
-int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, const nlohmann::json& compJson,
-    const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
+int32_t SecCompManager::CheckClickEventParams(const SecCompCallerInfo& caller,
+    const std::vector<sptr<IRemoteObject>>& remote)
 {
     if (remote.size() < REPORT_REMOTE_OBJECT_SIZE) {
         SC_LOG_ERROR(LABEL, "remote object size is invalid");
@@ -565,26 +571,35 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
         return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
     }
+    return SC_OK;
+}
 
+int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, const nlohmann::json& compJson,
+    const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
+{
+    int32_t res = CheckClickEventParams(caller, remote);
+    if (res != SC_OK) {
+        return res;
+    }
     OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, info.scId);
     if (sc == nullptr) {
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
-    int32_t res = CheckClickSecurityComponentInfo(sc, info.scId, compJson, caller, message);
+    if (!message.empty()) {
+        if (!sc->AllowToBypassSecurityCheck(message)) {
+            return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+        }
+    }
+    res = CheckClickSecurityComponentInfo(sc, info.scId, compJson, caller, message);
     if (res != SC_OK) {
         return res;
     }
-    SecCompBase* reportComponentInfo = SecCompInfoHelper::ParseComponent(sc->GetType(), compJson, message, true);
-    std::shared_ptr<SecCompBase> report(reportComponentInfo);
-    if (report == nullptr) {
-        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
-    }
 
-    GetFoldOffsetY(report->crossAxisState_);
+    GetFoldOffsetY(sc->componentInfo_->crossAxisState_);
 
-    res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, report->crossAxisState_, message);
+    res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, sc->componentInfo_->crossAxisState_, message);
     if (res != SC_OK) {
         ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
             info.scId, sc->GetType());
@@ -595,7 +610,8 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    const FirstUseDialog::DisplayInfo displayInfo = {report->displayId_, report->crossAxisState_, report->windowId_};
+    const FirstUseDialog::DisplayInfo displayInfo = {sc->componentInfo_->displayId_,
+        sc->componentInfo_->crossAxisState_, sc->componentInfo_->windowId_, superFoldOffsetY_};
 
     if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], displayInfo) ==
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
@@ -661,6 +677,17 @@ bool SecCompManager::Initialize()
     DelayExitTask::GetInstance().Start();
 
     return true;
+}
+
+bool SecCompManager::HasCustomPermissionForSecComp()
+{
+    uint32_t callingTokenID = IPCSkeleton::GetCallingTokenID();
+    if (AccessToken::AccessTokenKit::VerifyAccessToken(callingTokenID, CUSTOMIZE_SAVE_BUTTON) ==
+        AccessToken::TypePermissionState::PERMISSION_GRANTED) {
+        return true;
+    }
+    SC_LOG_INFO(LABEL, "Permission denied(tokenID=%{public}d)", callingTokenID);
+    return false;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

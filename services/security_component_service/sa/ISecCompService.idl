@@ -23,5 +23,6 @@ interface OHOS.Security.SecurityComponent.ISecCompService {
     void ReportSecurityComponentClickEvent([in] IRemoteObject callerToken, [in] IRemoteObject dialogCallback,
         [in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
     void VerifySavePermission([in] unsigned int tokenId, [out] boolean ret);
+    void HasCustomPermissionForSecComp([out] boolean hasCustomPermission);
     void PreRegisterSecCompProcess([in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
 }

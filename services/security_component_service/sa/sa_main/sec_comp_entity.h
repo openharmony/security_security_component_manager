@@ -45,9 +45,46 @@ public:
         return isGrant_;
     }
 
+    void SetCustomAuthorizationStatus(bool isCustomAuthorized)
+    {
+        isCustomAuthorized_ = isCustomAuthorized;
+    }
+
+    bool AllowToBypassSecurityCheck(const std::string& errMessage)
+    {
+        if (errMessage.empty()) {
+            return false;
+        }
+        if (!isCustomAuthorized_) {
+            return false;
+        }
+        if (GetType() != SecCompType::SAVE_COMPONENT) {
+            return false;
+        }
+        bypassSecurityCheck_ = true;
+        return true;
+    }
+
+    bool AllowToShowToast() const
+    {
+        if (componentInfo_ == nullptr) {
+            return false;
+        }
+        if (!isCustomAuthorized_) {
+            return false;
+        }
+        if (GetType() != SecCompType::SAVE_COMPONENT) {
+            return false;
+        }
+        if (!(componentInfo_->isCustomizable_ || bypassSecurityCheck_)) {
+            return false;
+        }
+        return true;
+    }
+
     bool CompareComponentBasicInfo(SecCompBase* other, bool isRectCheck) const;
     int32_t CheckClickInfo(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY, const CrossAxisState crossAxisState,
-        std::string& message) const;
+        std::string& message);
     bool IsInPCVirtualScreen(const CrossAxisState crossAxisState) const;
 
     std::shared_ptr<SecCompBase> componentInfo_;
@@ -55,6 +92,8 @@ public:
     int32_t scId_;
     int32_t pid_;
     int32_t uid_;
+    bool isCustomAuthorized_ = false;
+    bool bypassSecurityCheck_ = false;
 
 private:
     int32_t CheckKeyEvent(const SecCompClickEvent& clickInfo) const;

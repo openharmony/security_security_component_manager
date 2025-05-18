@@ -77,12 +77,14 @@ const std::string JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG = "blur
 const std::string JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG = "foregroundBlurRadius";
 const std::string JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG = "isOverlayTextSet";
 const std::string JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG = "isOverlayNodeCovered";
+const std::string JsonTagConstants::JSON_TIP_POSITION = "tipPosition";
+const std::string JsonTagConstants::JSON_IS_CUSTOMIZABLE = "isCustomizable";
 
 bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
 {
     std::string tag = JsonTagConstants::JSON_NON_COMPATIBLE_CHANGE_TAG;
     if ((json.find(tag) == json.end()) || !json.at(tag).is_boolean()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     hasNonCompatibleChange_ = json.at(tag).get<bool>();
@@ -96,15 +98,15 @@ bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
     if (!ParseDimension(json, JsonTagConstants::JSON_LINEAR_GRADIENT_BLUR_RADIUS_TAG, blurRadius_)) {
         return false;
     }
-    
+
     if (!ParseDimension(json, JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG, foregroundBlurRadius_)) {
         return false;
     }
-    
+
     if (!ParseBool(json, JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG, isOverlayTextSet_)) {
         return false;
     }
-    
+
     if (!ParseBool(json, JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG, isOverlayNodeCovered_)) {
         return false;
     }
@@ -115,7 +117,7 @@ bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
 bool SecCompBase::ParseDimension(const nlohmann::json& json, const std::string& tag, DimensionT& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number_float()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -126,7 +128,7 @@ bool SecCompBase::ParseDimension(const nlohmann::json& json, const std::string& 
 bool SecCompBase::ParseColor(const nlohmann::json& json, const std::string& tag, SecCompColor& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -137,7 +139,7 @@ bool SecCompBase::ParseColor(const nlohmann::json& json, const std::string& tag,
 bool SecCompBase::ParseBool(const nlohmann::json& json, const std::string& tag, bool& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_boolean()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -148,7 +150,7 @@ bool SecCompBase::ParseBool(const nlohmann::json& json, const std::string& tag, 
 bool SecCompBase::ParseString(const nlohmann::json& json, const std::string& tag, std::string& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_string()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -159,7 +161,7 @@ bool SecCompBase::ParseString(const nlohmann::json& json, const std::string& tag
 bool SecCompBase::ParsePadding(const nlohmann::json& json, const std::string& tag, PaddingSize& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -182,7 +184,7 @@ bool SecCompBase::ParsePadding(const nlohmann::json& json, const std::string& ta
 bool SecCompBase::ParseBorderRadius(const nlohmann::json& json, const std::string& tag, BorderRadius& res)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -205,7 +207,7 @@ bool SecCompBase::ParseBorderRadius(const nlohmann::json& json, const std::strin
 bool SecCompBase::ParseColors(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     auto jsonColors = json.at(tag);
@@ -224,7 +226,7 @@ bool SecCompBase::ParseColors(const nlohmann::json& json, const std::string& tag
 bool SecCompBase::ParseBorders(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     auto jsonBorder = json.at(tag);
@@ -234,7 +236,7 @@ bool SecCompBase::ParseBorders(const nlohmann::json& json, const std::string& ta
 bool SecCompBase::ParseSize(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -266,7 +268,7 @@ bool SecCompBase::ParseSize(const nlohmann::json& json, const std::string& tag)
 bool SecCompBase::ParseParent(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     auto jsonParent = json.at(tag);
@@ -297,7 +299,7 @@ bool SecCompBase::ParseParent(const nlohmann::json& json, const std::string& tag
 bool SecCompBase::ParseRect(const nlohmann::json& json, const std::string& tag, SecCompRect& rect)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
 
@@ -324,7 +326,7 @@ bool SecCompBase::ParseRect(const nlohmann::json& json, const std::string& tag, 
 bool SecCompBase::ParseType(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     int32_t value = json.at(tag).get<int32_t>();
@@ -341,7 +343,7 @@ bool SecCompBase::ParseType(const nlohmann::json& json, const std::string& tag)
 bool SecCompBase::ParseValue(const nlohmann::json& json, const std::string& tag, int32_t& value)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     value = json.at(tag).get<int32_t>();
@@ -352,7 +354,7 @@ bool SecCompBase::ParseValue(const nlohmann::json& json, const std::string& tag,
 bool SecCompBase::ParseDisplayId(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     displayId_ = json.at(tag).get<uint64_t>();
@@ -363,7 +365,7 @@ bool SecCompBase::ParseDisplayId(const nlohmann::json& json, const std::string& 
 bool SecCompBase::ParseCrossAxisState(const nlohmann::json& json, const std::string& tag)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     int32_t value = json.at(tag).get<int32_t>();
@@ -381,10 +383,80 @@ bool SecCompBase::ParseWearable(const nlohmann::json& json, const std::string& t
 {
     if ((json.find(tag) == json.end()) ||
         !json.at(tag).is_boolean()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     isWearableDevice_ = json.at(tag).get<bool>();
+    return true;
+}
+
+bool SecCompBase::ParseTipPosition(const nlohmann::json& json, const std::string& tag)
+{
+    if ((json.find(tag) == json.end()) || !json.at(tag).is_number()) {
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
+        return false;
+    }
+    int32_t value = json.at(tag).get<int32_t>();
+    if ((value < static_cast<int32_t>(TipPosition::ABOVE_BOTTOM)) ||
+        (value > static_cast<int32_t>(TipPosition::BELOW_TOP))) {
+        SC_LOG_ERROR(LABEL, "Save tip position: %{public}d is invalid.", value);
+        return false;
+    }
+
+    tipPosition_ = static_cast<TipPosition>(value);
+    return true;
+}
+
+bool SecCompBase::ParseComponentInfo(const nlohmann::json& json, std::string& message, bool isClicked)
+{
+    if (!ParseRect(json, JsonTagConstants::JSON_RECT, rect_)) {
+        return false;
+    }
+    if (!ParseSize(json, JsonTagConstants::JSON_SIZE_TAG)) {
+        return false;
+    }
+    if (!ParseColors(json, JsonTagConstants::JSON_COLORS_TAG)) {
+        return false;
+    }
+    if (!ParseBorders(json, JsonTagConstants::JSON_BORDER_TAG)) {
+        return false;
+    }
+    if (!ParseStyle(json, JsonTagConstants::JSON_STYLE_TAG, message, isClicked)) {
+        return false;
+    }
+    return true;
+}
+
+bool SecCompBase::ParseWindowInfo(const nlohmann::json& json)
+{
+    if (!ParseRect(json, JsonTagConstants::JSON_WINDOW_RECT, windowRect_)) {
+        return false;
+    }
+    if (!ParseValue(json, JsonTagConstants::JSON_WINDOW_ID, windowId_)) {
+        return false;
+    }
+    return true;
+}
+
+bool SecCompBase::ParseDisplayInfo(const nlohmann::json& json)
+{
+    if (!ParseDisplayId(json, JsonTagConstants::JSON_DISPLAY_ID)) {
+        return false;
+    }
+    if (!ParseCrossAxisState(json, JsonTagConstants::JSON_CROSS_AXIS_STATE)) {
+        return false;
+    }
+    return true;
+}
+
+bool SecCompBase::ParseCustomInfo(const nlohmann::json& json)
+{
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_CUSTOMIZABLE, isCustomizable_)) {
+        return false;
+    }
+    if (!ParseTipPosition(json, JsonTagConstants::JSON_TIP_POSITION)) {
+        return false;
+    }
     return true;
 }
 
@@ -400,34 +472,19 @@ bool SecCompBase::FromJson(const nlohmann::json& jsonSrc, std::string& message, 
     if (!ParseWearable(jsonSrc, JsonTagConstants::JSON_IS_WEARABLE)) {
         return false;
     }
-    if (!ParseRect(jsonSrc, JsonTagConstants::JSON_RECT, rect_)) {
-        return false;
-    }
-    if (!ParseRect(jsonSrc, JsonTagConstants::JSON_WINDOW_RECT, windowRect_)) {
-        return false;
-    }
-    if (!ParseSize(jsonSrc, JsonTagConstants::JSON_SIZE_TAG)) {
-        return false;
-    }
-    if (!ParseColors(jsonSrc, JsonTagConstants::JSON_COLORS_TAG)) {
-        return false;
-    }
-    if (!ParseBorders(jsonSrc, JsonTagConstants::JSON_BORDER_TAG)) {
-        return false;
-    }
     if (!ParseParent(jsonSrc, JsonTagConstants::JSON_PARENT_TAG)) {
         return false;
     }
-    if (!ParseStyle(jsonSrc, JsonTagConstants::JSON_STYLE_TAG, message, isClicked)) {
+    if (!ParseComponentInfo(jsonSrc, message, isClicked)) {
         return false;
     }
-    if (!ParseValue(jsonSrc, JsonTagConstants::JSON_WINDOW_ID, windowId_)) {
+    if (!ParseWindowInfo(jsonSrc)) {
         return false;
     }
-    if (!ParseDisplayId(jsonSrc, JsonTagConstants::JSON_DISPLAY_ID)) {
+    if (!ParseDisplayInfo(jsonSrc)) {
         return false;
     }
-    if (!ParseCrossAxisState(jsonSrc, JsonTagConstants::JSON_CROSS_AXIS_STATE)) {
+    if (!ParseCustomInfo(jsonSrc)) {
         return false;
     }
     if (!ParseNonCompatibleChange(jsonSrc)) {
@@ -521,6 +578,8 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     jsonRes[JsonTagConstants::JSON_FOREGROUND_BLUR_RADIUS_TAG] = foregroundBlurRadius_;
     jsonRes[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = isOverlayTextSet_;
     jsonRes[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = isOverlayNodeCovered_;
+    jsonRes[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = isCustomizable_;
+    jsonRes[JsonTagConstants::JSON_TIP_POSITION] = tipPosition_;
 }
 
 std::string SecCompBase::ToJsonStr() const
@@ -533,7 +592,7 @@ std::string SecCompBase::ToJsonStr() const
 bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck) const
 {
     if (other == nullptr) {
-        SC_LOG_ERROR(LABEL, "other is nullptr.");
+        SC_LOG_ERROR(LABEL, "Other is nullptr.");
         return false;
     }
 
@@ -558,7 +617,7 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
 bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag, std::string& message, bool isClicked)
 {
     if ((json.find(tag) == json.end()) || !json.at(tag).is_object()) {
-        SC_LOG_ERROR(LABEL, "json: %{public}s tag invalid.", tag.c_str());
+        SC_LOG_ERROR(LABEL, "Json: %{public}s tag invalid.", tag.c_str());
         return false;
     }
     auto jsonStyle = json.at(tag);
@@ -580,14 +639,14 @@ bool SecCompBase::ParseStyle(const nlohmann::json& json, const std::string& tag,
     text_ = jsonStyle.at(JsonTagConstants::JSON_TEXT_TAG).get<int32_t>();
     icon_ = jsonStyle.at(JsonTagConstants::JSON_ICON_TAG).get<int32_t>();
     if (!IsTextIconTypeValid(message, isClicked)) {
-        SC_LOG_ERROR(LABEL, "text or icon is invalid.");
+        SC_LOG_ERROR(LABEL, "Text or icon is invalid.");
         return false;
     }
     bg_ = static_cast<SecCompBackground>(jsonStyle.at(JsonTagConstants::JSON_BG_TAG).get<int32_t>());
     if ((bg_ != SecCompBackground::NO_BG_TYPE) && (bg_ != SecCompBackground::CAPSULE) &&
         (bg_ != SecCompBackground::CIRCLE) && (bg_ != SecCompBackground::NORMAL) &&
         (bg_ != SecCompBackground::ROUNDED_RECTANGLE)) {
-        SC_LOG_ERROR(LABEL, "bg is invalid.");
+        SC_LOG_ERROR(LABEL, "Background is invalid.");
         return false;
     }
     return true;
