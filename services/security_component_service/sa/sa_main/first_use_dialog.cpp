@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <fstream>
 #include <sys/stat.h>
+#include <sys/statfs.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "ability_manager_client.h"
@@ -37,11 +38,13 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "FirstUseDialog"};
+static const std::string SECURITY_COMPONENT_MANAGER = "security_component_manager";
 static const std::string SEC_COMP_SRV_CFG_PATH = "/data/service/el1/public/security_component_service";
 static const std::string FIRST_USE_RECORD_JSON = SEC_COMP_SRV_CFG_PATH + "/first_use_record.json";
 static const std::string FIRST_USE_RECORD_TAG = "FirstUseRecord";
 static const std::string TOKEN_ID_TAG = "TokenId";
 static const std::string COMP_TYPE_TAG = "CompType";
+static const char* DATA_FOLDER = "/data";
 
 const std::string GRANT_ABILITY_BUNDLE_NAME = "com.ohos.permissionmanager";
 const std::string GRANT_ABILITY_ABILITY_NAME = "com.ohos.permissionmanager.SecurityExtAbility";
@@ -59,6 +62,29 @@ constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
 static std::mutex g_instanceMutex;
+}
+
+bool ReportUserData(const std::string filePath)
+{
+    struct stat fileInfo;
+    if (stat(filePath.c_str(), &fileInfo) != 0) {
+        SC_LOG_ERROR(LABEL, "Failed to get file stat, path = %{public}s.", filePath.c_str());
+        return false;
+    }
+    uint64_t fileSize = fileInfo.st_size;
+
+    struct statfs stat;
+    if (statfs(DATA_FOLDER, &stat) != 0) {
+        SC_LOG_ERROR(LABEL, "Failed to get data remain size.");
+        return false;
+    }
+    uint64_t remainSize = static_cast<uint64_t>(stat.f_bfree) * stat.f_bsize;
+
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "COMPONENT_NAME", SECURITY_COMPONENT_MANAGER,
+        "PARTITION_NAME", DATA_FOLDER, "REMAIN_PARTITION_SIZE", remainSize,
+        "FILE_OR_FOLDER_PATH", filePath, "FILE_OR_FOLDER_SIZE", fileSize);
+    return true;
 }
 
 void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
@@ -254,6 +280,9 @@ void FirstUseDialog::SaveFirstUseRecord(void)
         }
 
         jsonRes[FIRST_USE_RECORD_TAG] = recordsJson;
+    }
+    if (!ReportUserData(FIRST_USE_RECORD_JSON)) {
+        SC_LOG_ERROR(LABEL, "report user data failed.");
     }
     WriteCfgContent(jsonRes.dump());
 }
