@@ -33,6 +33,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static const std::string SEC_COMP_SRV_CFG_PATH = "/data/service/el1/public/security_component_service";
 static const std::string SEC_COMP_SRV_CFG_FILE = SEC_COMP_SRV_CFG_PATH + "/" + "first_use_record.json";
 static const std::string SEC_COMP_SRV_CFG_BACK_FILE = SEC_COMP_SRV_CFG_PATH + "/" + "first_use_record.json.bak";
+static const std::string INVALID_PATH = "/invalid_path";
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
 }
@@ -81,6 +82,18 @@ void FirstUseDialogTest::TearDown()
     }
     std::string cmdline = "mv " + SEC_COMP_SRV_CFG_BACK_FILE + " " + SEC_COMP_SRV_CFG_FILE;
     system(cmdline.c_str());
+}
+
+/**
+ * @tc.name: LoadFirstUseRecord001
+ * @tc.desc: Test cfg file not exist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, ReportUserData001, TestSize.Level0)
+{
+    ASSERT_EQ(false, ReportUserData(SEC_COMP_SRV_CFG_FILE));
+    ASSERT_EQ(false, ReportUserData(INVALID_PATH));
 }
 
 /**
