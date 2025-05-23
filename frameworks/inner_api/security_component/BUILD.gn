@@ -74,8 +74,6 @@ ohos_shared_library("libsecurity_component_sdk") {
     "samgr:samgr_proxy",
   ]
 
-  public_external_deps = [ "json:nlohmann_json_static" ]
-
   cflags_cc = [
     "-DHILOG_ENABLE",
     "-fvisibility=hidden",
