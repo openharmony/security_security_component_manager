@@ -90,6 +90,7 @@ ohos_unittest("sec_comp_service_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -163,6 +164,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "json:nlohmann_json_static",
+    "samgr:samgr_proxy",
   ]
 }
 
