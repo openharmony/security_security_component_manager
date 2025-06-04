@@ -72,17 +72,17 @@ static std::unordered_map<TipPosition, int32_t> tipPositionsMap = {{TipPosition:
     {TipPosition::BELOW_TOP, BELOW_TOP_OFFSET}};
 }
 
-bool ReportUserData(const std::string filePath)
+bool ReportUserData(const std::string& filePath, const std::string& folderPath)
 {
     struct stat fileInfo;
     if (stat(filePath.c_str(), &fileInfo) != 0) {
         SC_LOG_ERROR(LABEL, "Failed to get file stat, path = %{public}s.", filePath.c_str());
         return false;
     }
-    uint64_t fileSize = fileInfo.st_size;
+    int64_t fileSize = fileInfo.st_size;
 
     struct statfs stat;
-    if (statfs(DATA_FOLDER, &stat) != 0) {
+    if (statfs(folderPath.c_str(), &stat) != 0) {
         SC_LOG_ERROR(LABEL, "Failed to get data remain size.");
         return false;
     }
@@ -90,7 +90,7 @@ bool ReportUserData(const std::string filePath)
 
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "COMPONENT_NAME", SECURITY_COMPONENT_MANAGER,
-        "PARTITION_NAME", DATA_FOLDER, "REMAIN_PARTITION_SIZE", remainSize,
+        "PARTITION_NAME", folderPath, "REMAIN_PARTITION_SIZE", remainSize,
         "FILE_OR_FOLDER_PATH", filePath, "FILE_OR_FOLDER_SIZE", fileSize);
     return true;
 }
@@ -289,7 +289,7 @@ void FirstUseDialog::SaveFirstUseRecord(void)
 
         jsonRes[FIRST_USE_RECORD_TAG] = recordsJson;
     }
-    if (!ReportUserData(FIRST_USE_RECORD_JSON)) {
+    if (!ReportUserData(FIRST_USE_RECORD_JSON, DATA_FOLDER)) {
         SC_LOG_ERROR(LABEL, "report user data failed.");
     }
     WriteCfgContent(jsonRes.dump());
@@ -386,7 +386,11 @@ void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> enti
     want.SetElementName(GRANT_ABILITY_BUNDLE_NAME, GRANT_ABILITY_ABILITY_NAME);
     want.SetParam(NOTIFY_TYPE, NotifyType::TOAST);
     want.SetParam(TOAST_POSITION, entity->componentInfo_->tipPosition_);
-    want.SetParam(TOAST_OFFSET, tipPositionsMap[entity->componentInfo_->tipPosition_]);
+    int32_t toastOffset = ABOVE_BOTTOM_OFFSET;
+    if (tipPositionsMap.find(entity->componentInfo_->tipPosition_) != tipPositionsMap.end()) {
+        toastOffset = tipPositionsMap[entity->componentInfo_->tipPosition_];
+    }
+    want.SetParam(TOAST_OFFSET, toastOffset);
     int32_t superFoldOffsetY = 0;
     if (entity->IsInPCVirtualScreen(displayInfo.crossAxisState)) {
         superFoldOffsetY = displayInfo.superFoldOffsetY;

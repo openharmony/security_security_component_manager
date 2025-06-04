@@ -33,7 +33,7 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-bool ReportUserData(const std::string filePath);
+bool ReportUserData(const std::string& filePath, const std::string& folderPath);
 
 class SecCompDialogSrvCallback : public SecCompDialogCallbackStub {
 public:

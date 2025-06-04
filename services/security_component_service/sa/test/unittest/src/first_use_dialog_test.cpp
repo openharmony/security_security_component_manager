@@ -34,6 +34,7 @@ static const std::string SEC_COMP_SRV_CFG_PATH = "/data/service/el1/public/secur
 static const std::string SEC_COMP_SRV_CFG_FILE = SEC_COMP_SRV_CFG_PATH + "/" + "first_use_record.json";
 static const std::string SEC_COMP_SRV_CFG_BACK_FILE = SEC_COMP_SRV_CFG_PATH + "/" + "first_use_record.json.bak";
 static const std::string INVALID_PATH = "/invalid_path";
+static const char* DATA_FOLDER = "/data";
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
 }
@@ -92,8 +93,12 @@ void FirstUseDialogTest::TearDown()
  */
 HWTEST_F(FirstUseDialogTest, ReportUserData001, TestSize.Level0)
 {
-    ASSERT_EQ(false, ReportUserData(SEC_COMP_SRV_CFG_FILE));
-    ASSERT_EQ(false, ReportUserData(INVALID_PATH));
+    FirstUseDialog diag;
+    diag.firstUseMap_[1] = 1;
+    diag.SaveFirstUseRecord();
+    EXPECT_EQ(true, ReportUserData(SEC_COMP_SRV_CFG_FILE, DATA_FOLDER));
+    EXPECT_EQ(false, ReportUserData(INVALID_PATH, DATA_FOLDER));
+    EXPECT_EQ(false, ReportUserData(SEC_COMP_SRV_CFG_FILE, INVALID_PATH));
 }
 
 /**
