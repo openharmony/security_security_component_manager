@@ -134,7 +134,7 @@ void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
     }
 }
 
-bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
+__attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -147,7 +147,8 @@ bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
     return true;
 }
 
-bool SecCompEnhanceAdapter::EnhanceDataPreprocess(int32_t scId, std::string& componentInfo)
+__attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(
+    int32_t scId, std::string& componentInfo)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -201,7 +202,8 @@ static bool ReadMessageParcel(SecCompRawdata& tmpData, MessageParcel& data)
     return true;
 }
 
-bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, SecCompRawdata& output)
+__attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientSerialize(
+    MessageParcel& input, SecCompRawdata& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -215,7 +217,8 @@ bool SecCompEnhanceAdapter::EnhanceClientSerialize(MessageParcel& input, SecComp
     return WriteMessageParcel(input, output);
 }
 
-bool SecCompEnhanceAdapter::EnhanceClientDeserialize(SecCompRawdata& input, MessageParcel& output)
+__attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientDeserialize(
+    SecCompRawdata& input, MessageParcel& output)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -253,7 +256,7 @@ bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(SecCompRawdata& input, Message
     return ReadMessageParcel(input, output);
 }
 
-void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
+__attribute__((noinline)) void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
@@ -265,7 +268,7 @@ void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
     }
 }
 
-void SecCompEnhanceAdapter::UnregisterScIdEnhance(int32_t scId)
+__attribute__((noinline)) void SecCompEnhanceAdapter::UnregisterScIdEnhance(int32_t scId)
 {
     if (!isEnhanceClientHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
