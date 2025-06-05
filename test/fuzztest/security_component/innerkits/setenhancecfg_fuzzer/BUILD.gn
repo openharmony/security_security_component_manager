@@ -15,10 +15,10 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 import("../../../../../security_component.gni")
 
-module_output_path = "security_component_manager/security_component_manager"
-
 ohos_fuzztest("SetEnhanceCfgFuzzTest") {
-  module_out_path = module_output_path
+  part_name = "security_component_manager"
+  module_name = "security_component_manager"
+  module_out_path = part_name + "/" + module_name
   fuzz_config_file = "${sec_comp_dir}/test/fuzztest/security_component/innerkits/setenhancecfg_fuzzer"
 
   include_dirs = [ "${sec_comp_dir}/frameworks/common/include" ]
