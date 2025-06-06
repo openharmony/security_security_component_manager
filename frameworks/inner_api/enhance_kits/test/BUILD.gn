@@ -18,7 +18,8 @@ sec_comp_root_dir = "../../../.."
 ohos_unittest("sec_comp_enhance_sdk_test") {
   subsystem_name = "accesscontrol"
   part_name = "security_component_manager"
-  module_out_path = part_name + "/" + part_name
+  module_name = "security_component_manager"
+  module_out_path = part_name + "/" + module_name
   sanitize = {
     cfi = true
     cfi_cross_dso = true
