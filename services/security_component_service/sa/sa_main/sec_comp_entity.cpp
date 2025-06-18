@@ -209,9 +209,13 @@ static bool IsScreenReadMode()
         return false;
     }
     int32_t columnIndex;
-    result->GetColumnIndex(ADVANCED_DATA_COLUMN_VALUE, columnIndex);
+    if (result->GetColumnIndex(ADVANCED_DATA_COLUMN_VALUE, columnIndex) != DataShare::E_OK) {
+        return false;
+    }
     std::string value;
-    result->GetString(columnIndex, value);
+    if (result->GetString(columnIndex, value) != DataShare::E_OK) {
+        return false;
+    }
     result->Close();
     dataShareHelper->Release();
     return value == "1";
