@@ -39,11 +39,13 @@ static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t si
     MessageParcel input;
     SecCompRawdata inputData;
     MessageParcel reply;
+    CompoRandomGenerator generator(data, size);
+    uint32_t type = generator.GetScType();
 
     if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
         return;
     }
-    rawData.WriteUint32(1);
+    rawData.WriteUint32(type);
     SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
     input.WriteUint32(inputData.size);
     input.WriteRawData(inputData.data, inputData.size);

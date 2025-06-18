@@ -30,6 +30,7 @@ public:
     {}
 
     uint32_t GetScType();
+    std::string GetMessage();
     std::string GenerateRandomCompoStr(uint32_t type);
     std::string ConstructLocationJson();
     std::string ConstructSaveJson();
