@@ -27,10 +27,10 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEnhanceTest"};
 static bool g_inputEnhanceExist = false;
 static bool g_srvEnhanceExist = false;
-static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 76;
+static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 172;
 static const std::string ENHANCE_INPUT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
 static const std::string ENHANCE_SRV_INTERFACE_LIB = "libsecurity_component_service_enhance.z.so";
-static constexpr uint32_t MAX_HMAC_SIZE = 64;
+static constexpr uint32_t MAX_HMAC_SIZE = 160;
 }  // namespace
 
 void SecCompEnhanceTest::SetUpTestCase()

@@ -147,7 +147,8 @@ struct ExtraInfo {
 enum class ClickEventType : int32_t {
     UNKNOWN_EVENT_TYPE,
     POINT_EVENT_TYPE,
-    KEY_EVENT_TYPE
+    KEY_EVENT_TYPE,
+    ACCESSIBILITY_EVENT_TYPE
 };
 
 struct SecCompPointEvent {
@@ -161,11 +162,17 @@ struct SecCompKeyEvent {
     int32_t keyCode;
 };
 
+struct SecCompAccessibilityEvent {
+    int64_t timestamp = 0;
+    int64_t componentId = 0;
+};
+
 struct SecCompClickEvent {
     ClickEventType type;
     union {
         SecCompPointEvent point;
         SecCompKeyEvent key;
+        SecCompAccessibilityEvent accessibility;
     };
     ExtraInfo extraInfo;
 };
