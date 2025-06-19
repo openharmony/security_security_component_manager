@@ -129,6 +129,10 @@ static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& c
     auto service =
         std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     service->OnRemoteRequest(code, input, reply, option);
+    int32_t errCode = reply.ReadInt32();
+    if (errCode != 0) {
+        return 0;
+    }
     if (!reply.ReadUint32(replyData.size)) {
         return 0;
     }
@@ -150,6 +154,32 @@ static int32_t RegisterSecurityComponentStub(uint32_t type, const std::string& c
         return 0;
     }
     return scId;
+}
+
+static int32_t UnRegisterSecurityComponentStub(int32_t scId)
+{
+    uint32_t code =
+        static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_UNREGISTER_SECURITY_COMPONENT);
+    MessageParcel rawData;
+    MessageParcel input;
+    SecCompRawdata inputData;
+    MessageParcel reply;
+    SecCompRawdata replyData;
+
+    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
+        return 0;
+    }
+    if (!rawData.WriteInt32(scId)) {
+        return 0;
+    }
+    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
+    input.WriteUint32(inputData.size);
+    input.WriteRawData(inputData.data, inputData.size);
+    MessageOption option(MessageOption::TF_SYNC);
+    auto service =
+        std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
+    service->OnRemoteRequest(code, input, reply, option);
+    return 0;
 }
 
 static void ReportSecurityComponentClickEventStubFuzzTest(const uint8_t *data, size_t size)
@@ -174,6 +204,9 @@ static void ReportSecurityComponentClickEventStubFuzzTest(const uint8_t *data, s
         return;
     }
 
+    if (!rawData.WriteString(generator.GetMessage())) {
+        return;
+    }
     sptr<SecCompClickEventParcel> parcel =  new (std::nothrow) SecCompClickEventParcel();
     ConstructClickEvent(generator, parcel->clickInfoParams_);
     if (!rawData.WriteParcelable(parcel)) {
@@ -195,6 +228,7 @@ static void ReportSecurityComponentClickEventStubFuzzTest(const uint8_t *data, s
     MessageOption option(MessageOption::TF_SYNC);
     auto service = std::make_shared<SecCompService>(SA_ID_SECURITY_COMPONENT_SERVICE, true);
     service->OnRemoteRequest(code, input, reply, option);
+    UnRegisterSecurityComponentStub(scId);
 }
 } // namespace OHOS
 

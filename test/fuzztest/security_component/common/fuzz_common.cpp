@@ -42,6 +42,15 @@ uint32_t CompoRandomGenerator::GetScType()
     return GetData<uint32_t>() % (SecCompType::MAX_SC_TYPE - 1) + 1;
 }
 
+std::string CompoRandomGenerator::GetMessage()
+{
+    bool isEmpty = GetData<bool>();
+    if (isEmpty) {
+        return "";
+    }
+    return "the text of the security component is out of range";
+}
+
 std::string CompoRandomGenerator::GenerateRandomCompoStr(uint32_t type)
 {
     switch (type) {
