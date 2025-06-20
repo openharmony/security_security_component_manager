@@ -37,7 +37,7 @@ constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 static void TestInCallerNotCheckList()
 {
     int32_t scId = -1;
-    struct SecCompClickEvent click;
+    struct SecCompClickEvent click = {};
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
@@ -54,7 +54,7 @@ static void TestInCallerNotCheckList()
 static void TestInCallerCheckList()
 {
     int32_t scId = -1;
-    struct SecCompClickEvent click;
+    struct SecCompClickEvent click = {};
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);

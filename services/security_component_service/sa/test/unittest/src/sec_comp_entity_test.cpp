@@ -193,7 +193,7 @@ HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level0)
  */
 HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level0)
 {
-    SecCompClickEvent clickInfo;
+    SecCompClickEvent clickInfo = {};
     clickInfo.type = ClickEventType::KEY_EVENT_TYPE;
     auto current = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / 1000;

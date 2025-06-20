@@ -35,7 +35,7 @@ static void ReportSecurityComponentClickEventFuzzTest(const uint8_t *data, size_
     CompoRandomGenerator generator(data, size);
     int32_t scId = generator.GetData<int32_t>();
     std::string componentInfo = generator.GenerateRandomCompoStr(generator.GetScType());
-    struct SecCompClickEvent clickInfo;
+    struct SecCompClickEvent clickInfo = {};
     clickInfo.type = generator.GetData<ClickEventType>(),
     clickInfo.point.touchX = generator.GetData<DimensionT>();
     clickInfo.point.touchY = generator.GetData<DimensionT>();

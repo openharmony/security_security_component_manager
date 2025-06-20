@@ -33,7 +33,7 @@ public:
     static constexpr uint32_t TEST_DIFF_COLOR = 0;
     static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
     static constexpr uint32_t HAP_TOKEN_ID = 537715419;
-    static constexpr uint32_t MAX_HMAC_SIZE = 64;
+    static constexpr uint32_t MAX_HMAC_SIZE = 160;
     static constexpr size_t MAX_CALLER_SIZE = 10;
 
     static void BuildComponentCommonInfo(nlohmann::json& jsonComponent);

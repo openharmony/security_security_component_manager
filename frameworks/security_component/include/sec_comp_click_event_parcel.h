@@ -28,13 +28,16 @@ struct SecCompClickEventParcel final : public Parcelable {
 
     bool MarshallingPointEvent(Parcel& out) const;
     bool MarshallingKeyEvent(Parcel& out) const;
+    bool MarshallingAccessibilityEvent(Parcel& out) const;
     bool Marshalling(Parcel& out) const override;
 
     static bool UnmarshallingPointEvent(Parcel& in, SecCompClickEvent& clickInfo);
     static bool UnmarshallingKeyEvent(Parcel& in, SecCompClickEvent& clickInfo);
+    static bool UnmarshallingAccessibilityEvent(Parcel& in, SecCompClickEvent& clickInfo);
+    static bool UnmarshallingEvent(Parcel& in, SecCompClickEvent& clickInfo);
     static SecCompClickEventParcel* Unmarshalling(Parcel& in);
 
-    SecCompClickEvent clickInfoParams_;
+    SecCompClickEvent clickInfoParams_ = {};
 };
 }  // namespace SecurityComponent
 }  // namespace Security

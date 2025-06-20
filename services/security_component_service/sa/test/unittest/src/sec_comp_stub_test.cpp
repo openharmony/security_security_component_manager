@@ -140,6 +140,8 @@ HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level0)
     EXPECT_FALSE(clickParcel->Marshalling(out));
     clickParcel->clickInfoParams_.type = ClickEventType::KEY_EVENT_TYPE;
     EXPECT_FALSE(clickParcel->Marshalling(out));
+    clickParcel->clickInfoParams_.type = ClickEventType::ACCESSIBILITY_EVENT_TYPE;
+    EXPECT_FALSE(clickParcel->Marshalling(out));
 
     uint8_t data[32] = {0};
     clickParcel->clickInfoParams_.extraInfo.dataSize = 32;
@@ -157,31 +159,52 @@ HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level0)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
     Parcel in;
-    in.WriteInt32(1);
+    in.WriteInt32(1); // ClickEventType::POINT_EVENT_TYPE
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(2);
+    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(0);
+    in.WriteInt32(0); // ClickEventType::UNKNOWN_EVENT_TYPE
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
-    in.WriteInt32(2);
+    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
     in.WriteInt32(1);
     int dataSize = MAX_EXTRA_SIZE + 1;
     in.WriteUint32(dataSize);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
-    in.WriteInt32(2);
+    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
     in.WriteInt32(1);
     in.WriteUint32(1);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
-    in.WriteInt32(2);
+    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
     in.WriteInt32(1);
-    in.WriteUint32(32);
+    in.WriteUint32(32); // dataLen
     uint8_t data[32] = {0};
+    in.WriteBuffer(data, 32);
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    in.WriteInt64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    in.WriteInt64(1);
+    in.WriteUint32(32); // dataLen
     in.WriteBuffer(data, 32);
     EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
 }

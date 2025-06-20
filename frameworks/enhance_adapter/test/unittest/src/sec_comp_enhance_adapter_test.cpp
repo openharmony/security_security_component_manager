@@ -26,7 +26,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEnhanceAdapterTest"};
 static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 76;
-static constexpr uint32_t MAX_HMAC_SIZE = 64;
+static constexpr uint32_t MAX_HMAC_SIZE = 160;
 }  // namespace
 
 void SecCompEnhanceAdapterTest::SetUpTestCase()
@@ -74,7 +74,7 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level0)
         SecCompEnhanceAdapter::GetPointerEventEnhanceData(originData, MAX_HMAC_SIZE, nullptr, enHancedataLen));
 
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
-    SecCompClickEvent touchInfo;
+    SecCompClickEvent touchInfo = {};
     ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
 
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;

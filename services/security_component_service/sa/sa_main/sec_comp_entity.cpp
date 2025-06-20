@@ -143,9 +143,9 @@ int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t supe
     bool isScreenReadMode = IsScreenReadMode();
     if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && !isScreenReadMode) {
         res = CheckPointEvent(clickInfo, superFoldOffsetY, crossAxisState);
-    } else if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE && isScreenReadMode) {
-        SC_LOG_WARN(LABEL, "Device is in screen read mode, skip event check.");
-        return SC_OK;
+    } else if (clickInfo.type == ClickEventType::ACCESSIBILITY_EVENT_TYPE && isScreenReadMode) {
+        SC_LOG_WARN(LABEL, "Device is in screen read mode.");
+        res = SC_OK;
     } else if (clickInfo.type == ClickEventType::KEY_EVENT_TYPE) {
         res = CheckKeyEvent(clickInfo);
     }

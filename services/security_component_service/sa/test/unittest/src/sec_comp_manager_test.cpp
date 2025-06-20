@@ -450,7 +450,7 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
         .pid = ServiceTestCommon::TEST_PID_1
     };
-    SecCompClickEvent clickInfo;
+    SecCompClickEvent clickInfo = {};
     nlohmann::json jsonVaild;
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);
@@ -505,7 +505,7 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level0
     ASSERT_EQ(SC_OK,
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
-    SecCompClickEvent clickInfo;
+    SecCompClickEvent clickInfo = {};
     nlohmann::json jsonVaild;
     LocationButton buttonValid = BuildValidLocationComponent();
     buttonValid.ToJson(jsonVaild);

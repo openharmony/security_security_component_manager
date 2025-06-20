@@ -54,6 +54,20 @@ bool SecCompClickEventParcel::MarshallingKeyEvent(Parcel& out) const
     return true;
 }
 
+bool SecCompClickEventParcel::MarshallingAccessibilityEvent(Parcel& out) const
+{
+    if (!(out.WriteInt64(this->clickInfoParams_.accessibility.timestamp))) {
+        SC_LOG_ERROR(LABEL, "Write accessibility timestamp fail.");
+        return false;
+    }
+
+    if (!(out.WriteInt64(this->clickInfoParams_.accessibility.componentId))) {
+        SC_LOG_ERROR(LABEL, "Write accessibility componentId fail.");
+        return false;
+    }
+    return true;
+}
+
 bool SecCompClickEventParcel::Marshalling(Parcel& out) const
 {
     if (!(out.WriteInt32(static_cast<int32_t>(this->clickInfoParams_.type)))) {
@@ -61,17 +75,25 @@ bool SecCompClickEventParcel::Marshalling(Parcel& out) const
         return false;
     }
 
-    if (this->clickInfoParams_.type == ClickEventType::POINT_EVENT_TYPE) {
-        if (!MarshallingPointEvent(out)) {
+    switch (this->clickInfoParams_.type) {
+        case ClickEventType::POINT_EVENT_TYPE:
+            if (!MarshallingPointEvent(out)) {
+                return false;
+            }
+            break;
+        case ClickEventType::KEY_EVENT_TYPE:
+            if (!MarshallingKeyEvent(out)) {
+                return false;
+            }
+            break;
+        case ClickEventType::ACCESSIBILITY_EVENT_TYPE:
+            if (!MarshallingAccessibilityEvent(out)) {
+                return false;
+            }
+            break;
+        default:
+            SC_LOG_ERROR(LABEL, "Click type %{public}d is error", this->clickInfoParams_.type);
             return false;
-        }
-    } else if (this->clickInfoParams_.type == ClickEventType::KEY_EVENT_TYPE) {
-        if (!MarshallingKeyEvent(out)) {
-            return false;
-        }
-    } else {
-        SC_LOG_ERROR(LABEL, "click type %{public}d is error", this->clickInfoParams_.type);
-        return false;
     }
 
     if (!(out.WriteUint32(this->clickInfoParams_.extraInfo.dataSize))) {
@@ -115,6 +137,46 @@ bool SecCompClickEventParcel::UnmarshallingKeyEvent(Parcel& in, SecCompClickEven
     return true;
 }
 
+bool SecCompClickEventParcel::UnmarshallingAccessibilityEvent(Parcel& in, SecCompClickEvent& clickInfo)
+{
+    if (!in.ReadInt64(clickInfo.accessibility.timestamp)) {
+        SC_LOG_ERROR(LABEL, "Read timestamp fail.");
+        return false;
+    }
+
+    if (!in.ReadInt64(clickInfo.accessibility.componentId)) {
+        SC_LOG_ERROR(LABEL, "Read componentId fail.");
+        return false;
+    }
+    return true;
+}
+
+bool SecCompClickEventParcel::UnmarshallingEvent(Parcel& in, SecCompClickEvent& clickInfo)
+{
+    switch (clickInfo.type) {
+        case ClickEventType::POINT_EVENT_TYPE:
+            if (!UnmarshallingPointEvent(in, clickInfo)) {
+                return false;
+            }
+            break;
+        case ClickEventType::KEY_EVENT_TYPE:
+            if (!UnmarshallingKeyEvent(in, clickInfo)) {
+                return false;
+            }
+            break;
+        case ClickEventType::ACCESSIBILITY_EVENT_TYPE:
+            if (!UnmarshallingAccessibilityEvent(in, clickInfo)) {
+                return false;
+            }
+            break;
+        default:
+            SC_LOG_ERROR(LABEL, "Click type %{public}d is error", clickInfo.type);
+            return false;
+    }
+
+    return true;
+}
+
 SecCompClickEventParcel* SecCompClickEventParcel::Unmarshalling(Parcel& in)
 {
     SecCompClickEventParcel* clickInfoParcel = new (std::nothrow) SecCompClickEventParcel();
@@ -122,7 +184,7 @@ SecCompClickEventParcel* SecCompClickEventParcel::Unmarshalling(Parcel& in)
         return nullptr;
     }
 
-    SecCompClickEvent clickInfo;
+    SecCompClickEvent clickInfo = {};
     int32_t type;
     if (!in.ReadInt32(type)) {
         SC_LOG_ERROR(LABEL, "Read click type fail");
@@ -131,18 +193,7 @@ SecCompClickEventParcel* SecCompClickEventParcel::Unmarshalling(Parcel& in)
     }
     clickInfo.type = static_cast<ClickEventType>(type);
 
-    if (clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
-        if (!UnmarshallingPointEvent(in, clickInfo)) {
-            delete clickInfoParcel;
-            return nullptr;
-        }
-    } else if (clickInfo.type == ClickEventType::KEY_EVENT_TYPE) {
-        if (!UnmarshallingKeyEvent(in, clickInfo)) {
-            delete clickInfoParcel;
-            return nullptr;
-        }
-    } else {
-        SC_LOG_ERROR(LABEL, "click type %{public}d is error", clickInfo.type);
+    if (!UnmarshallingEvent(in, clickInfo)) {
         delete clickInfoParcel;
         return nullptr;
     }
