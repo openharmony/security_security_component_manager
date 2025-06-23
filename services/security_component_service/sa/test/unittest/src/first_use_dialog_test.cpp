@@ -398,16 +398,16 @@ HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level0)
     entity->componentInfo_->type_ = LOCATION_COMPONENT;
     entity->tokenId_ = 0;
     EXPECT_EQ(diag.SetFirstUseMap(entity), true);
-    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    EXPECT_NE(LOCATION_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // first use save button
     entity->componentInfo_->type_ = SAVE_COMPONENT;
     EXPECT_EQ(diag.SetFirstUseMap(entity), true);
-    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    EXPECT_EQ(SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // second use save button
     EXPECT_EQ(diag.SetFirstUseMap(entity), true);
-    EXPECT_EQ(LOCATION_BUTTON_FIRST_USE | SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+    EXPECT_EQ(SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     // wait for event handler done
     sleep(3);
@@ -460,7 +460,17 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
+    diag.firstUseMap_[0] = LOCATION_BUTTON_FIRST_USE;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+
+    diag.firstUseMap_[0] = SAVE_BUTTON_FIRST_USE;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
+
     // first use save button
+    diag.firstUseMap_[0] = 0;
+    entity->componentInfo_ = std::make_shared<SaveButton>();
     entity->componentInfo_->type_ = SAVE_COMPONENT;
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
@@ -470,6 +480,13 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
+
+    diag.firstUseMap_[0] = SAVE_BUTTON_FIRST_USE;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo), SC_OK);
+
+    diag.firstUseMap_[0] = LOCATION_BUTTON_FIRST_USE;
+    EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
+        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
 
     diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject, displayInfo);
 

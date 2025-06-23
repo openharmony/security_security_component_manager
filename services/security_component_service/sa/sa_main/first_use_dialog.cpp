@@ -467,8 +467,10 @@ bool FirstUseDialog::SetFirstUseMap(std::shared_ptr<SecCompEntity> entity)
 
     SecCompType type = entity->GetType();
     if (type == LOCATION_COMPONENT) {
-        typeMask = LOCATION_BUTTON_FIRST_USE;
-    } else if (type == SAVE_COMPONENT) {
+        SC_LOG_INFO(LABEL, "LocationButton need not notify dialog to user.");
+        return true;
+    }
+    if (type == SAVE_COMPONENT) {
         typeMask = SAVE_BUTTON_FIRST_USE;
     } else {
         SC_LOG_INFO(LABEL, "This type need not notify dialog to user.");
@@ -531,7 +533,7 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     }
 
     uint64_t compTypes = firstUseMap_[tokenId];
-    if ((compTypes & typeMask) == typeMask) {
+    if ((typeMask == SAVE_BUTTON_FIRST_USE) && ((compTypes & typeMask) == typeMask)) {
         SC_LOG_INFO(LABEL, "no need notify dialog again.");
         StartToastAbility(entity, callerToken, displayInfo);
         return SC_OK;
