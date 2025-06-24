@@ -218,7 +218,7 @@ HWTEST_F(SecCompKitTest, RegisterWithoutCallback001, TestSize.Level0)
 HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level0)
 {
     SecCompClient::GetInstance().FinishStartSAFail();
-    EXPECT_TRUE(SecCompClient::GetInstance().readyFlag_);
+    EXPECT_EQ(SecCompClient::GetInstance().readyFlag_, false);
     SecCompClient::GetInstance().OnRemoteDiedHandle();
     EXPECT_EQ(nullptr, SecCompClient::GetInstance().proxy_);
     SecCompClient::GetInstance().GetProxyFromRemoteObject(nullptr);
