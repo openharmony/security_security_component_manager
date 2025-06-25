@@ -21,7 +21,10 @@
 #include "sec_comp_load_callback.h"
 #include "sec_comp_log.h"
 #include "sec_comp_service_proxy.h"
+#include "sys_binder.h"
 #include "tokenid_kit.h"
+#include <algorithm>
+#include <chrono>
 
 namespace OHOS {
 namespace Security {
@@ -30,6 +33,10 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompClient"};
 constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 static std::mutex g_instanceMutex;
+static constexpr int32_t SENDREQ_FAIL_ERR = 32;
+static const std::vector<int32_t> RETRY_CODE_LIST = {
+    SC_SERVICE_ERROR_SERVICE_NOT_EXIST, BR_DEAD_REPLY, BR_FAILED_REPLY, SENDREQ_FAIL_ERR };
+static constexpr int32_t SA_DIED_TIME_OUT = 500;
 }  // namespace
 
 SecCompClient& SecCompClient::GetInstance()
@@ -80,15 +87,9 @@ int32_t SecCompClient::RegisterWriteToRawdata(SecCompType type, const std::strin
     return SC_OK;
 }
 
-int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
-    const std::string& componentInfo, int32_t& scId)
+int32_t SecCompClient::TryRegisterSecurityComponent(SecCompType type, const std::string& componentInfo,
+    int32_t& scId, sptr<ISecCompService> proxy)
 {
-    auto proxy = GetProxy(true);
-    if (proxy == nullptr) {
-        SC_LOG_ERROR(LABEL, "Proxy is null");
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-
     std::lock_guard<std::mutex> lock(useIPCMutex_);
     SecCompRawdata rawData;
     if (RegisterWriteToRawdata(type, componentInfo, rawData) != SC_OK) {
@@ -98,13 +99,14 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
     SecCompRawdata rawReply;
     int32_t res = proxy->RegisterSecurityComponent(rawData, rawReply);
     MessageParcel deserializedReply;
-    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
-        SC_LOG_ERROR(LABEL, "Register deserialize session info failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
 
     if (res != SC_OK) {
         SC_LOG_ERROR(LABEL, "Register request failed, result: %{public}d.", res);
+        return res;
+    }
+
+    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
+        SC_LOG_ERROR(LABEL, "Register deserialize session info failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
     }
 
@@ -122,6 +124,30 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
     if (!deserializedReply.ReadInt32(scId)) {
         SC_LOG_ERROR(LABEL, "Register read scId failed.");
         return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
+    }
+    return res;
+}
+
+int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
+    const std::string& componentInfo, int32_t& scId)
+{
+    auto proxy = GetProxy(true);
+    if (proxy == nullptr) {
+        SC_LOG_ERROR(LABEL, "Proxy is null.");
+        return SC_SERVICE_ERROR_VALUE_INVALID;
+    }
+
+    auto res = TryRegisterSecurityComponent(type, componentInfo, scId, proxy);
+    if (std::find(RETRY_CODE_LIST.begin(), RETRY_CODE_LIST.end(), res) == RETRY_CODE_LIST.end()) {
+        return res;
+    }
+
+    std::unique_lock<std::mutex> lock(secCompSaMutex_);
+    auto waitStatus = secCompSACon_.wait_for(lock, std::chrono::milliseconds(SA_DIED_TIME_OUT),
+        [this]() { return secCompSAFlag_; });
+    if (waitStatus) {
+        proxy = GetProxy(true);
+        return TryRegisterSecurityComponent(type, componentInfo, scId, proxy);
     }
     return res;
 }
@@ -477,9 +503,15 @@ void SecCompClient::FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject
 {
     GetProxyFromRemoteObject(remoteObject);
     // get lock which wait_for release and send a notice so that wait_for can out of block
-    std::unique_lock<std::mutex> lock(cvLock_);
-    readyFlag_ = true;
-    secComCon_.notify_one();
+    {
+        std::unique_lock<std::mutex> lock(cvLock_);
+        readyFlag_ = true;
+        secComCon_.notify_one();
+    }
+    {
+        std::unique_lock<std::mutex> lock(secCompSaMutex_);
+        secCompSAFlag_ = false;
+    }
 }
 
 void SecCompClient::FinishStartSAFail()
@@ -487,7 +519,7 @@ void SecCompClient::FinishStartSAFail()
     SC_LOG_ERROR(LABEL, "get security component sa failed.");
     // get lock which wait_for release and send a notice
     std::unique_lock<std::mutex> lock(cvLock_);
-    readyFlag_ = true;
+    readyFlag_ = false;
     secComCon_.notify_one();
 }
 
@@ -503,11 +535,22 @@ void SecCompClient::OnRemoteDiedHandle()
 {
     SC_LOG_ERROR(LABEL, "Remote service died");
     std::unique_lock<std::mutex> lock(proxyMutex_);
+    if (proxy_ != nullptr) {
+        auto remoteObj = proxy_->AsObject();
+        if ((remoteObj != nullptr) && (serviceDeathObserver_ != nullptr)) {
+            remoteObj->RemoveDeathRecipient(serviceDeathObserver_);
+        }
+    }
     proxy_ = nullptr;
     serviceDeathObserver_ = nullptr;
     {
         std::unique_lock<std::mutex> lock1(cvLock_);
         readyFlag_ = false;
+    }
+    {
+        std::unique_lock<std::mutex> lock1(secCompSaMutex_);
+        secCompSAFlag_ = true;
+        secCompSACon_.notify_one();
     }
 }
 

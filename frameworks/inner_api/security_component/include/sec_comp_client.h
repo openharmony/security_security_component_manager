@@ -17,6 +17,7 @@
 #define SECURITY_COMPONENT_CLIENT_H
 
 #include <condition_variable>
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include "access_token.h"
@@ -68,11 +69,16 @@ private:
     void LoadSecCompSa();
     sptr<ISecCompService> GetProxy(bool doLoadSa);
     void GetProxyFromRemoteObject(const sptr<IRemoteObject>& remoteObject);
+    int32_t TryRegisterSecurityComponent(SecCompType type, const std::string& componentInfo,
+        int32_t& scId, sptr<ISecCompService> proxy);
 
     std::mutex cvLock_;
     bool readyFlag_ = false;
     std::condition_variable secComCon_;
     std::mutex proxyMutex_;
+    bool secCompSAFlag_ = false;
+    std::condition_variable secCompSACon_;
+    std::mutex secCompSaMutex_;
     sptr<ISecCompService> proxy_ = nullptr;
     sptr<SecCompDeathRecipient> serviceDeathObserver_ = nullptr;
 };
