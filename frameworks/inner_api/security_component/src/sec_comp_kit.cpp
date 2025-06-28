@@ -28,6 +28,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompKit"};
+const std::string CUSTOMIZE_SAVE_BUTTON = "ohos.permission.CUSTOMIZE_SAVE_BUTTON";
 }  // namespace
 
 int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
@@ -173,7 +174,9 @@ bool SecCompKit::IsSystemAppCalling()
 
 bool SecCompKit::HasCustomPermissionForSecComp()
 {
-    return SecCompClient::GetInstance().HasCustomPermissionForSecComp();
+    auto selfToken = IPCSkeleton::GetSelfTokenID();
+    int32_t res = AccessToken::AccessTokenKit::VerifyAccessToken(selfToken, CUSTOMIZE_SAVE_BUTTON);
+    return (res == AccessToken::TypePermissionState::PERMISSION_GRANTED) ? true : false;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

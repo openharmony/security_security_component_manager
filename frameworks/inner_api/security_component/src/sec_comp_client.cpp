@@ -365,25 +365,6 @@ bool SecCompClient::IsSystemAppCalling()
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
 }
 
-bool SecCompClient::HasCustomPermissionForSecComp()
-{
-    auto proxy = GetProxy(true);
-    if (proxy == nullptr) {
-        SC_LOG_ERROR(LABEL, "Proxy is null");
-        return false;
-    }
-
-    std::lock_guard<std::mutex> lock(useIPCMutex_);
-    bool hasCustomPermission;
-    int32_t res = proxy->HasCustomPermissionForSecComp(hasCustomPermission);
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Get custom permission status failed, result: %{public}d.", res);
-        return false;
-    }
-
-    return hasCustomPermission;
-}
-
 int32_t SecCompClient::PreRegisterWriteToRawdata(SecCompRawdata& rawData)
 {
     MessageParcel dataParcel;
