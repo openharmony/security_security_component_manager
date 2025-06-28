@@ -631,12 +631,6 @@ int32_t SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId,
     return SC_OK;
 }
 
-int32_t SecCompService::HasCustomPermissionForSecComp(bool& hasCustomPermission)
-{
-    hasCustomPermission = SecCompManager::GetInstance().HasCustomPermissionForSecComp();
-    return SC_OK;
-}
-
 bool SecCompService::IsMediaLibraryCalling()
 {
     int32_t uid = IPCSkeleton::GetCallingUid();

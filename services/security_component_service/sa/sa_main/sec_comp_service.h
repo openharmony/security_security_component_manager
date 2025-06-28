@@ -52,7 +52,6 @@ public:
         const sptr<IRemoteObject>& dialogCallback, const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
     int32_t VerifySavePermission(AccessToken::AccessTokenID tokenId, bool& isGranted) override;
     int32_t PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
-    int32_t HasCustomPermissionForSecComp(bool& hasCustomPermission) override;
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
 

@@ -50,7 +50,6 @@ public:
     bool IsServiceExist();
     bool LoadService();
     bool IsSystemAppCalling();
-    bool HasCustomPermissionForSecComp();
 
     void FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject);
     void FinishStartSAFail();
