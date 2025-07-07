@@ -129,7 +129,7 @@ static bool IsColorAplhaSimilar(const SecCompColor& fgColor, const SecCompColor&
     double bgAlpha = static_cast<double>(bgColor.argb.alpha) / MAX_ALPHA;
 
     double mixAlpha = fgAlpha + bgAlpha - fgAlpha * bgAlpha;
-    if (GreatNotEqual(bgAlpha / mixAlpha, MIN_CONTRAST_ALPHA)) {
+    if (IsEqual(mixAlpha, ZERO_DOUBLE) || GreatNotEqual(bgAlpha / mixAlpha, MIN_CONTRAST_ALPHA)) {
         SC_LOG_ERROR(LABEL, "FgAlpha=%{public}x BgAlpha=%{public}x is similar, check failed",
             fgColor.argb.alpha, bgColor.argb.alpha);
         return true;

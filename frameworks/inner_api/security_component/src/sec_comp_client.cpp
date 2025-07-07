@@ -37,6 +37,7 @@ static constexpr int32_t SENDREQ_FAIL_ERR = 32;
 static const std::vector<int32_t> RETRY_CODE_LIST = {
     SC_SERVICE_ERROR_SERVICE_NOT_EXIST, BR_DEAD_REPLY, BR_FAILED_REPLY, SENDREQ_FAIL_ERR };
 static constexpr int32_t SA_DIED_TIME_OUT = 500;
+constexpr int32_t SA_LOAD_TIME_OUT = 3000;
 }  // namespace
 
 SecCompClient& SecCompClient::GetInstance()
@@ -45,7 +46,8 @@ SecCompClient& SecCompClient::GetInstance()
     if (instance == nullptr) {
         std::lock_guard<std::mutex> lock(g_instanceMutex);
         if (instance == nullptr) {
-            instance = new SecCompClient();
+            SecCompClient* tmp = new (std::nothrow)SecCompClient();
+            instance = std::move(tmp);
         }
     }
     return *instance;
@@ -472,7 +474,7 @@ void SecCompClient::WaitForSecCompSa()
     // wait_for release lock and block until time out(1s) or match the condition with notice
     std::unique_lock<std::mutex> lock(cvLock_);
     auto waitStatus = secComCon_.wait_for(
-        lock, std::chrono::milliseconds(SA_ID_SECURITY_COMPONENT_SERVICE), [this]() { return readyFlag_; });
+        lock, std::chrono::milliseconds(SA_LOAD_TIME_OUT), [this]() { return readyFlag_; });
     if (!waitStatus) {
         // time out or loadcallback fail
         SC_LOG_ERROR(LABEL, "security component load sa timeout");

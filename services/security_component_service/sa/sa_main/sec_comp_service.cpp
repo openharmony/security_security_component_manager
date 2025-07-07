@@ -257,11 +257,15 @@ int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
     int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
     std::string bundleName = "";
-    bmsClient.GetNameForUid(uid, bundleName);
+    if (bmsClient.GetNameForUid(uid, bundleName) != SC_OK) {
+        return res;
+    }
 
     AppExecFwk::BundleInfo bundleInfo;
     int32_t userId = uid / BASE_USER_RANGE;
-    bmsClient.GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId);
+    if (bmsClient.GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId) != SC_OK) {
+        return res;
+    }
 
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
