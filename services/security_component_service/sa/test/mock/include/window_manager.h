@@ -55,6 +55,7 @@ public:
     WindowMode mode_;
     WindowType type_;
     float scaleVal_;
+    bool isCompatScaleMode_ { false };
 };
 
 class UnreliableWindowInfo : public Parcelable {
