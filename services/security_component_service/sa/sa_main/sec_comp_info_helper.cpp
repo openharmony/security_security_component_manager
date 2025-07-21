@@ -230,16 +230,16 @@ std::string ColorToHexString(const SecCompColor& color)
 static bool CheckSecCompBaseButtonColorsimilar(const SecCompBase* comp, std::string& message)
 {
     if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) && !IsColorFullTransparent(comp->bgColor_) &&
-        (comp->icon_ != NO_ICON) && IsColorSimilar(comp->iconColor_, comp->bgColor_)) {
-        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconColor is similar with backgroundColor.");
+        (comp->icon_ != NO_ICON) && (comp->iconColor_.value == comp->bgColor_.value)) {
+        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconColor is the same with backgroundColor.");
         message = ", icon color is similar with background color, icon color = " +
             ColorToHexString(comp->iconColor_) + ", background color = " + ColorToHexString(comp->bgColor_);
         return false;
     }
 
     if ((comp->bg_ != SecCompBackground::NO_BG_TYPE) && !IsColorFullTransparent(comp->bgColor_) &&
-        (comp->text_ != NO_TEXT) && IsColorSimilar(comp->fontColor_, comp->bgColor_)) {
-        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontColor is similar with backgroundColor.");
+        (comp->text_ != NO_TEXT) && (comp->fontColor_.value == comp->bgColor_.value)) {
+        SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontColor is the same with backgroundColor.");
         message = ", font color is similar with background color, font color = " +
             ColorToHexString(comp->fontColor_) + ", background color = " + ColorToHexString(comp->bgColor_);
         return false;

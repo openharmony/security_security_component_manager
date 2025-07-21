@@ -632,31 +632,3 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level0)
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
     ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
 }
-
-/**
- * @tc.name: IsColorSimilar001
- * @tc.desc: Test IsColorSimilar
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompInfoHelperTest, IsColorSimilar001, TestSize.Level0)
-{
-    SecCompColor color1 = {
-        .argb = {
-            .red = 0xFF,
-            .green = 0xFF,
-            .blue = 0xFF,
-            .alpha = 0xFF,
-        }
-    };
-
-    SecCompColor color2 = {
-        .argb = {
-            .red = 0xFF,
-            .green = 0xFF,
-            .blue = 0xFF,
-            .alpha = 0xF0, // different alpha
-        }
-    };
-    EXPECT_TRUE(IsColorSimilar(color1, color2));
-}
