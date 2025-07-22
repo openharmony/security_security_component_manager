@@ -16,7 +16,9 @@
 #define SEC_COMP_INFO_HELPER_TEST_H
 
 #include <gtest/gtest.h>
+#define private public
 #include "sec_comp_info_helper.h"
+#undef private
 
 namespace OHOS {
 namespace Security {
