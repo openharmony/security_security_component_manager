@@ -253,17 +253,22 @@ int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
 
     int32_t res = SecCompManager::GetInstance().RegisterSecurityComponent(type, jsonRes, caller, scId);
     FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
+    if (res != SC_OK) {
+        return res;
+    }
 
     int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
     std::string bundleName = "";
     if (bmsClient.GetNameForUid(uid, bundleName) != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Failed to get bundle name for UID %{public}d", uid);
         return res;
     }
 
     AppExecFwk::BundleInfo bundleInfo;
     int32_t userId = uid / BASE_USER_RANGE;
     if (bmsClient.GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId) != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Failed to get bundle info for bundle name %{public}s", bundleName.c_str());
         return res;
     }
 
