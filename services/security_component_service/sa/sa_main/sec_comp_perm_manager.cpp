@@ -23,6 +23,7 @@ namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompPermManager"};
 static const int32_t DELAY_REVOKE_MILLISECONDS = 10 * 1000;
+static constexpr int32_t DELAY_SAVE_REVOKE_MILLISECONDS = 60 * 1000;
 static const std::string REVOKE_TASK_PREFIX = "RevokeAll";
 static const std::string REVOKE_SAVE_PERM_TASK_PREFIX = "RevokeSavePerm";
 static std::mutex g_instanceMutex;
@@ -52,8 +53,8 @@ bool SecCompPermManager::DelaySaveRevokePermission(AccessToken::AccessTokenID to
         SecCompPermManager::GetInstance().RevokeTempSavePermissionCount(tokenId);
     });
 
-    SC_LOG_DEBUG(LABEL, "revoke save permission after %{public}d ms", DELAY_REVOKE_MILLISECONDS);
-    secHandler_->ProxyPostTask(delayed, taskName, DELAY_REVOKE_MILLISECONDS);
+    SC_LOG_DEBUG(LABEL, "revoke save permission after %{public}d ms", DELAY_SAVE_REVOKE_MILLISECONDS);
+    secHandler_->ProxyPostTask(delayed, taskName, DELAY_SAVE_REVOKE_MILLISECONDS);
     return true;
 }
 
