@@ -653,7 +653,7 @@ HWTEST_F(SecCompServiceMockTest, PreRegisterSecCompProcess001, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestSize.Level0)
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestSize.Level1)
 {
     int32_t scId;
     secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
@@ -692,7 +692,7 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody001, TestS
     ASSERT_TRUE(isGranted);
     secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
     ASSERT_TRUE(isGranted);
-    sleep(11);
+    sleep(61);
     secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted);
     ASSERT_FALSE(isGranted);
 
