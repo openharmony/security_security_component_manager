@@ -16,6 +16,7 @@
 
 #include <fcntl.h>
 #include <fstream>
+#include <cstdlib>
 #include <sys/stat.h>
 #include <sys/statfs.h>
 #include <sys/types.h>
@@ -166,25 +167,41 @@ bool FirstUseDialog::IsCfgFileValid(void)
 bool FirstUseDialog::ReadCfgContent(std::string& content)
 {
     std::stringstream buffer;
-    std::ifstream i(FIRST_USE_RECORD_JSON);
+    char* canonicalPath = realpath(FIRST_USE_RECORD_JSON.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        SC_LOG_ERROR(LABEL, "Cannot get canonical path for %{public}s, errno %{public}d.",
+            FIRST_USE_RECORD_JSON.c_str(), errno);
+        return false;
+    }
+    std::ifstream i(canonicalPath);
     if (!i.is_open()) {
-        SC_LOG_ERROR(LABEL, "cannot open file %{public}s, errno %{public}d.", FIRST_USE_RECORD_JSON.c_str(), errno);
+        SC_LOG_ERROR(LABEL, "cannot open file %{public}s, errno %{public}d.", canonicalPath, errno);
+        free(canonicalPath);
         return false;
     }
     buffer << i.rdbuf();
     content = buffer.str();
     i.close();
+    free(canonicalPath);
     return true;
 }
 
 void FirstUseDialog::WriteCfgContent(const std::string& content)
 {
-    std::ofstream out(FIRST_USE_RECORD_JSON);
+    char* canonicalPath = realpath(FIRST_USE_RECORD_JSON.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
+        SC_LOG_ERROR(LABEL, "Cannot get canonical path for %{public}s, errno %{public}d.",
+            FIRST_USE_RECORD_JSON.c_str(), errno);
+        return;
+    }
+    std::ofstream out(canonicalPath);
     if (!out.is_open()) {
-        SC_LOG_ERROR(LABEL, "cannot open file %{public}s, errno %{public}d.", FIRST_USE_RECORD_JSON.c_str(), errno);
+        SC_LOG_ERROR(LABEL, "cannot open file %{public}s, errno %{public}d.", canonicalPath, errno);
+        free(canonicalPath);
         return;
     }
     out << content;
+    free(canonicalPath);
     out.close();
 }
 
@@ -226,7 +243,7 @@ void FirstUseDialog::ParseRecords(nlohmann::json& jsonRes)
         uint64_t type;
         if (!ParseRecord(recordJson, id, type)) {
             SC_LOG_ERROR(LABEL, "parse record failed.");
-            return;
+            continue;
         }
         firstUseMap_[id] = type;
     }

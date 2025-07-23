@@ -28,7 +28,7 @@ constexpr int32_t INVALID_WINDOW_LAYER = -1;
 constexpr uint32_t UI_EXTENSION_MASK = 0x40000000;
 }
 
-float WindowInfoHelper::GetWindowScale(int32_t windowId)
+float WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode)
 {
     float scale = FULL_SCREEN_SCALE;
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
@@ -43,8 +43,9 @@ float WindowInfoHelper::GetWindowScale(int32_t windowId)
         SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
         return scale;
     }
+    isCompatScaleMode = (*iter)->isCompatScaleMode_;
     scale = (*iter)->scaleVal_;
-    SC_LOG_INFO(LABEL, "Get scale %{public}f", scale);
+    SC_LOG_INFO(LABEL, "Get scale = %{public}f, isCompatScaleMode = %{public}d", scale, isCompatScaleMode);
     return scale;
 }
 

@@ -43,7 +43,7 @@ int32_t SecCompKit::RegisterSecurityComponent(SecCompType type,
         bmsClient.GetNameForUid(uid, bundleName);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
-            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "REGITSTER");
+            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "REGISTER");
         return SC_SERVICE_ERROR_CALLER_INVALID;
     }
 

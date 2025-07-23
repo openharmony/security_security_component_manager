@@ -46,16 +46,25 @@ const int NUMBER_TWO = 2;
 const char HEX_FILL_CHAR = '0';
 }
 
-void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale)
+void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale, bool isCompatScaleMode)
 {
     comp->rect_.width_ *= scale;
     comp->rect_.height_ *= scale;
-    comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scale;
-    comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scale;
-
+    if (!isCompatScaleMode) {
+        // window scales towards the top-left corner
+        comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scale;
+        comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scale;
+    } else {
+        // window scales towards the center
+        auto disX = comp->rect_.x_ - comp->windowRect_.x_;
+        auto disY = comp->rect_.y_ - comp->windowRect_.y_;
+        comp->windowRect_.x_ = comp->windowRect_.x_ + (1 - scale) * comp->windowRect_.width_ / NUMBER_TWO;
+        comp->windowRect_.y_ = comp->windowRect_.y_ + (1 - scale) * comp->windowRect_.height_ / NUMBER_TWO;
+        comp->rect_.x_ = comp->windowRect_.x_ + scale * disX;
+        comp->rect_.y_ = comp->windowRect_.y_ + scale * disY;
+    }
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
-
     comp->windowRect_.width_ *= scale;
     comp->windowRect_.height_ *= scale;
 }
@@ -337,10 +346,11 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp, std::string& mess
         return false;
     }
 
-    float scale = WindowInfoHelper::GetWindowScale(comp->windowId_);
+    bool isCompatScaleMode = false;
+    float scale = WindowInfoHelper::GetWindowScale(comp->windowId_, isCompatScaleMode);
     SC_LOG_DEBUG(LABEL, "WindowScale = %{public}f", scale);
     if (!IsEqual(scale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
-        AdjustSecCompRect(comp, scale);
+        AdjustSecCompRect(comp, scale, isCompatScaleMode);
     }
 
     if (!CheckSecCompBase(comp, message)) {
