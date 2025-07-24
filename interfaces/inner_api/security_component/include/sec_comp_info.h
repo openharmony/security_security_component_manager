@@ -122,8 +122,8 @@ public:
 
     bool IsInRect(double x, double y) const
     {
-        return (GreatOrEqual(x, x_) && GreatOrEqual((x_ + width_), x) &&
-            GreatOrEqual(y, y_) && GreatOrEqual((y_ + height_), y));
+        return (GreatOrEqual(x, x_ - 1.0) && GreatOrEqual((x_ + width_), x - 1.0) &&
+            GreatOrEqual(y, y_ - 1.0) && GreatOrEqual((y_ + height_), y - 1.0));
     };
 
     bool operator==(const SecCompRect& other) const
