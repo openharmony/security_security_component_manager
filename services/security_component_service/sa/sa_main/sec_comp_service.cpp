@@ -142,7 +142,7 @@ bool SecCompService::RegisterAppStateObserver()
             appStateObserver_->AddProcessToForegroundSet(*it);
         }
     }
-    SC_LOG_ERROR(LABEL, "Register app state observer success");
+    SC_LOG_INFO(LABEL, "Register app state observer success");
     return true;
 }
 
