@@ -238,11 +238,11 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -257,7 +257,7 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -291,11 +291,11 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -311,7 +311,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -370,13 +370,13 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent002, Test
 HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, TestSize.Level0)
 {
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
     g_token_sum ++;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
 
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -389,7 +389,7 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
 #ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
@@ -486,13 +486,13 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
     g_token_sum ++;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -507,7 +507,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level0)
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -530,11 +530,11 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level0)
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -549,7 +549,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level0)
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
@@ -567,11 +567,11 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
 {
     system("param set sec.comp.enhance 1");
     nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
+    TestCommon::BuildPasteComponentInfo(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
     int32_t scId;
 
-    EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
+    EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
     struct SecCompClickEvent clickInfo = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -586,7 +586,7 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     ASSERT_NE(callback, nullptr);
     auto token = callback->AsObject();
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
     std::string message;
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
         ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
