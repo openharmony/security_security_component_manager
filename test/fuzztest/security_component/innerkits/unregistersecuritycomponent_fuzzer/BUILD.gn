@@ -47,7 +47,6 @@ ohos_fuzztest("UnregisterSecurityComponentFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "hilog:libhilog",
-    "json:nlohmann_json_static",
     "window_manager:libdm",
   ]
 }

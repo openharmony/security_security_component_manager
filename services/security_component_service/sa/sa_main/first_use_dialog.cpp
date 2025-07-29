@@ -82,12 +82,12 @@ bool ReportUserData(const std::string& filePath, const std::string& folderPath)
     }
     int64_t fileSize = fileInfo.st_size;
 
-    struct statfs stat;
-    if (statfs(folderPath.c_str(), &stat) != 0) {
+    struct statfs statsInfo;
+    if (statfs(folderPath.c_str(), &statsInfo) != 0) {
         SC_LOG_ERROR(LABEL, "Failed to get data remain size.");
         return false;
     }
-    uint64_t remainSize = static_cast<uint64_t>(stat.f_bfree) * stat.f_bsize;
+    uint64_t remainSize = static_cast<uint64_t>(statsInfo.f_bfree) * statsInfo.f_bsize;
 
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::FILEMANAGEMENT, "USER_DATA_SIZE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "COMPONENT_NAME", SECURITY_COMPONENT_MANAGER,

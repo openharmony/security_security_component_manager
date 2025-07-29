@@ -146,10 +146,12 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
 
     std::unique_lock<std::mutex> lock(secCompSaMutex_);
     auto waitStatus = secCompSACon_.wait_for(lock, std::chrono::milliseconds(SA_DIED_TIME_OUT),
-        [this]() { return secCompSAFlag_; });
+        [this]() { return serviceAbilityNeedLoadFlag_; });
     if (waitStatus) {
         proxy = GetProxy(true);
-        return TryRegisterSecurityComponent(type, componentInfo, scId, proxy);
+        if (proxy != nullptr) {
+            return TryRegisterSecurityComponent(type, componentInfo, scId, proxy);
+        }
     }
     return res;
 }
@@ -177,7 +179,7 @@ int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& 
 {
     auto proxy = GetProxy(true);
     if (proxy == nullptr) {
-        SC_LOG_ERROR(LABEL, "Proxy is null");
+        SC_LOG_ERROR(LABEL, "Proxy is null.");
         return SC_SERVICE_ERROR_VALUE_INVALID;
     }
 
@@ -493,7 +495,7 @@ void SecCompClient::FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject
     }
     {
         std::unique_lock<std::mutex> lock(secCompSaMutex_);
-        secCompSAFlag_ = false;
+        serviceAbilityNeedLoadFlag_ = false;
     }
 }
 
@@ -532,7 +534,7 @@ void SecCompClient::OnRemoteDiedHandle()
     }
     {
         std::unique_lock<std::mutex> lock1(secCompSaMutex_);
-        secCompSAFlag_ = true;
+        serviceAbilityNeedLoadFlag_ = true;
         secCompSACon_.notify_one();
     }
 }
