@@ -139,6 +139,10 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo001, TestSize.Level0)
     touch.point.timestamp = static_cast<uint64_t>(
         std::chrono::high_resolution_clock::now().time_since_epoch().count()) / ServiceTestCommon::TIME_CONVERSION_UNIT;
     ASSERT_EQ(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
+
+    OHOS::Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
+    entity_->componentInfo_->type_ = SAVE_COMPONENT;
+    ASSERT_EQ(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
 }
 
 /**
