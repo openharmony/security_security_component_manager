@@ -263,3 +263,26 @@ HWTEST_F(SecCompKitTest, HasCustomPermissionForSecComp001, TestSize.Level0)
 {
     EXPECT_EQ(false, SecCompKit::HasCustomPermissionForSecComp());
 }
+
+/**
+ * @tc.name: PreRegisterSecCompProcess001
+ * @tc.desc: Test PreRegisterSecCompProcess.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, PreRegisterSecCompProcess001, TestSize.Level0)
+{
+    EXPECT_NE(SC_OK, SecCompKit::PreRegisterSecCompProcess());
+}
+
+/**
+ * @tc.name: LoadService001
+ * @tc.desc: Test LoadService.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, LoadService001, TestSize.Level0)
+{
+    EXPECT_EQ(true, SecCompKit::LoadService());
+    EXPECT_EQ(true, SecCompKit::IsServiceExist());
+}

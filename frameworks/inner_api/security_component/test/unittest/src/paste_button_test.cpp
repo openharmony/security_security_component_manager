@@ -171,3 +171,18 @@ HWTEST_F(PasteButtonTest, ComparePasteButton003, TestSize.Level0)
     ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, true));
 }
+
+/**
+ * @tc.name: IsCorrespondenceType001
+ * @tc.desc: Test IsCorrespondenceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PasteButtonTest, IsCorrespondenceType001, TestSize.Level1)
+{
+    PasteButton button;
+    button.type_ = PASTE_COMPONENT;
+    EXPECT_TRUE(button.IsCorrespondenceType());
+    button.type_ = LOCATION_COMPONENT;
+    EXPECT_FALSE(button.IsCorrespondenceType());
+}

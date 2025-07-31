@@ -175,3 +175,18 @@ HWTEST_F(SaveButtonTest, CompareSaveButton003, TestSize.Level0)
     ASSERT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     ASSERT_FALSE(button1.CompareComponentBasicInfo(&button2, true));
 }
+
+/**
+ * @tc.name: IsCorrespondenceType001
+ * @tc.desc: Test IsCorrespondenceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SaveButtonTest, IsCorrespondenceType001, TestSize.Level1)
+{
+    SaveButton button;
+    button.type_ = SAVE_COMPONENT;
+    EXPECT_TRUE(button.IsCorrespondenceType());
+    button.type_ = PASTE_COMPONENT;
+    EXPECT_FALSE(button.IsCorrespondenceType());
+}

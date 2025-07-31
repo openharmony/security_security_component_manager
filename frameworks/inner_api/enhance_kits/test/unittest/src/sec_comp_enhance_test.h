@@ -19,6 +19,8 @@
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_enhance_kit.h"
 
+extern "C" __attribute__((visibility("default"))) void InitSecCompClientEnhance();
+
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {

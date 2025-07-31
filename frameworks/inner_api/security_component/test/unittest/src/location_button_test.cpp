@@ -780,3 +780,18 @@ HWTEST_F(LocationButtonTest, CompareLocationButton003, TestSize.Level1)
     EXPECT_TRUE(button1.FromJson(jsonComponent, message, isClicked));
     EXPECT_FALSE(button1.CompareComponentBasicInfo(&button2, false));
 }
+
+/**
+ * @tc.name: IsCorrespondenceType001
+ * @tc.desc: Test IsCorrespondenceType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocationButtonTest, IsCorrespondenceType001, TestSize.Level1)
+{
+    LocationButton button;
+    button.type_ = LOCATION_COMPONENT;
+    EXPECT_TRUE(button.IsCorrespondenceType());
+    button.type_ = SAVE_COMPONENT;
+    EXPECT_FALSE(button.IsCorrespondenceType());
+}
