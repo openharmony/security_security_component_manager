@@ -95,6 +95,7 @@ HWTEST_F(SecCompEnhanceTest, GetPoniterEventEnhanceData001, TestSize.Level0)
     uint8_t* enhanceData = nullptr;
     uint32_t enHancedataLen = MAX_HMAC_SIZE;
 
+    InitSecCompClientEnhance();
     int32_t result = SecCompEnhanceKit::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen);
     if (g_inputEnhanceExist) {
         EXPECT_EQ(result, SC_SERVICE_ERROR_SERVICE_NOT_EXIST);
