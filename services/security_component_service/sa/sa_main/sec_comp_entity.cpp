@@ -115,7 +115,7 @@ int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t supe
     bool isInPCVirtualScreen = IsInPCVirtualScreen(crossAxisState);
     SC_LOG_INFO(LABEL, "The cross axis state: %{public}d, the fold offset y: %{public}d.",
         static_cast<int32_t>(crossAxisState), superFoldOffsetY);
-    if (isInPCVirtualScreen) {
+    if (isInPCVirtualScreen && clickInfo.type == ClickEventType::POINT_EVENT_TYPE) {
         clickInfo.point.touchY += superFoldOffsetY;
         componentInfo_->rect_.y_ += superFoldOffsetY;
     }
