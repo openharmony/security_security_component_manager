@@ -491,6 +491,7 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level0)
     int32_t scId;
     ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
     g_token_sum ++;
+    ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
