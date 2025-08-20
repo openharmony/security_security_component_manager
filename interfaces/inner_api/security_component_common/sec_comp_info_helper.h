@@ -50,8 +50,9 @@ struct ScreenInfo {
     static double GetDistance(DimensionT x1, DimensionT y1, DimensionT x2, DimensionT y2);
 
 private:
-    static float GetWindowScale(int32_t windowId);
-    static void AdjustSecCompRect(SecCompBase* comp, float scale, bool isCompatScaleMode);
+    static Scales GetWindowScale(int32_t windowId);
+    static void AdjustSecCompRect(SecCompBase* comp, const Scales scales, bool isCompatScaleMode,
+        SecCompRect& windowRect);
     static bool IsOutOfWatchScreen(const SecCompRect& rect, double radius, std::string& message);
     static bool IsOutOfScreen(const SecCompRect& rect, double curScreenWidth, double curScreenHeight,
         std::string& message, bool isWearable);

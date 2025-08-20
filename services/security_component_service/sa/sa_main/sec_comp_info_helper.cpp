@@ -46,27 +46,33 @@ const int NUMBER_TWO = 2;
 const char HEX_FILL_CHAR = '0';
 }
 
-void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, float scale, bool isCompatScaleMode)
+void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales, bool isCompatScaleMode,
+    SecCompRect& windowRect)
 {
-    comp->rect_.width_ *= scale;
-    comp->rect_.height_ *= scale;
     if (!isCompatScaleMode) {
         // window scales towards the top-left corner
-        comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scale;
-        comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scale;
+        comp->rect_.width_ *= scales.floatingScale;
+        comp->rect_.height_ *= scales.floatingScale;
+        comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scales.floatingScale;
+        comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scales.floatingScale;
+        comp->windowRect_.width_ *= scales.floatingScale;
+        comp->windowRect_.height_ *= scales.floatingScale;
     } else {
         // window scales towards the center
+        comp->rect_.width_ *= scales.scaleX;
+        comp->rect_.height_ *= scales.scaleY;
         auto disX = comp->rect_.x_ - comp->windowRect_.x_;
         auto disY = comp->rect_.y_ - comp->windowRect_.y_;
-        comp->windowRect_.x_ = comp->windowRect_.x_ + (1 - scale) * comp->windowRect_.width_ / NUMBER_TWO;
-        comp->windowRect_.y_ = comp->windowRect_.y_ + (1 - scale) * comp->windowRect_.height_ / NUMBER_TWO;
-        comp->rect_.x_ = comp->windowRect_.x_ + scale * disX;
-        comp->rect_.y_ = comp->windowRect_.y_ + scale * disY;
+        comp->rect_.x_ = windowRect.x_ + disX * scales.scaleX;
+        comp->rect_.y_ = windowRect.y_ + disY * scales.scaleY;
+        
+        comp->windowRect_.x_ = windowRect.x_;
+        comp->windowRect_.y_ = windowRect.y_;
+        comp->windowRect_.width_ = windowRect.width_;
+        comp->windowRect_.height_ = windowRect.height_;
     }
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
-    comp->windowRect_.width_ *= scale;
-    comp->windowRect_.height_ *= scale;
 }
 
 SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
@@ -347,10 +353,11 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp, std::string& mess
     }
 
     bool isCompatScaleMode = false;
-    float scale = WindowInfoHelper::GetWindowScale(comp->windowId_, isCompatScaleMode);
-    SC_LOG_DEBUG(LABEL, "WindowScale = %{public}f", scale);
-    if (!IsEqual(scale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scale, 0.0)) {
-        AdjustSecCompRect(comp, scale, isCompatScaleMode);
+    SecCompRect scaleRect;
+    Scales scales = WindowInfoHelper::GetWindowScale(comp->windowId_, isCompatScaleMode, scaleRect);
+    if ((!IsEqual(scales.floatingScale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.floatingScale, 0.0)) ||
+        isCompatScaleMode) {
+        AdjustSecCompRect(comp, scales, isCompatScaleMode, scaleRect);
     }
 
     if (!CheckSecCompBase(comp, message)) {

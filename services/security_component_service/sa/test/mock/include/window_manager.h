@@ -55,6 +55,9 @@ public:
     WindowMode mode_;
     WindowType type_;
     float scaleVal_;
+    float scaleX_;
+    float scaleY_;
+    Rect scaleRect_;
     bool isCompatScaleMode_ { false };
 };
 
