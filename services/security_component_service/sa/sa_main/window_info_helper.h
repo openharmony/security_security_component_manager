@@ -23,7 +23,7 @@ namespace Security {
 namespace SecurityComponent {
 class __attribute__((visibility("default"))) WindowInfoHelper {
 public:
-    static float GetWindowScale(int32_t windowId, bool& isCompatScaleMode);
+    static Scales GetWindowScale(int32_t windowId, bool& isCompatScaleMode, SecCompRect& scaleRect);
     static bool CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, std::string& message);
 public:
     static constexpr float FULL_SCREEN_SCALE = 1.0F;

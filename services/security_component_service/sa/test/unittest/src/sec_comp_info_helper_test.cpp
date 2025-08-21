@@ -533,8 +533,12 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
+    SecCompRect scaleRect;
     SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
-    float scale = 0.8f;
+    Scales scales;
+    scales.floatingScale = 0.8f;
+    scales.scaleX = 0.8f;
+    scales.scaleY = 0.8f;
 
     comp->rect_.x_ = 10.0f;
     comp->rect_.y_ = 5.0f;
@@ -545,7 +549,45 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     comp->windowRect_.width_ = 200.0f;
     comp->windowRect_.height_ = 100.0f;
 
-    SecCompInfoHelper::AdjustSecCompRect(comp, scale, false);
+    SecCompInfoHelper::AdjustSecCompRect(comp, scales, false, scaleRect);
+    EXPECT_TRUE(IsEqual(comp->rect_.width_, 16));
+    EXPECT_TRUE(IsEqual(comp->rect_.height_, 8));
+    EXPECT_TRUE(IsEqual(comp->rect_.x_, 8));
+    EXPECT_TRUE(IsEqual(comp->rect_.y_, 4));
+}
+
+/**
+ * @tc.name: AdjustSecCompRect002
+ * @tc.desc: Test AdjustSecCompRect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect002, TestSize.Level0)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    std::string message;
+    SecCompRect scaleRect;
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    Scales scales;
+    scales.floatingScale = 0.8f;
+    scales.scaleX = 0.8f;
+    scales.scaleY = 0.8f;
+
+    comp->rect_.x_ = 10.0f;
+    comp->rect_.y_ = 5.0f;
+    comp->rect_.width_ = 20.0f;
+    comp->rect_.height_ = 10.0f;
+    comp->windowRect_.x_ = 0.0f;
+    comp->windowRect_.y_ = 0.0f;
+    comp->windowRect_.width_ = 200.0f;
+    comp->windowRect_.height_ = 100.0f;
+    scaleRect.x_ = 0.0f;
+    scaleRect.y_ = 0.0f;
+    scaleRect.width_ = 200.0f;
+    scaleRect.height_ = 100.0f;
+
+    SecCompInfoHelper::AdjustSecCompRect(comp, scales, true, scaleRect);
     EXPECT_TRUE(IsEqual(comp->rect_.width_, 16));
     EXPECT_TRUE(IsEqual(comp->rect_.height_, 8));
     EXPECT_TRUE(IsEqual(comp->rect_.x_, 8));
@@ -555,16 +597,17 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     comp->rect_.y_ = 5.0f;
     comp->rect_.width_ = 20.0f;
     comp->rect_.height_ = 10.0f;
-    comp->windowRect_.x_ = 0.0f;
-    comp->windowRect_.y_ = 0.0f;
-    comp->windowRect_.width_ = 200.0f;
-    comp->windowRect_.height_ = 100.0f;
-
-    SecCompInfoHelper::AdjustSecCompRect(comp, scale, true);
+    scaleRect.x_ = 0.0f;
+    scaleRect.y_ = 0.0f;
+    scaleRect.width_ = 200.0f;
+    scaleRect.height_ = 100.0f;
+    scales.scaleX = 0.8f;
+    scales.scaleY = 0.6f;
+    SecCompInfoHelper::AdjustSecCompRect(comp, scales, true, scaleRect);
     EXPECT_TRUE(IsEqual(comp->rect_.width_, 16));
-    EXPECT_TRUE(IsEqual(comp->rect_.height_, 8));
-    EXPECT_TRUE(IsEqual(comp->rect_.x_, 28));
-    EXPECT_TRUE(IsEqual(comp->rect_.y_, 14));
+    EXPECT_TRUE(IsEqual(comp->rect_.height_, 6));
+    EXPECT_TRUE(IsEqual(comp->rect_.x_, 8));
+    EXPECT_TRUE(IsEqual(comp->rect_.y_, 3));
 }
 
 /**

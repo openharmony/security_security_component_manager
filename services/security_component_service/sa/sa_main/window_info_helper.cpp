@@ -28,25 +28,33 @@ constexpr int32_t INVALID_WINDOW_LAYER = -1;
 constexpr uint32_t UI_EXTENSION_MASK = 0x40000000;
 }
 
-float WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode)
+Scales WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode, SecCompRect& scaleRect)
 {
-    float scale = FULL_SCREEN_SCALE;
+    Scales scales;
+    scales.floatingScale = FULL_SCREEN_SCALE;
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
     if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
-        return scale;
+        return scales;
     }
     auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
         return windowId == info->wid_;
     });
     if ((iter == infos.end()) || (*iter == nullptr)) {
         SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
-        return scale;
+        return scales;
     }
     isCompatScaleMode = (*iter)->isCompatScaleMode_;
-    scale = (*iter)->scaleVal_;
-    SC_LOG_INFO(LABEL, "Get scale = %{public}f, isCompatScaleMode = %{public}d", scale, isCompatScaleMode);
-    return scale;
+    scales.floatingScale = (*iter)->scaleVal_;
+    scales.scaleX = (*iter)->scaleX_;
+    scales.scaleY = (*iter)->scaleY_;
+    scaleRect.x_ = (*iter)->scaleRect_.posX_;
+    scaleRect.y_ = (*iter)->scaleRect_.posY_;
+    scaleRect.width_ = (*iter)->scaleRect_.width_;
+    scaleRect.height_ = (*iter)->scaleRect_.height_;
+    SC_LOG_INFO(LABEL, "Get floatingScale = %{public}f, scaleX = %{public}f, scaleY = %{public}f, \
+        isCompatScaleMode = %{public}d", scales.floatingScale, scales.scaleX, scales.scaleY, isCompatScaleMode);
+    return scales;
 }
 
 std::string GetSecCompWindowMsg(int32_t compWinId, const SecCompRect& secRect,

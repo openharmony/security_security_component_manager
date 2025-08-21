@@ -52,6 +52,12 @@ struct BorderRadius {
     DimensionT rightBottom = DEFAULT_DIMENSION;
 };
 
+struct Scales {
+    float scaleX = DEFAULT_DIMENSION;
+    float scaleY = DEFAULT_DIMENSION;
+    float floatingScale = DEFAULT_DIMENSION;
+};
+
 enum SecCompType {
     UNKNOWN_SC_TYPE = 0,
     LOCATION_COMPONENT,
