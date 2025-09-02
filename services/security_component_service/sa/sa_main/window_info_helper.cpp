@@ -14,10 +14,10 @@
  */
 #include "window_info_helper.h"
 
+#include <thread>
 #include <vector>
 #include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
-#include "window_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -26,32 +26,52 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "WindowInfoHelper"};
 constexpr int32_t INVALID_WINDOW_LAYER = -1;
 constexpr uint32_t UI_EXTENSION_MASK = 0x40000000;
+static constexpr int32_t GET_WINDOW_WAITTIME_MILLISECONDS = 1; // 1ms
+static constexpr int32_t GET_WINDOW_REPEAT_TIMES = 10;
+}
+
+bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::AccessibilityWindowInfo>& windowInfo)
+{
+    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
+    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
+        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
+        return false;
+    }
+    auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
+        return windowId == info->wid_;
+    });
+    if ((iter == infos.end()) || (*iter == nullptr)) {
+        return false;
+    }
+    windowInfo = *iter;
+    return true;
 }
 
 Scales WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode, SecCompRect& scaleRect)
 {
     Scales scales;
     scales.floatingScale = FULL_SCREEN_SCALE;
-    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
-        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
-        return scales;
+    auto sleepTime = std::chrono::milliseconds(GET_WINDOW_WAITTIME_MILLISECONDS);
+    sptr<Rosen::AccessibilityWindowInfo> windowInfo = nullptr;
+    int32_t i = 0;
+    for (i = 0; i < GET_WINDOW_REPEAT_TIMES; ++i) {
+        if (TryGetWindowInfo(windowId, windowInfo)) {
+            break;
+        }
+        std::this_thread::sleep_for(sleepTime);
     }
-    auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
-        return windowId == info->wid_;
-    });
-    if ((iter == infos.end()) || (*iter == nullptr)) {
+    if ((i >= GET_WINDOW_REPEAT_TIMES) || (windowInfo == nullptr)) {
         SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
         return scales;
     }
-    isCompatScaleMode = (*iter)->isCompatScaleMode_;
-    scales.floatingScale = (*iter)->scaleVal_;
-    scales.scaleX = (*iter)->scaleX_;
-    scales.scaleY = (*iter)->scaleY_;
-    scaleRect.x_ = (*iter)->scaleRect_.posX_;
-    scaleRect.y_ = (*iter)->scaleRect_.posY_;
-    scaleRect.width_ = (*iter)->scaleRect_.width_;
-    scaleRect.height_ = (*iter)->scaleRect_.height_;
+    isCompatScaleMode = windowInfo->isCompatScaleMode_;
+    scales.floatingScale = windowInfo->scaleVal_;
+    scales.scaleX = windowInfo->scaleX_;
+    scales.scaleY = windowInfo->scaleY_;
+    scaleRect.x_ = windowInfo->scaleRect_.posX_;
+    scaleRect.y_ = windowInfo->scaleRect_.posY_;
+    scaleRect.width_ = windowInfo->scaleRect_.width_;
+    scaleRect.height_ = windowInfo->scaleRect_.height_;
     SC_LOG_INFO(LABEL, "Get floatingScale = %{public}f, scaleX = %{public}f, scaleY = %{public}f, \
         isCompatScaleMode = %{public}d", scales.floatingScale, scales.scaleX, scales.scaleY, isCompatScaleMode);
     return scales;

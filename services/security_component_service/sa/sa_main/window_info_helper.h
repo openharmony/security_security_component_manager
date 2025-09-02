@@ -17,12 +17,14 @@
 
 #include <cstdint>
 #include "sec_comp_info.h"
+#include "window_manager.h"
 
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 class __attribute__((visibility("default"))) WindowInfoHelper {
 public:
+    static bool TryGetWindowInfo(int32_t windowId, sptr<Rosen::AccessibilityWindowInfo>& windowInfo);
     static Scales GetWindowScale(int32_t windowId, bool& isCompatScaleMode, SecCompRect& scaleRect);
     static bool CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, std::string& message);
 public:
