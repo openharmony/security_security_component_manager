@@ -16,6 +16,7 @@
 
 #include <cstdio>
 #include "accesstoken_kit.h"
+#include "i_sec_comp_dialog_callback.h"
 #include "location_button.h"
 #include "save_button.h"
 #include "sec_comp_log.h"
@@ -565,6 +566,51 @@ HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level0)
     entity->componentInfo_->type_ = SAVE_COMPONENT;
     diag.dialogWaitMap_[1] = entity;
     EXPECT_EQ(diag.GrantDialogWaitEntity(1), SC_OK);
+}
+
+/*
+ * @tc.name: OnDialogClosed001
+ * @tc.desc: Test OnDialogClosed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, OnDialogClosed001, TestSize.Level0)
+{
+    SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(0, nullptr, nullptr);
+    sptr<SecCompDialogSrvCallback> srvCallback = call;
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    data.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    data.WriteInt32(ISecCompDialogCallback::ON_DIALOG_FAILED);
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data, reply, option), 0);
+    
+    MessageParcel data1;
+    data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    data1.WriteInt32(ISecCompDialogCallback::ON_DIALOG_CLOSED);
+    srvCallback->scId_ = 0;
+    FirstUseDialog::GetInstance().dialogWaitMap_[0] = nullptr;
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data1, reply, option), 0);
+
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 1, 0, 0, 0);
+    FirstUseDialog::GetInstance().dialogWaitMap_[0] = entity;
+    data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    data1.WriteInt32(ISecCompDialogCallback::ON_DIALOG_CLOSED);
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data1, reply, option), 0);
+
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(runner, nullptr);
+    std::shared_ptr<SecEventHandler> handler = std::make_shared<SecEventHandler>(runner);
+    SecCompPermManager::GetInstance().InitEventHandler(handler);
+    entity->componentInfo_ = std::make_shared<SaveButton>();
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    FirstUseDialog::GetInstance().dialogWaitMap_[1] = entity;
+    srvCallback->scId_ = 1;
+    data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
+    data1.WriteInt32(ISecCompDialogCallback::ON_DIALOG_CLOSED);
+    EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data1, reply, option), 0);
 }
 
 /*
