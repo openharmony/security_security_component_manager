@@ -28,6 +28,7 @@
 #include "display_info.h"
 #include "display_manager.h"
 #include "hisysevent.h"
+#include "i_sec_comp_dialog_callback.h"
 #include "ipc_skeleton.h"
 #include "sec_comp_dialog_callback_proxy.h"
 #include "sec_comp_err.h"
@@ -99,13 +100,16 @@ bool ReportUserData(const std::string& filePath, const std::string& folderPath)
 void SecCompDialogSrvCallback::OnDialogClosed(int32_t result)
 {
     SC_LOG_INFO(LABEL, "Call dialog close callback scId_ %{public}d", scId_);
-    int32_t grantRes = FirstUseDialog::GetInstance().GrantDialogWaitEntity(scId_);
-    if (grantRes == SC_SERVICE_ERROR_COMPONENT_NOT_EXIST) {
-        SC_LOG_ERROR(LABEL, "Call dialog close callback scId_ %{public}d is not exist", scId_);
-        return;
-    }
-    if (!grantRes && !FirstUseDialog::GetInstance().SetFirstUseMap(sc_)) {
-        return;
+    int32_t grantRes = result;
+    if (result == ISecCompDialogCallback::ON_DIALOG_CLOSED) {
+        grantRes = FirstUseDialog::GetInstance().GrantDialogWaitEntity(scId_);
+        if (grantRes == SC_SERVICE_ERROR_COMPONENT_NOT_EXIST) {
+            SC_LOG_ERROR(LABEL, "Call dialog close callback scId_ %{public}d is not exist", scId_);
+            return;
+        }
+        if (!grantRes && !FirstUseDialog::GetInstance().SetFirstUseMap(sc_)) {
+            return;
+        }
     }
     auto callback = iface_cast<ISecCompDialogCallback>(dialogCallback_);
     if (callback != nullptr) {

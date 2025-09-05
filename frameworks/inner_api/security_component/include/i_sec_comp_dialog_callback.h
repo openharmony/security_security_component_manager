@@ -26,6 +26,8 @@ public:
     virtual void OnDialogClosed(int32_t result) = 0;
     enum InterfaceCode {
         ON_DIALOG_CLOSED = 0,
+        ON_DIALOG_FAILED = 1,
+        ON_DIALOG_CANCELED = 2,
     };
 };
 }  // namespace SecurityComponent
