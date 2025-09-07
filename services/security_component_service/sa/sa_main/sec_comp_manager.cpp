@@ -502,7 +502,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
 
     SecCompInfoHelper::ScreenInfo screenInfo = {report->displayId_, report->crossAxisState_, report->isWearableDevice_};
     if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
-        screenInfo, message))) {
+        screenInfo, message, reportComponentInfo->scale_))) {
         SC_LOG_ERROR(LABEL, "compare component info failed.");
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,

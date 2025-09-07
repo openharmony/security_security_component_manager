@@ -46,7 +46,7 @@ struct ScreenInfo {
         std::string& message, bool isClicked = false);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const ScreenInfo& screenInfo,
-        std::string& message);
+        std::string& message, const float scale);
     static double GetDistance(DimensionT x1, DimensionT y1, DimensionT x2, DimensionT y2);
 
 private:

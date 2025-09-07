@@ -57,6 +57,7 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales
         comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scales.floatingScale;
         comp->windowRect_.width_ *= scales.floatingScale;
         comp->windowRect_.height_ *= scales.floatingScale;
+        comp->scale_ = scales.floatingScale;
     } else {
         // window scales towards the center
         comp->rect_.width_ *= scales.scaleX;
@@ -70,6 +71,11 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales
         comp->windowRect_.y_ = windowRect.y_;
         comp->windowRect_.width_ = windowRect.width_;
         comp->windowRect_.height_ = windowRect.height_;
+        if (scales.scaleX > scales.scaleY) {
+            comp->scale_ = scales.scaleX;
+        } else {
+            comp->scale_ = scales.scaleY;
+        }
     }
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
@@ -191,7 +197,7 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
 }
 
 bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect,
-    const ScreenInfo& screenInfo, std::string& message)
+    const ScreenInfo& screenInfo, std::string& message, const float scale)
 {
     double curScreenWidth = 0.0F;
     double curScreenHeight = 0.0F;
@@ -210,9 +216,9 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
         return false;
     }
 
-    if (GreatNotEqual(windowRect.x_, rect.x_ + 1.0) || GreatNotEqual(windowRect.y_, rect.y_ + 1.0) ||
-        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_ + 1.0) ||
-        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_ + 1.0)) {
+    if (GreatNotEqual(windowRect.x_, rect.x_ + 1.0 + scale) || GreatNotEqual(windowRect.y_, rect.y_ + 1.0 + scale) ||
+        GreatNotEqual(rect.x_ + rect.width_, windowRect.x_ + windowRect.width_ + 1.0 + scale) ||
+        GreatNotEqual(rect.y_ + rect.height_, windowRect.y_ + windowRect.height_ + 1.0 + scale)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of window");
         message = OUT_OF_WINDOW + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
