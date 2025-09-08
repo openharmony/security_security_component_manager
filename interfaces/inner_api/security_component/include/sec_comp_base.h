@@ -163,6 +163,7 @@ public:
     bool isWearableDevice_ = false;
     TipPosition tipPosition_ = TipPosition::ABOVE_BOTTOM;
     bool isCustomizable_ = false;
+    float scale_ = 1.0f;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;
