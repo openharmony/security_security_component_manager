@@ -14,10 +14,10 @@
  */
 #include "window_info_helper.h"
 
+#include <thread>
 #include <vector>
 #include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
-#include "window_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -26,25 +26,45 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "WindowInfoHelper"};
 constexpr int32_t INVALID_WINDOW_LAYER = -1;
 constexpr uint32_t UI_EXTENSION_MASK = 0x40000000;
+static constexpr int32_t GET_WINDOW_WAITTIME_MILLISECONDS = 1; // 1ms
+static constexpr int32_t GET_WINDOW_REPEAT_TIMES = 10;
 }
 
-float WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode)
+bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::AccessibilityWindowInfo>& windowInfo)
 {
-    float scale = FULL_SCREEN_SCALE;
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
     if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
-        return scale;
+        return false;
     }
     auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
         return windowId == info->wid_;
     });
     if ((iter == infos.end()) || (*iter == nullptr)) {
+        return false;
+    }
+    windowInfo = *iter;
+    return true;
+}
+
+float WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode)
+{
+    float scale = FULL_SCREEN_SCALE;
+    auto sleepTime = std::chrono::milliseconds(GET_WINDOW_WAITTIME_MILLISECONDS);
+    sptr<Rosen::AccessibilityWindowInfo> windowInfo = nullptr;
+    int32_t i = 0;
+    for (i = 0; i < GET_WINDOW_REPEAT_TIMES; ++i) {
+        if (TryGetWindowInfo(windowId, windowInfo)) {
+            break;
+        }
+        std::this_thread::sleep_for(sleepTime);
+    }
+    if ((i >= GET_WINDOW_REPEAT_TIMES) || (windowInfo == nullptr)) {
         SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
         return scale;
     }
-    isCompatScaleMode = (*iter)->isCompatScaleMode_;
-    scale = (*iter)->scaleVal_;
+    isCompatScaleMode = windowInfo->isCompatScaleMode_;
+    scale = windowInfo->scaleVal_;
     SC_LOG_INFO(LABEL, "Get scale = %{public}f, isCompatScaleMode = %{public}d", scale, isCompatScaleMode);
     return scale;
 }
