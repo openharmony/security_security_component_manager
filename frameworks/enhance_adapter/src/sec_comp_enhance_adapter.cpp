@@ -67,7 +67,11 @@ void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
             break;
     }
 
+#ifdef SECURITY_COMPONENT_ENHANCE_DISABLE
+    void* handler = nullptr;
+#else
     void* handler = dlopen(libPath.c_str(), RTLD_LAZY);
+#endif
     if (handler == nullptr) {
         SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed, error %{public}s", libPath.c_str(), dlerror());
         return;

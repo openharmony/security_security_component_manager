@@ -199,3 +199,34 @@ ohos_source_set("security_component_no_cfi_enhance_adapter_src_set") {
     "-fvisibility=hidden",
   ]
 }
+
+ohos_source_set("security_component_no_cfi_disable_enhance_adapter_src_set") {
+  branch_protector_ret = "pac_ret"
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+  include_dirs = [
+    "common/include",
+    "enhance_adapter/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
+    "${sec_comp_root_dir}/frameworks/inner_api/security_component/include",
+  ]
+
+  sources = [ "enhance_adapter/src/sec_comp_enhance_adapter.cpp" ]
+
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "json:nlohmann_json_static",
+  ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-fvisibility=hidden",
+    "-DSECURITY_COMPONENT_ENHANCE_DISABLE"
+  ]
+}
