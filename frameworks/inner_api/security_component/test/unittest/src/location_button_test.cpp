@@ -710,6 +710,7 @@ HWTEST_F(LocationButtonTest, CompareLocationButton002, TestSize.Level1)
     TestCommon::BuildLocationComponentInfo(jsonComponent);
     EXPECT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     LocationButton comp2 = comp1;
+    comp2.isClickEvent_ = true;
 
     comp1.type_ = SAVE_COMPONENT;
     EXPECT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
