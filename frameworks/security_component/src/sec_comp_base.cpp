@@ -597,7 +597,7 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
     }
 
     if (!other->isClickEvent_) {
-        SC_LOG_ERROR(LABEL, "Is not click event, skip unnecessary check");
+        SC_LOG_INFO(LABEL, "Is not click event, skip unnecessary check");
         return true;
     }
 
