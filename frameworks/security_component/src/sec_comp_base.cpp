@@ -596,6 +596,11 @@ bool SecCompBase::CompareComponentBasicInfo(SecCompBase *other, bool isRectCheck
         return false;
     }
 
+    if (!other->isClickEvent_) {
+        SC_LOG_INFO(LABEL, "Is not click event, skip unnecessary check");
+        return true;
+    }
+
     SecCompRect rect = other->rect_;
     SecCompRect windowRect = other->windowRect_;
     if (isRectCheck) {

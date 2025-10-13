@@ -133,6 +133,7 @@ HWTEST_F(PasteButtonTest, ComparePasteButton002, TestSize.Level0)
     TestCommon::BuildPasteComponentInfo(jsonComponent);
     ASSERT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     PasteButton comp2 = comp1;
+    comp2.isClickEvent_ = true;
 
     comp1.type_ = SAVE_COMPONENT;
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));

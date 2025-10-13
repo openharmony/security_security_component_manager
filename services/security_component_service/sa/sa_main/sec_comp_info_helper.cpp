@@ -106,6 +106,7 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     }
 
     comp->SetValid(CheckComponentValid(comp, message));
+    comp->isClickEvent_ = isClicked;
     return comp;
 }
 

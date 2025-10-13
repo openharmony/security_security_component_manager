@@ -137,6 +137,7 @@ HWTEST_F(SaveButtonTest, CompareSaveButton002, TestSize.Level0)
     bool isClicked = true;
     ASSERT_TRUE(comp1.FromJson(jsonComponent, message, isClicked));
     SaveButton comp2 = comp1;
+    comp2.isClickEvent_ = true;
 
     comp1.type_ = PASTE_COMPONENT;
     ASSERT_FALSE(comp1.CompareComponentBasicInfo(&comp2, true));
