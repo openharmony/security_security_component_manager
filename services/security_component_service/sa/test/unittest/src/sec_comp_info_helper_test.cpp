@@ -723,3 +723,29 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level0)
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
     ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
 }
+
+/**
+ * @tc.name: CheckComponentValid006
+ * @tc.desc: Test CheckComponentValid with arkui component or transparent component
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, CheckComponentValid006, TestSize.Level0)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    std::string message;
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    ASSERT_NE(nullptr, comp);
+
+    Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
+    comp->isArkuiComponent_ = true;
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+
+    comp->isArkuiComponent_ = false;
+    comp->bgColor_.value = 0x0C000000;
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    
+    comp->bgColor_.value = 0x00000000;
+    ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
+}

@@ -14,6 +14,7 @@
  */
 #include "sec_comp_info_helper.h"
 
+#include <cstdint>
 #include <iomanip>
 #include <sstream>
 
@@ -21,6 +22,7 @@
 #include "display.h"
 #include "display_info.h"
 #include "display_manager.h"
+#include "ipc_skeleton.h"
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
@@ -28,6 +30,7 @@
 #include "sec_comp_info.h"
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
+#include "tokenid_kit.h"
 #include "window_info_helper.h"
 
 namespace OHOS {
@@ -44,6 +47,10 @@ const std::string SECURITY_COMPONENT_IS_TOO_LARGER =
 const int HEX_FIELD_WIDTH = 2;
 const int NUMBER_TWO = 2;
 const char HEX_FILL_CHAR = '0';
+const static uint8_t DEFAULT_TRANSPARENCY_THRESHOLD = 0x1A;
+const static std::set<uint32_t> RELEASE_ATTRIBUTE_LIST = {
+    0x0C000000,
+};
 }
 
 void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales, bool isCompatScaleMode,
@@ -267,15 +274,23 @@ static bool CheckSecCompBaseButtonColorsimilar(const SecCompBase* comp, std::str
         return false;
     }
 
-    if (comp->bg_ == SecCompBackground::NO_BG_TYPE &&
-        ((comp->padding_.top != MIN_PADDING_WITHOUT_BG) || (comp->padding_.right != MIN_PADDING_WITHOUT_BG) ||
-        (comp->padding_.bottom != MIN_PADDING_WITHOUT_BG) || (comp->padding_.left != MIN_PADDING_WITHOUT_BG))) {
-        SC_LOG_INFO(LABEL, "padding can not change without background.");
-        message = ", padding can not change without background";
-        return false;
-    }
-
     return true;
+}
+
+static bool IsInReleaseList(uint32_t value)
+{
+    return RELEASE_ATTRIBUTE_LIST.find(value) != RELEASE_ATTRIBUTE_LIST.end();
+}
+
+static bool IsBelowThreshold(const SecCompColor& value)
+{
+    return value.argb.alpha < DEFAULT_TRANSPARENCY_THRESHOLD;
+}
+
+static bool IsSystemAppCalling()
+{
+    auto callerToken = IPCSkeleton::GetCallingFullTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerToken);
 }
 
 static bool CheckSecCompBaseButton(const SecCompBase* comp, std::string& message)
@@ -303,6 +318,19 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp, std::string& message
         SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: iconSize is too small.");
         message = ", icon size is too small, icon size = " +
             std::to_string(comp->iconSize_);
+        return false;
+    }
+
+    if (comp->bg_ == SecCompBackground::NO_BG_TYPE) {
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: background must be set.");
+        return false;
+    }
+
+    bool res = IsSystemAppCalling();
+    res |= comp->isArkuiComponent_;
+    if (!res && !IsInReleaseList(comp->bgColor_.value) && IsBelowThreshold(comp->bgColor_)) {
+        SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: the transparency of the background color cannot be too low.");
+        message = ", the transparency of the background color is too low.";
         return false;
     }
 

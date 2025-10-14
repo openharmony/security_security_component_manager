@@ -625,6 +625,9 @@ HWTEST_F(LocationButtonTest, FromJson020, TestSize.Level1)
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = true;
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = WRONG_TYPE;
     EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
+    
+    jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = WRONG_TYPE;
+    EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
 }
 
 /**

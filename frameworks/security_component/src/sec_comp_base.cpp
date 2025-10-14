@@ -79,6 +79,7 @@ const std::string JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG = "isOverlayTex
 const std::string JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG = "isOverlayNodeCovered";
 const std::string JsonTagConstants::JSON_TIP_POSITION = "tipPosition";
 const std::string JsonTagConstants::JSON_IS_CUSTOMIZABLE = "isCustomizable";
+const std::string JsonTagConstants::JSON_IS_ARKUI_COMPONENT = "isArkuiComponent";
 
 bool SecCompBase::ParseNonCompatibleChange(const nlohmann::json& json)
 {
@@ -424,6 +425,9 @@ bool SecCompBase::ParseComponentInfo(const nlohmann::json& json, std::string& me
     if (!ParseStyle(json, JsonTagConstants::JSON_STYLE_TAG, message, isClicked)) {
         return false;
     }
+    if (!ParseBool(json, JsonTagConstants::JSON_IS_ARKUI_COMPONENT, isArkuiComponent_)) {
+        return false;
+    }
     return true;
 }
 
@@ -580,6 +584,7 @@ void SecCompBase::ToJson(nlohmann::json& jsonRes) const
     jsonRes[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = isOverlayNodeCovered_;
     jsonRes[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = isCustomizable_;
     jsonRes[JsonTagConstants::JSON_TIP_POSITION] = tipPosition_;
+    jsonRes[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = isArkuiComponent_;
 }
 
 std::string SecCompBase::ToJsonStr() const
