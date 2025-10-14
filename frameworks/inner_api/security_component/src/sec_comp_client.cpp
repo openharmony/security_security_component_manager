@@ -416,9 +416,25 @@ int32_t SecCompClient::PreRegisterSecCompProcess()
     return serviceRes;
 }
 
+static sptr<IRemoteObject> GetServiceHandler()
+{
+    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sam == nullptr) {
+        SC_LOG_ERROR(LABEL, "GetSystemAbilityManager return null");
+        return nullptr;
+    }
+
+    auto secCompSa = sam->CheckSystemAbility(SA_ID_SECURITY_COMPONENT_SERVICE);
+    if (secCompSa == nullptr) {
+        SC_LOG_INFO(LABEL, "Service is not start.");
+        return nullptr;
+    }
+    return secCompSa;
+}
+
 bool SecCompClient::IsServiceExist()
 {
-    return GetProxy(false) != nullptr;
+    return GetServiceHandler() != nullptr;
 }
 
 bool SecCompClient::LoadService()
@@ -456,15 +472,8 @@ bool SecCompClient::StartLoadSecCompSa()
 
 bool SecCompClient::TryToGetSecCompSa()
 {
-    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        SC_LOG_ERROR(LABEL, "GetSystemAbilityManager return null");
-        return false;
-    }
-
-    auto secCompSa = sam->CheckSystemAbility(SA_ID_SECURITY_COMPONENT_SERVICE);
-    if (secCompSa == nullptr) {
-        SC_LOG_INFO(LABEL, "Service is not start.");
+    auto secCompSa = GetServiceHandler();
+    if (!secCompSa) {
         return false;
     }
     GetProxyFromRemoteObject(secCompSa);
