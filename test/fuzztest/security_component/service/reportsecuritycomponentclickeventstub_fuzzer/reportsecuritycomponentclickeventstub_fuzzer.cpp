@@ -75,7 +75,7 @@ void GetCompoRect(nlohmann::json &jsonComponent, SecCompRect& rect)
 
     return;
 }
-static constexpr uint64_t MAX_TOUCH_INTERVAL = 1000000L; // 1000ms
+static constexpr uint64_t MAX_TOUCH_INTERVAL = 5000000L; // 5000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
 }
 
