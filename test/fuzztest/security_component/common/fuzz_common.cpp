@@ -118,6 +118,7 @@ std::string CompoRandomGenerator::ConstructLocationJson()
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
+    jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -173,6 +174,7 @@ std::string CompoRandomGenerator::ConstructSaveJson()
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
+    jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
@@ -228,6 +230,7 @@ std::string CompoRandomGenerator::ConstructPasteJson()
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = false;
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
+    jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
     compoJson_ = jsonComponent;
     return compoJson_.dump();
 }
