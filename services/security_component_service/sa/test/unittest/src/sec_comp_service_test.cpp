@@ -275,7 +275,7 @@ HWTEST_F(SecCompServiceTest, ReportSecurityComponentClickEventBody001, TestSize.
     };
     SecCompInfo secCompInfo{ scId, locationInfo, touch };
     std::string message;
-    EXPECT_EQ(SC_OK,
+    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
         secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     setuid(uid);

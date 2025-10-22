@@ -85,10 +85,10 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     return SC_OK;
 }
 
-void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
     sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
-    return;
+    return true;
 }
 
 void FirstUseDialog::SendSaveEventHandler(void)

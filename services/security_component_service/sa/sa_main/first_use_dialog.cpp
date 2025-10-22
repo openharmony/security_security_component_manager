@@ -426,7 +426,7 @@ void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> enti
     SC_LOG_INFO(LABEL, "Start toast ability res %{public}d", startRes);
 }
 
-void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
     sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
     int32_t typeNum;
@@ -437,14 +437,14 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
         typeNum = 1;
     } else {
         SC_LOG_ERROR(LABEL, "Unknown type.");
-        return;
+        return false;
     }
     int32_t scId = entity->scId_;
     SecCompDialogSrvCallback *call = new (std::nothrow)SecCompDialogSrvCallback(scId, entity, dialogCallback);
     sptr<IRemoteObject> srvCallback = call;
     if (srvCallback == nullptr) {
         SC_LOG_ERROR(LABEL, "New SecCompDialogCallback fail");
-        return;
+        return false;
     }
     dialogWaitMap_[scId] = entity;
     AAFwk::Want want;
@@ -458,14 +458,17 @@ void FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     want.SetParam(CALLER_UID_KEY, uid);
     if (!SetDisplayInfo(want, displayInfo)) {
         SC_LOG_ERROR(LABEL, "Set display info failed.");
-        return;
+        return false;
     }
 
     int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
     SC_LOG_INFO(LABEL, "Start ability res %{public}d", startRes);
     if (startRes != 0) {
         dialogWaitMap_.erase(scId);
+        return false;
     }
+
+    return true;
 }
 
 void FirstUseDialog::SendSaveEventHandler(void)
@@ -549,7 +552,9 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     auto iter = firstUseMap_.find(tokenId);
     if (iter == firstUseMap_.end()) {
         SC_LOG_INFO(LABEL, "has not use record, start dialog");
-        StartDialogAbility(entity, callerToken, dialogCallback, displayInfo);
+        if (!StartDialogAbility(entity, callerToken, dialogCallback, displayInfo)) {
+            return SC_SERVICE_ERROR_START_FIRST_USE_DIALOG_FAILED;
+        }
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
     }
 
@@ -559,7 +564,9 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
         StartToastAbility(entity, callerToken, displayInfo);
         return SC_OK;
     }
-    StartDialogAbility(entity, callerToken, dialogCallback, displayInfo);
+    if (!StartDialogAbility(entity, callerToken, dialogCallback, displayInfo)) {
+        return SC_SERVICE_ERROR_START_FIRST_USE_DIALOG_FAILED;
+    }
     return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
 }
 
