@@ -50,6 +50,7 @@ ohos_unittest("sec_comp_service_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
     "unittest/src/app_state_observer_test.cpp",
+    "unittest/src/first_use_dialog_test.cpp",
     "unittest/src/sec_comp_entity_test.cpp",
     "unittest/src/sec_comp_info_helper_test.cpp",
     "unittest/src/sec_comp_manager_test.cpp",
@@ -135,7 +136,6 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/sec_comp_enhance_adapter.cpp",
-    "unittest/src/first_use_dialog_test.cpp",
     "unittest/src/sec_comp_service_mock_test.cpp",
     "unittest/src/sec_comp_stub_mock_test.cpp",
     "unittest/src/service_test_common.cpp",
@@ -145,7 +145,10 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/config:coverage_flags",
     "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
   ]
-  cflags_cc = [ "-DHILOG_ENABLE" ]
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-DDIALOG_TDD_MACRO",
+  ]
 
   deps = [
     "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",

@@ -83,7 +83,7 @@ private:
     void ParseRecords(nlohmann::json& jsonRes);
     void LoadFirstUseRecord(void);
     void SaveFirstUseRecord(void);
-    void StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
+    bool StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
         sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
     void StartToastAbility(const std::shared_ptr<SecCompEntity> entity, const sptr<IRemoteObject> callerToken,
         const DisplayInfo& displayInfo);

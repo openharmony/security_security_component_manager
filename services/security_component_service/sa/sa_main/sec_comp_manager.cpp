@@ -574,6 +574,36 @@ int32_t SecCompManager::CheckClickEventParams(const SecCompCallerInfo& caller,
     return SC_OK;
 }
 
+int32_t SecCompManager::StartDialog(SecCompInfo& info, std::shared_ptr<SecCompEntity>& sc,
+    const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
+{
+    int32_t res = SC_OK;
+#ifndef DIALOG_TDD_MACRO
+    const FirstUseDialog::DisplayInfo displayInfo = {sc->componentInfo_->displayId_,
+        sc->componentInfo_->crossAxisState_, sc->componentInfo_->windowId_, superFoldOffsetY_};
+
+    res = FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], displayInfo);
+    if (res == SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
+        SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
+        return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
+    } else if (res != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Start dialog failed.");
+        message = "start dialog failed.";
+        return res;
+    }
+#endif
+
+    res = sc->GrantTempPermission();
+    if (res != SC_OK) {
+        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, info.scId, sc->GetType());
+        return res;
+    }
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", info.scId, "SC_TYPE", sc->GetType());
+    return res;
+}
+
 int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, const nlohmann::json& compJson,
     const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
 {
@@ -610,24 +640,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
-    const FirstUseDialog::DisplayInfo displayInfo = {sc->componentInfo_->displayId_,
-        sc->componentInfo_->crossAxisState_, sc->componentInfo_->windowId_, superFoldOffsetY_};
-
-    if (FirstUseDialog::GetInstance().NotifyFirstUseDialog(sc, remote[0], remote[1], displayInfo) ==
-        SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
-        SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
-        return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
-    }
-
-    res = sc->GrantTempPermission();
-    if (res != SC_OK) {
-        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, info.scId, sc->GetType());
-        return res;
-    }
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
-        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
-        "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", info.scId, "SC_TYPE", sc->GetType());
-    return res;
+    return StartDialog(info, sc, remote, message);
 }
 
 void SecCompManager::DumpSecComp(std::string& dumpStr)
