@@ -577,7 +577,7 @@ int32_t SecCompManager::CheckClickEventParams(const SecCompCallerInfo& caller,
 int32_t SecCompManager::StartDialog(SecCompInfo& info, std::shared_ptr<SecCompEntity>& sc,
     const std::vector<sptr<IRemoteObject>>& remote, std::string& message)
 {
-    int32_t res = SC_OK;
+    int32_t res = SC_SERVICE_ERROR_VALUE_INVALID;
 #ifndef DIALOG_TDD_MACRO
     const FirstUseDialog::DisplayInfo displayInfo = {sc->componentInfo_->displayId_,
         sc->componentInfo_->crossAxisState_, sc->componentInfo_->windowId_, superFoldOffsetY_};
@@ -586,9 +586,9 @@ int32_t SecCompManager::StartDialog(SecCompInfo& info, std::shared_ptr<SecCompEn
     if (res == SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE) {
         SC_LOG_INFO(LABEL, "start dialog, onclick will be trap after dialog closed.");
         return SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE;
-    } else if (res != SC_OK) {
+    }
+    if (res != SC_OK) {
         SC_LOG_ERROR(LABEL, "Start dialog failed.");
-        message = "start dialog failed.";
         return res;
     }
 #endif
