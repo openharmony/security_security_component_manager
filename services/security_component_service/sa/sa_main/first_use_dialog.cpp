@@ -436,7 +436,7 @@ bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
     } else if (type == SAVE_COMPONENT) {
         typeNum = 1;
     } else {
-        SC_LOG_ERROR(LABEL, "Unknown type.");
+        SC_LOG_ERROR(LABEL, "Unknown type: %{public}d.", type);
         return false;
     }
     int32_t scId = entity->scId_;
