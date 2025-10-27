@@ -519,9 +519,6 @@ void SecCompClient::FinishStartSAFail()
 
 void SecCompClient::LoadSecCompSa()
 {
-    if (AccessToken::AccessTokenKit::CreateSecCompEnhanceKey() != SC_OK) {
-        return;
-    }
     if (!StartLoadSecCompSa()) {
         return;
     }
