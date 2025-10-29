@@ -62,11 +62,6 @@ public:
         return static_cast<int32_t>(idInner->dlpFlag);
     }
 
-    static bool IsToastShownNeeded(int32_t pid)
-    {
-        return false;
-    }
-
     static std::mutex mutex_;
     static std::map<AccessTokenID, std::set<std::string>> permMap_;
     static int getHapTokenInfoRes;
