@@ -398,11 +398,6 @@ void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> enti
     if (!entity->AllowToShowToast()) {
         return;
     }
-    bool needToShow = AccessToken::AccessTokenKit::IsToastShownNeeded(entity->pid_);
-    if (!needToShow) {
-        SC_LOG_INFO(LABEL, "Process pid=%{public}d needs not to show", entity->pid_);
-        return;
-    }
     AAFwk::Want want;
     want.SetElementName(GRANT_ABILITY_BUNDLE_NAME, GRANT_ABILITY_ABILITY_NAME);
     want.SetParam(NOTIFY_TYPE, NotifyType::TOAST);
