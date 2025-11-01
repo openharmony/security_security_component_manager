@@ -185,10 +185,17 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level0)
     rect.width_ = g_testWidth;
     rect.height_ = g_testHeight;
 
-    rect.x_ = g_curScreenWidth - g_testWidth;
+    rect.x_ = g_curScreenWidth - g_testWidth + 1;   // reach the threshold
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
     rect.x_ = g_testWidth;
-    rect.y_ = g_curScreenHeight - g_testHeight;
+    rect.y_ = g_curScreenHeight - g_testHeight + 1; // reach the threshold
+
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
+
+    rect.x_ = g_curScreenWidth - g_testWidth + 1.1; // exceed the threshold
+    ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
+    rect.x_ = g_testWidth;
+    rect.y_ = g_curScreenHeight - g_testHeight + 1.1;   // exceed the threshold
 
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
     rect.y_ = g_testHeight;
