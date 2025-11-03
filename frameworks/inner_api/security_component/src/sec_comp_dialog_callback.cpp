@@ -25,6 +25,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 
 void SecCompDialogCallback::OnDialogClosed(int32_t result)
 {
+    std::unique_lock<std::mutex> lock(callbackMutex_);
     if (callback_ == nullptr) {
         SC_LOG_ERROR(LABEL, "callback_ is nullptr");
         return;

@@ -41,6 +41,7 @@ public:
 
     void OnDialogClosed(int32_t result) override;
 private:
+    std::mutex callbackMutex_;
     OnFirstUseDialogCloseFunc callback_;
 };
 } // namespace SecurityComponent

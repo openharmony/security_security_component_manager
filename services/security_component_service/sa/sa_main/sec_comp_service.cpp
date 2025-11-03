@@ -95,6 +95,7 @@ void SecCompService::OnStop()
 
 bool SecCompService::RegisterAppStateObserver()
 {
+    std::unique_lock<std::mutex> lock(secCompSrvMutex_);
     if (appStateObserver_ != nullptr) {
         SC_LOG_INFO(LABEL, "AppStateObserver instance already create");
         return true;
@@ -148,6 +149,7 @@ bool SecCompService::RegisterAppStateObserver()
 
 void SecCompService::UnregisterAppStateObserver()
 {
+    std::unique_lock<std::mutex> lock(secCompSrvMutex_);
     if (iAppMgr_ != nullptr && appStateObserver_ != nullptr) {
         iAppMgr_->UnregisterApplicationStateObserver(appStateObserver_);
     }
@@ -162,6 +164,7 @@ bool SecCompService::GetCallerInfo(SecCompCallerInfo& caller)
         SC_LOG_ERROR(LABEL, "Get caller tokenId invalid");
         return false;
     }
+    std::unique_lock<std::mutex> lock(secCompSrvMutex_);
     if ((uid != ROOT_UID) && (!appStateObserver_->IsProcessForeground(pid, uid))) {
         SC_LOG_ERROR(LABEL, "caller pid is not in foreground");
         return false;
@@ -642,6 +645,7 @@ int32_t SecCompService::VerifySavePermission(AccessToken::AccessTokenID tokenId,
 
 bool SecCompService::IsMediaLibraryCalling()
 {
+    std::unique_lock<std::mutex> lock(mediaLibMutex_);
     int32_t uid = IPCSkeleton::GetCallingUid();
     if (uid == ROOT_UID) {
         return true;
@@ -670,6 +674,7 @@ int SecCompService::Dump(int fd, const std::vector<std::u16string>& args)
         dprintf(fd, "       -p: dump foreground processes\n");
     } else if (arg0.compare("-p") == 0) {
         std::string dumpStr;
+        std::unique_lock<std::mutex> lock(secCompSrvMutex_);
         appStateObserver_->DumpProcess(dumpStr);
         dprintf(fd, "%s\n", dumpStr.c_str());
     }  else if (arg0.compare("-a") == 0 || arg0 == "") {
