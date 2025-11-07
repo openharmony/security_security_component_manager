@@ -79,6 +79,8 @@ private:
     bool GetCallerInfo(SecCompCallerInfo& caller);
     bool IsMediaLibraryCalling();
 
+    std::mutex secCompSrvMutex_;
+    std::mutex mediaLibMutex_;
     ServiceRunningState state_;
     sptr<AppExecFwk::IAppMgr> iAppMgr_;
     sptr<AppStateObserver> appStateObserver_;

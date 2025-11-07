@@ -539,6 +539,7 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
 
 void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
 {
+    std::unique_lock<std::mutex> lock(superFoldOffsetMtx_);
     if (crossAxisState == CrossAxisState::STATE_INVALID) {
         return;
     }

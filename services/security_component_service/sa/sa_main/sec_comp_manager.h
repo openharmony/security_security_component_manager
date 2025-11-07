@@ -90,6 +90,7 @@ private:
 
     OHOS::Utils::RWLock componentInfoLock_;
     std::mutex scIdMtx_;
+    std::mutex superFoldOffsetMtx_;
     std::unordered_map<int32_t, ProcessCompInfos> componentMap_;
     int32_t scIdStart_;
     bool isSaExit_ = false;
