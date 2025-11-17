@@ -451,15 +451,15 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEvent001, TestSize.Leve
         .pid = ServiceTestCommon::TEST_PID_1
     };
     SecCompClickEvent clickInfo = {};
-    nlohmann::json jsonVaild;
+    nlohmann::json jsonValid;
     LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonVaild);
+    buttonValid.ToJson(jsonValid);
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
     int32_t scId = 1;
     SecCompInfo secCompInfo{ scId, "", clickInfo};
     std::string message;
     ASSERT_NE(SC_OK, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(secCompInfo,
-        jsonVaild, caller, remote, message));
+        jsonValid, caller, remote, message));
 }
 
 /**
@@ -506,24 +506,24 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo001, TestSize.Level0
         SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
 
     SecCompClickEvent clickInfo = {};
-    nlohmann::json jsonVaild;
+    nlohmann::json jsonValid;
     LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonVaild);
-    jsonVaild[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
+    buttonValid.ToJson(jsonValid);
+    jsonValid[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
     std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
     SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
     std::string message;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        secCompInfo, jsonVaild, caller, remote, message));
+        secCompInfo, jsonValid, caller, remote, message));
 
-    jsonVaild[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
-    jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    jsonValid[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    jsonValid[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        secCompInfo, jsonVaild, caller, remote, message));
+        secCompInfo, jsonValid, caller, remote, message));
 
-    jsonVaild[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
+    jsonValid[JsonTagConstants::JSON_RECT][JsonTagConstants::JSON_RECT_X] = ServiceTestCommon::TEST_COORDINATE - 1;
     ASSERT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
-        secCompInfo, jsonVaild, caller, remote, message));
+        secCompInfo, jsonValid, caller, remote, message));
 }
 
 /**

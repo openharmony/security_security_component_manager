@@ -42,9 +42,9 @@ static void TestInCallerNotCheckList()
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
     int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo SecCompInfo{ scId, emptyStr, click };
+    SecCompInfo secCompInfo{ scId, emptyStr, click };
     std::string message;
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(SecCompInfo, nullptr, std::move(func), message);
+    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message);
 
     EXPECT_EQ(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
