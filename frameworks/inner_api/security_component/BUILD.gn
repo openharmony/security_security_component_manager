@@ -78,4 +78,8 @@ ohos_shared_library("libsecurity_component_sdk") {
     "-DHILOG_ENABLE",
     "-fvisibility=hidden",
   ]
+
+  if (use_clang_coverage) {
+    cflags_cc += [ "-DTDD_MARCO" ]
+  }
 }

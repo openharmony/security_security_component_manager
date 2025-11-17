@@ -50,6 +50,10 @@ ohos_unittest("sec_comp_sdk_test") {
   ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
+  if (use_clang_coverage) {
+    cflags_cc += [ "-DTDD_MARCO" ]
+  }
+
   if (security_component_enhance_enable) {
     cflags_cc += [ "-DSECURITY_COMPONENT_ENHANCE_ENABLE" ]
   }
@@ -96,6 +100,10 @@ ohos_unittest("sec_comp_register_callback_test") {
     "-DHILOG_ENABLE",
     "-O0",
   ]
+
+  if (use_clang_coverage) {
+    cflags_cc += [ "-DTDD_MARCO" ]
+  }
 
   if (security_component_enhance_enable) {
     cflags_cc += [ "-DSECURITY_COMPONENT_ENHANCE_ENABLE" ]

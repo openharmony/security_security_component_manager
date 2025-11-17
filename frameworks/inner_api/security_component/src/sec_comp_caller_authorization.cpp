@@ -21,7 +21,11 @@ namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 namespace {
+#ifdef TDD_MARCO
+static constexpr int32_t MAX_FUNC_ASM_SIZE = 0x1388;
+#else
 static constexpr int32_t MAX_FUNC_ASM_SIZE = 0x380;
+#endif
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompCallerAuthorization"};
 static constexpr size_t MAX_CALLER_SIZE = 10;
