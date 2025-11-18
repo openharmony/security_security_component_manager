@@ -51,7 +51,7 @@ ohos_unittest("sec_comp_sdk_test") {
   cflags_cc = [ "-DHILOG_ENABLE" ]
 
   if (use_clang_coverage) {
-    cflags_cc += [ "-DTDD_MARCO" ]
+    cflags_cc += [ "-DTDD_COVERAGE" ]
   }
 
   if (security_component_enhance_enable) {
@@ -102,7 +102,7 @@ ohos_unittest("sec_comp_register_callback_test") {
   ]
 
   if (use_clang_coverage) {
-    cflags_cc += [ "-DTDD_MARCO" ]
+    cflags_cc += [ "-DTDD_COVERAGE" ]
   }
 
   if (security_component_enhance_enable) {
