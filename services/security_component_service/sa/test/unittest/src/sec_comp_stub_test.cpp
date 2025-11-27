@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,6 +130,7 @@ HWTEST_F(SecCompStubTest, UnregisterSecurityComponentInner001, TestSize.Level0)
 HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level0)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    ASSERT_NE(nullptr, clickParcel);
     Parcel out;
     EXPECT_FALSE(clickParcel->Marshalling(out));
     clickParcel->clickInfoParams_.type = ClickEventType::UNKNOWN_EVENT_TYPE;
@@ -151,60 +152,200 @@ HWTEST_F(SecCompStubTest, Marshalling001, TestSize.Level0)
 
 /**
  * @tc.name: Unmarshalling001
- * @tc.desc: Test SecCompClickEventParcel::Unmarshalling
+ * @tc.desc: Test SecCompClickEventParcel::Unmarshalling for type
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(SecCompStubTest, Unmarshalling001, TestSize.Level0)
 {
     sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    ASSERT_NE(nullptr, clickParcel);
     Parcel in;
-    in.WriteInt32(1); // ClickEventType::POINT_EVENT_TYPE
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(0); // ClickEventType::UNKNOWN_EVENT_TYPE
-    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
-    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
+    in.FlushBuffer();
+    in.WriteInt32(0); // 0: ClickEventType::UNKNOWN_EVENT_TYPE
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    in.WriteUint64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
     in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
+    in.WriteUint64(1);
     in.WriteInt32(1);
-    int dataSize = MAX_EXTRA_SIZE + 1;
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    in.WriteInt64(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+}
+
+/**
+ * @tc.name: Unmarshalling002
+ * @tc.desc: Test SecCompClickEventParcel::Unmarshalling for POINT_EVENT_TYPE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompStubTest, Unmarshalling002, TestSize.Level0)
+{
+    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    ASSERT_NE(nullptr, clickParcel);
+    Parcel in;
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    in.WriteUint64(1);
+    in.WriteUint32(0);
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    in.WriteUint64(1);
+    uint32_t dataSize = MAX_EXTRA_SIZE + 1;
     in.WriteUint32(dataSize);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
-    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    in.WriteUint64(1);
+    in.WriteUint32(1);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(1); // 1: ClickEventType::POINT_EVENT_TYPE
+    in.WriteDouble(1.0);
+    in.WriteDouble(1.0);
+    in.WriteUint64(1);
+    in.WriteUint32(32); // dataLen is 32
+    uint8_t data[32] = {0};
+    in.WriteBuffer(data, 32); // the length of data is 32
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+}
+
+/**
+ * @tc.name: Unmarshalling003
+ * @tc.desc: Test SecCompClickEventParcel::Unmarshalling for KEY_EVENT_TYPE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompStubTest, Unmarshalling003, TestSize.Level0)
+{
+    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    ASSERT_NE(nullptr, clickParcel);
+    Parcel in;
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
+    in.WriteUint64(1);
+    in.WriteInt32(1);
+    in.WriteUint32(0);
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
+    in.WriteUint64(1);
+    in.WriteInt32(1);
+    uint32_t dataSize = MAX_EXTRA_SIZE + 1;
+    in.WriteUint32(dataSize);
+    EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
+
+    in.FlushBuffer();
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
     in.WriteInt32(1);
     in.WriteUint32(1);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
-    in.WriteInt32(2); // ClickEventType::KEY_EVENT_TYPE
+    in.FlushBuffer();
+    in.WriteInt32(2); // 2: ClickEventType::KEY_EVENT_TYPE
     in.WriteUint64(1);
     in.WriteInt32(1);
-    in.WriteUint32(32); // dataLen
+    in.WriteUint32(32); // dataLen is 32
     uint8_t data[32] = {0};
-    in.WriteBuffer(data, 32);
+    in.WriteBuffer(data, 32); // the length of data is 32
+    EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
+}
+
+/**
+ * @tc.name: Unmarshalling004
+ * @tc.desc: Test SecCompClickEventParcel::Unmarshalling for ACCESSIBILITY_EVENT_TYPE
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompStubTest, Unmarshalling004, TestSize.Level0)
+{
+    sptr<SecCompClickEventParcel> clickParcel = new (std::nothrow) SecCompClickEventParcel();
+    ASSERT_NE(nullptr, clickParcel);
+    Parcel in;
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt64(1);
+    in.WriteInt64(1);
+    in.WriteUint32(0);
     EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
 
     in.FlushBuffer();
-    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
     in.WriteInt64(1);
+    in.WriteInt64(1);
+    uint32_t dataSize = MAX_EXTRA_SIZE + 1;
+    in.WriteUint32(dataSize);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
     in.FlushBuffer();
-    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
     in.WriteInt64(1);
     in.WriteInt64(1);
+    in.WriteUint32(1);
     EXPECT_EQ(nullptr, clickParcel->Unmarshalling(in));
 
     in.FlushBuffer();
-    in.WriteInt32(3); // ClickEventType::ACCESSIBILITY_EVENT_TYPE
+    in.WriteInt32(3); // 3: ClickEventType::ACCESSIBILITY_EVENT_TYPE
     in.WriteInt64(1);
     in.WriteInt64(1);
-    in.WriteUint32(32); // dataLen
-    in.WriteBuffer(data, 32);
+    in.WriteUint32(32); // dataLen is 32
+    uint8_t data[32] = {0};
+    in.WriteBuffer(data, 32); // the length of data is 32
     EXPECT_NE(nullptr, clickParcel->Unmarshalling(in));
 }
