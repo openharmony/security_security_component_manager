@@ -109,6 +109,18 @@ inline bool GreatNotEqual(double left, double right)
     return (left - right) > epsilon;
 }
 
+inline bool LessOrEqual(double left, double right)
+{
+    constexpr double epsilon = 0.001;
+    return (left - right) < epsilon;
+}
+
+inline bool LessNotEqual(double left, double right)
+{
+    constexpr double epsilon = -0.001;
+    return (left - right) < epsilon;
+}
+
 inline bool IsEqual(double left, double right)
 {
     constexpr double epsilon = 0.001;
