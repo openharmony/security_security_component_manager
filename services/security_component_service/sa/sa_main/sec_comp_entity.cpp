@@ -15,6 +15,7 @@
 #include "sec_comp_entity.h"
 
 #include <chrono>
+#include <ctime>
 #include "bundle_mgr_client.h"
 #include "datashare_helper.h"
 #include "hisysevent.h"
@@ -32,6 +33,7 @@ namespace Security {
 namespace SecurityComponent {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEntity"};
+static constexpr int32_t NANO_TO_SEC = 1000000000LL;
 static constexpr uint64_t MAX_TOUCH_INTERVAL = 5000000L; // 5000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
 static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
@@ -51,8 +53,12 @@ bool SecCompEntity::CompareComponentBasicInfo(SecCompBase* other, bool isRectChe
 int32_t SecCompEntity::CheckPointEvent(SecCompClickEvent& clickInfo, int32_t superFoldOffsetY,
     const CrossAxisState crossAxisState) const
 {
-    auto current = static_cast<uint64_t>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
+    struct timespec tv;
+    if (clock_gettime(CLOCK_MONOTONIC, &tv) < 0) {
+        SC_LOG_ERROR(LABEL, "clock_gettime failed.");
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    }
+    auto current = static_cast<uint64_t>(tv.tv_sec * NANO_TO_SEC + tv.tv_nsec) / TIME_CONVERSION_UNIT;
     SC_LOG_INFO(LABEL, "clickInfo timestamp: %{public}llu, current timestamp: %{public}llu",
         static_cast<unsigned long long>(clickInfo.point.timestamp), static_cast<unsigned long long>(current));
     if (clickInfo.point.timestamp < current - MAX_TOUCH_INTERVAL || clickInfo.point.timestamp > current) {
@@ -80,8 +86,12 @@ int32_t SecCompEntity::CheckPointEvent(SecCompClickEvent& clickInfo, int32_t sup
 
 int32_t SecCompEntity::CheckKeyEvent(const SecCompClickEvent& clickInfo) const
 {
-    auto current = static_cast<uint64_t>(
-        std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TIME_CONVERSION_UNIT;
+    struct timespec tv;
+    if (clock_gettime(CLOCK_MONOTONIC, &tv) < 0) {
+        SC_LOG_ERROR(LABEL, "clock_gettime failed.");
+        return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
+    }
+    auto current = static_cast<uint64_t>(tv.tv_sec * NANO_TO_SEC + tv.tv_nsec) / TIME_CONVERSION_UNIT;
     SC_LOG_INFO(LABEL, "clickInfo timestamp: %{public}llu, current timestamp: %{public}llu",
         static_cast<unsigned long long>(clickInfo.key.timestamp), static_cast<unsigned long long>(current));
     if (clickInfo.key.timestamp < current - MAX_TOUCH_INTERVAL || clickInfo.key.timestamp > current) {
