@@ -300,14 +300,7 @@ static bool CheckSecCompBaseButton(const SecCompBase* comp, std::string& message
         return false;
     }
     if (comp->text_ >= 0) {
-        DimensionT minFontSize;
-        if (comp->icon_ >= 0) {
-            minFontSize = MIN_FONT_SIZE_WITH_ICON;
-        } else {
-            minFontSize = MIN_FONT_SIZE_WITHOUT_ICON;
-        }
-
-        if (comp->fontSize_ < minFontSize) {
+        if (LessOrEqual(comp->fontSize_, 0.0)) {
             SC_LOG_INFO(LABEL, "SecurityComponentCheckFail: fontSize is too small.");
             message = ", font size is too small, font size = " +
                 std::to_string(comp->fontSize_);
