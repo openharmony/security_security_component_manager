@@ -105,7 +105,6 @@ int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
         }
         iter->second.isForeground = true;
         iter->second.compList.emplace_back(newEntity);
-        SecCompEnhanceAdapter::EnableInputEnhance();
         DelayExitTask::GetInstance().Stop();
         return SC_OK;
     }
@@ -115,7 +114,6 @@ int32_t SecCompManager::AddSecurityComponentToList(int32_t pid,
     newProcess.tokenId = tokenId;
     newProcess.compList.emplace_back(newEntity);
     componentMap_[pid] = newProcess;
-    SecCompEnhanceAdapter::EnableInputEnhance();
     DelayExitTask::GetInstance().Stop();
     return SC_OK;
 }
@@ -137,9 +135,6 @@ int32_t SecCompManager::DeleteSecurityComponentFromList(int32_t pid, int32_t scI
         }
         if (sc->scId_ == scId) {
             list.erase(it);
-            if (!IsForegroundCompExist()) {
-                SecCompEnhanceAdapter::DisableInputEnhance();
-            }
             DelayExitTask::GetInstance().Start();
             return SC_OK;
         }
@@ -220,9 +215,6 @@ void SecCompManager::NotifyProcessForeground(int32_t pid)
     }
     SecCompPermManager::GetInstance().CancelAppRevokingPermisions(iter->second.tokenId);
     iter->second.isForeground = true;
-    if (IsForegroundCompExist()) {
-        SecCompEnhanceAdapter::EnableInputEnhance();
-    }
 
     SC_LOG_INFO(LABEL, "App pid %{public}d to foreground", pid);
 }
@@ -237,9 +229,6 @@ void SecCompManager::NotifyProcessBackground(int32_t pid)
 
     SecCompPermManager::GetInstance().RevokeAppPermisionsDelayed(iter->second.tokenId);
     iter->second.isForeground = false;
-    if (!IsForegroundCompExist()) {
-        SecCompEnhanceAdapter::DisableInputEnhance();
-    }
     SC_LOG_INFO(LABEL, "App pid %{public}d to background", pid);
 }
 
@@ -263,10 +252,6 @@ void SecCompManager::NotifyProcessDied(int32_t pid, bool isProcessCached)
     SecCompPermManager::GetInstance().RevokeAppPermissions(iter->second.tokenId);
     SecCompPermManager::GetInstance().RevokeTempSavePermission(iter->second.tokenId);
     componentMap_.erase(pid);
-
-    if (!IsForegroundCompExist()) {
-        SecCompEnhanceAdapter::DisableInputEnhance();
-    }
 
     DelayExitTask::GetInstance().Start();
 }
@@ -308,7 +293,6 @@ void SecCompManager::ExitWhenAppMgrDied()
     componentMap_.clear();
 
     // no need exit enhance service, only disable input enhance.
-    SecCompEnhanceAdapter::DisableInputEnhance();
     isSaExit_ = true;
 
     SC_LOG_INFO(LABEL, "app mgr died, start sa exit");
@@ -362,7 +346,6 @@ int32_t SecCompManager::AddSecurityComponentProcess(const SecCompCallerInfo& cal
             newProcess.tokenId = caller.tokenId;
             componentMap_[caller.pid] = newProcess;
         }
-        SecCompEnhanceAdapter::EnableInputEnhance();
     }
     SecCompEnhanceAdapter::AddSecurityComponentProcess(caller.pid);
     return SC_OK;

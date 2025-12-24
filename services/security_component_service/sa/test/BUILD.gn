@@ -65,7 +65,10 @@ ohos_unittest("sec_comp_service_test") {
     "${sec_comp_root_dir}/config:coverage_flags",
     "${sec_comp_root_dir}/services/security_component_service/sa:sec_comp_service_gen_config",
   ]
-  cflags_cc = [ "-DHILOG_ENABLE" ]
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-DTDD_ENABLE",
+  ]
 
   if (security_component_enhance_enable) {
     cflags_cc += [ "-DSECURITY_COMPONENT_ENHANCE_ENABLE" ]
@@ -148,6 +151,7 @@ ohos_unittest("sec_comp_service_mock_test") {
   cflags_cc = [
     "-DHILOG_ENABLE",
     "-DDIALOG_TDD_MACRO",
+    "-DTDD_ENABLE",
   ]
 
   deps = [
