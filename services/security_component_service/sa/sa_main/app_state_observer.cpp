@@ -35,7 +35,7 @@ AppStateObserver::~AppStateObserver()
 
 bool AppStateObserver::IsProcessForeground(int32_t pid, int32_t uid)
 {
-    Utils::UniqueReadGuard<Utils::RWLock> infoGuard(this->fgProcLock_);
+    Utils::UniqueWriteGuard<Utils::RWLock> infoGuard(this->fgProcLock_);
     for (auto iter = foregrandProcList_.begin(); iter != foregrandProcList_.end(); ++iter) {
         if (pid == iter->pid) {
             return true;

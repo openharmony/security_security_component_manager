@@ -612,7 +612,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
     if (res != SC_OK) {
         return res;
     }
-    OHOS::Utils::UniqueReadGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
+    OHOS::Utils::UniqueWriteGuard<OHOS::Utils::RWLock> lk(this->componentInfoLock_);
     std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, info.scId);
     if (sc == nullptr) {
         SC_LOG_ERROR(LABEL, "Can not find target component");
