@@ -546,7 +546,7 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     Scales scales;
     scales.floatingScale = 0.8f;
-    scales.scaleX = 0.8f;
+    scales.scaleX = 0.9f;
     scales.scaleY = 0.8f;
 
     comp->rect_.x_ = 10.0f;
@@ -559,10 +559,15 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     comp->windowRect_.height_ = 100.0f;
 
     SecCompInfoHelper::AdjustSecCompRect(comp, scales, false, scaleRect);
-    EXPECT_TRUE(IsEqual(comp->rect_.width_, 16));
+    EXPECT_TRUE(IsEqual(comp->rect_.width_, 18));
     EXPECT_TRUE(IsEqual(comp->rect_.height_, 8));
-    EXPECT_TRUE(IsEqual(comp->rect_.x_, 8));
+    EXPECT_TRUE(IsEqual(comp->rect_.x_, 9));
     EXPECT_TRUE(IsEqual(comp->rect_.y_, 4));
+    EXPECT_TRUE(IsEqual(comp->scale_, 0.9f));
+
+    scales.scaleX = 0.7f;
+    SecCompInfoHelper::AdjustSecCompRect(comp, scales, false, scaleRect);
+    EXPECT_TRUE(IsEqual(comp->scale_, 0.8f));
 }
 
 /**
