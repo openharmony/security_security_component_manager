@@ -17,6 +17,7 @@
 #define SECURITY_COMPONENT_MANAGER_DISPLAY_INFO_MOCK_H
 #include <parcel.h>
 #include <window_manager.h>
+#include "dm_common.h"
 
 namespace OHOS::Rosen {
 namespace {
@@ -53,6 +54,11 @@ public:
     std::vector<Rosen::Rect> GetCreaseRects() const
     {
         return std::vector<Rosen::Rect>();
+    }
+
+    ScreenShape GetScreenShape() const
+    {
+        return ScreenShape::RECTANGLE;
     }
 };
 }

@@ -17,6 +17,7 @@
 #define SECURITY_COMPONENT_MANAGER_DISPLAY_MANAGER_MOCK_H
 #include "display.h"
 #include "display_info.h"
+#include "dm_common.h"
 
 namespace OHOS::Rosen {
 class DisplayManager {

@@ -117,10 +117,10 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     return comp;
 }
 
-static bool GetScreenSize(double& width, double& height, const uint64_t displayId, const CrossAxisState crossAxisState)
+static bool GetScreenSize(double& width, double& height, SecCompInfoHelper::ScreenInfo& screenInfo)
 {
     sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayId);
+        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(screenInfo.displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;
@@ -132,8 +132,9 @@ static bool GetScreenSize(double& width, double& height, const uint64_t displayI
         return false;
     }
 
+    screenInfo.screenShape = info->GetScreenShape();
     width = static_cast<double>(info->GetWidth());
-    if (crossAxisState == CrossAxisState::STATE_CROSS) {
+    if (screenInfo.crossAxisState == CrossAxisState::STATE_CROSS) {
         height = static_cast<double>(info->GetPhysicalHeight());
     } else {
         height = static_cast<double>(info->GetHeight());
@@ -173,9 +174,9 @@ bool SecCompInfoHelper::IsOutOfWatchScreen(const SecCompRect& rect, double radiu
 }
 
 bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenWidth, double curScreenHeight,
-    std::string& message, bool isWearable)
+    std::string& message, const ScreenInfo& screenInfo)
 {
-    if (isWearable) {
+    if ((screenInfo.isWearable) && (screenInfo.screenShape == Rosen::ScreenShape::ROUND)) {
         if (IsOutOfWatchScreen(rect, curScreenHeight / NUMBER_TWO, message)) {
             return true;
         }
@@ -205,11 +206,11 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
 }
 
 bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect,
-    const ScreenInfo& screenInfo, std::string& message, const float scale)
+    ScreenInfo& screenInfo, std::string& message, const float scale)
 {
     double curScreenWidth = 0.0F;
     double curScreenHeight = 0.0F;
-    if (!GetScreenSize(curScreenWidth, curScreenHeight, screenInfo.displayId, screenInfo.crossAxisState)) {
+    if (!GetScreenSize(curScreenWidth, curScreenHeight, screenInfo)) {
         SC_LOG_ERROR(LABEL, "Get screen size is invalid");
         return false;
     }
@@ -220,7 +221,7 @@ bool SecCompInfoHelper::CheckRectValid(const SecCompRect& rect, const SecCompRec
     }
 
     message.clear();
-    if (IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo.isWearable)) {
+    if (IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo)) {
         return false;
     }
 

@@ -52,6 +52,7 @@ sc_external_deps = [
   "ipc:ipc_core",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
+  "window_manager:libdm",
 ]
 
 sc_service_sources = [
