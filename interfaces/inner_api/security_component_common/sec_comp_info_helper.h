@@ -19,6 +19,7 @@
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
 #include "sec_comp_info.h"
+#include "display_manager.h"
 
 namespace OHOS {
 namespace Security {
@@ -40,12 +41,13 @@ struct ScreenInfo {
     uint64_t displayId;
     CrossAxisState crossAxisState;
     bool isWearable;
+    OHOS::Rosen::ScreenShape screenShape;
 };
 
     static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
         std::string& message, bool isClicked = false);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
-    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, const ScreenInfo& screenInfo,
+    static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, ScreenInfo& screenInfo,
         std::string& message, const float scale);
     static double GetDistance(DimensionT x1, DimensionT y1, DimensionT x2, DimensionT y2);
 
@@ -55,7 +57,7 @@ private:
         SecCompRect& windowRect);
     static bool IsOutOfWatchScreen(const SecCompRect& rect, double radius, std::string& message);
     static bool IsOutOfScreen(const SecCompRect& rect, double curScreenWidth, double curScreenHeight,
-        std::string& message, bool isWearable);
+        std::string& message, const ScreenInfo& screenInfo);
 };
 }  // namespace SecurityComponent
 }  // namespace Security

@@ -158,7 +158,8 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level0)
     SecCompInfoHelper::ScreenInfo screenInfo = {
         .displayId = 0,
         .crossAxisState = CrossAxisState::STATE_INVALID,
-        .isWearable = false
+        .isWearable = false,
+        .screenShape = OHOS::Rosen::ScreenShape::RECTANGLE
     };
     float scale = 1.0;
     ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
@@ -200,7 +201,14 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level0)
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
     rect.y_ = g_testHeight;
 
+    screenInfo.screenShape = OHOS::Rosen::ScreenShape::ROUND;
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
+
+    screenInfo.screenShape = OHOS::Rosen::ScreenShape::RECTANGLE;
     screenInfo.isWearable = true;
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
+
+    screenInfo.screenShape = OHOS::Rosen::ScreenShape::ROUND;
     ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
 }
 
@@ -246,6 +254,9 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent005, TestSize.Level0)
     windowRect.height_ = ServiceTestCommon::TEST_INVALID_DIMENSION;
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
     windowRect.height_ = g_testHeight;
+
+    screenInfo.crossAxisState = CrossAxisState::STATE_CROSS;
+    ASSERT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
 }
 
 /**

@@ -94,6 +94,7 @@ ohos_unittest("sec_comp_service_test") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "samgr:samgr_proxy",
+    "window_manager:libdm",
   ]
 }
 
@@ -172,6 +173,7 @@ ohos_unittest("sec_comp_service_mock_test") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "samgr:samgr_proxy",
+    "window_manager:libdm",
   ]
 }
 
