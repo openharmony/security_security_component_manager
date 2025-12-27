@@ -58,35 +58,23 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales
 {
     if (!isCompatScaleMode) {
         // window scales towards the top-left corner
-        comp->rect_.width_ *= scales.scaleX;
-        comp->rect_.height_ *= scales.scaleY;
-        comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scales.scaleX;
-        comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scales.scaleY;
         comp->windowRect_.width_ *= scales.scaleX;
         comp->windowRect_.height_ *= scales.scaleY;
-        if (scales.scaleX > scales.scaleY) {
-            comp->scale_ = scales.scaleX;
-        } else {
-            comp->scale_ = scales.scaleY;
-        }
     } else {
         // window scales towards the center
-        comp->rect_.width_ *= scales.scaleX;
-        comp->rect_.height_ *= scales.scaleY;
-        auto disX = comp->rect_.x_ - comp->windowRect_.x_;
-        auto disY = comp->rect_.y_ - comp->windowRect_.y_;
-        comp->rect_.x_ = windowRect.x_ + disX * scales.scaleX;
-        comp->rect_.y_ = windowRect.y_ + disY * scales.scaleY;
-        
         comp->windowRect_.x_ = windowRect.x_;
         comp->windowRect_.y_ = windowRect.y_;
         comp->windowRect_.width_ = windowRect.width_;
         comp->windowRect_.height_ = windowRect.height_;
-        if (scales.scaleX > scales.scaleY) {
-            comp->scale_ = scales.scaleX;
-        } else {
-            comp->scale_ = scales.scaleY;
-        }
+    }
+    comp->rect_.width_ *= scales.scaleX;
+    comp->rect_.height_ *= scales.scaleY;
+    comp->rect_.x_ = comp->windowRect_.x_ + (comp->rect_.x_ - comp->windowRect_.x_) * scales.scaleX;
+    comp->rect_.y_ = comp->windowRect_.y_ + (comp->rect_.y_ - comp->windowRect_.y_) * scales.scaleY;
+    if (scales.scaleX > scales.scaleY) {
+        comp->scale_ = scales.scaleX;
+    } else {
+        comp->scale_ = scales.scaleY;
     }
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
