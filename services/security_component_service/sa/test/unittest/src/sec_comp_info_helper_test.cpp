@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -540,6 +540,47 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level0)
     };
     comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
+}
+
+/**
+ * @tc.name: IsOutOfScreen001
+ * @tc.desc: Test IsOutOfScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, IsOutOfScreen001, TestSize.Level0)
+{
+    SecCompRect rect = GetDefaultRect();
+    std::string message;
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        .displayId = 0,
+        .crossAxisState = CrossAxisState::STATE_INVALID,
+        .isWearable = true,
+        .screenShape = Rosen::ScreenShape::ROUND
+    };
+    double curScreenHeight = 10.0f;
+    double curScreenWidth = 10.0f;
+    rect.x_ = 0.0f;
+    rect.y_ = 0.0f;
+    rect.width_ = 6.0f;
+    rect.height_ = 2.6f;
+
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 4.0f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 0.0f;
+    rect.y_ = 7.4f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 4.0f;
+    rect.y_ = 7.4f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 2.0f;
+    rect.y_ = 3.7f;
+    ASSERT_FALSE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
 }
 
 /**

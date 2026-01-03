@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompInfoHelper"};
 static constexpr double MAX_RECT_PERCENT = 0.3F; // 30%
 static constexpr double ZERO_OFFSET = 0.0F;
+static constexpr double MAX_THRESHOLD_PERCENT = 0.1F; // 10%
 const std::string OUT_OF_SCREEN = ", security component is out of screen, security component(x = ";
 const std::string OUT_OF_WINDOW = ", security component is out of window, security component(x = ";
 const std::string SECURITY_COMPONENT_IS_TOO_LARGER =
@@ -143,6 +144,7 @@ double SecCompInfoHelper::GetDistance(DimensionT x1, DimensionT y1, DimensionT x
 
 bool SecCompInfoHelper::IsOutOfWatchScreen(const SecCompRect& rect, double radius, std::string& message)
 {
+    double threshold = sqrt(pow(rect.width_, NUMBER_TWO) + pow(rect.height_, NUMBER_TWO)) * MAX_THRESHOLD_PERCENT;
     double leftTop = GetDistance(rect.x_ + rect.borderRadius_.leftTop,
         rect.y_ + rect.borderRadius_.leftTop, radius, radius);
     double leftBottom = GetDistance(rect.x_ + rect.borderRadius_.leftBottom,
@@ -151,15 +153,15 @@ bool SecCompInfoHelper::IsOutOfWatchScreen(const SecCompRect& rect, double radiu
         rect.y_ + rect.borderRadius_.rightTop, radius, radius);
     double rightBottom = GetDistance(rect.x_ + rect.width_ - rect.borderRadius_.rightBottom,
         rect.y_ + rect.height_ - rect.borderRadius_.rightBottom, radius, radius);
-    if (GreatNotEqual(leftTop, radius - rect.borderRadius_.leftTop + 1.0) ||
-        GreatNotEqual(leftBottom, radius - rect.borderRadius_.leftBottom + 1.0) ||
-        GreatNotEqual(rightTop, radius - rect.borderRadius_.rightTop + 1.0) ||
-        GreatNotEqual(rightBottom, radius - rect.borderRadius_.rightBottom + 1.0)) {
+    if (GreatNotEqual(leftTop, radius - rect.borderRadius_.leftTop + threshold) ||
+        GreatNotEqual(leftBottom, radius - rect.borderRadius_.leftBottom + threshold) ||
+        GreatNotEqual(rightTop, radius - rect.borderRadius_.rightTop + threshold) ||
+        GreatNotEqual(rightBottom, radius - rect.borderRadius_.rightBottom + threshold)) {
         SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
             "), current screen(width = " + std::to_string(radius * NUMBER_TWO) +
-            ", height = " + std::to_string(radius * NUMBER_TWO) + ")";
+            ", height = " + std::to_string(radius * NUMBER_TWO) + "), threshold = " + std::to_string(threshold);
         return true;
     }
     return false;
@@ -173,23 +175,29 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
             return true;
         }
     } else {
-        if (GreatNotEqual(ZERO_OFFSET, rect.x_) || GreatNotEqual(ZERO_OFFSET, rect.y_) ||
-            GreatNotEqual(rect.x_, curScreenWidth) || GreatNotEqual(rect.y_, curScreenHeight)) {
+        double thresholdX = rect.width_ * MAX_THRESHOLD_PERCENT;
+        double thresholdY = rect.height_ * MAX_THRESHOLD_PERCENT;
+        if (GreatNotEqual(ZERO_OFFSET - thresholdX, rect.x_) ||
+            GreatNotEqual(ZERO_OFFSET - thresholdY, rect.y_) ||
+            GreatNotEqual(rect.x_, curScreenWidth + thresholdX) ||
+            GreatNotEqual(rect.y_, curScreenHeight + thresholdY)) {
             SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
             message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
                 ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
-                ", height = " + std::to_string(curScreenHeight) + ")";
+                ", height = " + std::to_string(curScreenHeight) + "), threshold of X direction = " +
+                std::to_string(thresholdX) + ", threshold of Y direction = " + std::to_string(thresholdY);
             return true;
         }
 
-        if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + 1.0) ||
-            GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + 1.0)) {
+        if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + thresholdX) ||
+            GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + thresholdY)) {
             SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
             message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
                 ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
-                ", height = " + std::to_string(curScreenHeight) + ")";
+                ", height = " + std::to_string(curScreenHeight) + "), threshold of X direction = " +
+                std::to_string(thresholdX) + ", threshold of Y direction = " + std::to_string(thresholdY);
             return true;
         }
     }
