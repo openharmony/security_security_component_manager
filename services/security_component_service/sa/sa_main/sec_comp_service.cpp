@@ -83,6 +83,10 @@ void SecCompService::OnStart()
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "SERVICE_INIT_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PID", getpid());
     SC_LOG_INFO(LABEL, "Congratulations, SecCompService start successfully!");
+#if (!defined (TDD_ENABLE)) && (!defined (FUZZ_ENABLE))
+    SC_LOG_INFO(LABEL, "Start to listen accessibility service.");
+    AddSystemAbilityListener(ACCESSIBILITY_MANAGER_SERVICE_ID);
+#endif
     FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
 }
 
@@ -684,6 +688,14 @@ int SecCompService::Dump(int fd, const std::vector<std::u16string>& args)
     }
     return ERR_OK;
 }
+
+#if (!defined (TDD_ENABLE)) && (!defined (FUZZ_ENABLE))
+void SecCompService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    SC_LOG_ERROR(LABEL, "Accessibility service is started");
+    SecCompEnhanceAdapter::EnableInputEnhance();
+}
+#endif
 
 bool SecCompService::Initialize() const
 {

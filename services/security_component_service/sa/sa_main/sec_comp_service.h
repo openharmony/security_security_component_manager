@@ -54,6 +54,9 @@ public:
     int32_t PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
+#if (!defined (TDD_ENABLE)) && (!defined (FUZZ_ENABLE))
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+#endif
 
 private:
     int32_t WriteError(int32_t res, SecCompRawdata& rawReply);
