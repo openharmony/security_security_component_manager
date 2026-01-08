@@ -161,7 +161,7 @@ bool SecCompInfoHelper::IsOutOfWatchScreen(const SecCompRect& rect, double radiu
         message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
             ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
             "), current screen(width = " + std::to_string(radius * NUMBER_TWO) +
-            ", height = " + std::to_string(radius * NUMBER_TWO) + "), threshold = " + std::to_string(threshold);
+            ", height = " + std::to_string(radius * NUMBER_TWO) + ")";
         return true;
     }
     return false;
@@ -185,8 +185,7 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
             message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
                 ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
-                ", height = " + std::to_string(curScreenHeight) + "), threshold of X direction = " +
-                std::to_string(thresholdX) + ", threshold of Y direction = " + std::to_string(thresholdY);
+                ", height = " + std::to_string(curScreenHeight) + ")";
             return true;
         }
 
@@ -196,8 +195,7 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
             message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
                 ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
-                ", height = " + std::to_string(curScreenHeight) + "), threshold of X direction = " +
-                std::to_string(thresholdX) + ", threshold of Y direction = " + std::to_string(thresholdY);
+                ", height = " + std::to_string(curScreenHeight) + ")";
             return true;
         }
     }
