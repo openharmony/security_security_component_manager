@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "sec_comp_enhance_test.h"
-#include <dlfcn.h>
 #include <unistd.h>
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
@@ -25,27 +24,12 @@ using namespace OHOS::Security::SecurityComponent;
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEnhanceTest"};
-static bool g_inputEnhanceExist = false;
-static bool g_srvEnhanceExist = false;
 static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 172;
-static const std::string ENHANCE_INPUT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
-static const std::string ENHANCE_SRV_INTERFACE_LIB = "libsecurity_component_service_enhance.z.so";
 static constexpr uint32_t MAX_HMAC_SIZE = 160;
 }  // namespace
 
 void SecCompEnhanceTest::SetUpTestCase()
 {
-    void *handle = dlopen(ENHANCE_INPUT_INTERFACE_LIB.c_str(), RTLD_LAZY);
-    if (handle != nullptr) {
-        g_inputEnhanceExist = true;
-    }
-    dlclose(handle);
-
-    handle = dlopen(ENHANCE_SRV_INTERFACE_LIB.c_str(), RTLD_LAZY);
-    if (handle != nullptr) {
-        g_srvEnhanceExist = true;
-    }
-    dlclose(handle);
     system("kill -9 `pidof security_component_service`");
     SC_LOG_INFO(LABEL, "SetUpTestCase.");
 }
@@ -75,11 +59,11 @@ HWTEST_F(SecCompEnhanceTest, SetEnhanceCfg001, TestSize.Level0)
 {
     uint8_t cfgData[SEC_COMP_ENHANCE_CFG_SIZE] = { 0 };
     int32_t result = SecCompEnhanceKit::SetEnhanceCfg(cfgData, SEC_COMP_ENHANCE_CFG_SIZE);
-    if (g_inputEnhanceExist) {
+#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
         EXPECT_EQ(result, SC_OK);
-    } else {
+#else
         EXPECT_EQ(result, SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE);
-    }
+#endif
 }
 
 /**
@@ -97,9 +81,9 @@ HWTEST_F(SecCompEnhanceTest, GetPoniterEventEnhanceData001, TestSize.Level0)
 
     InitSecCompClientEnhance();
     int32_t result = SecCompEnhanceKit::GetPointerEventEnhanceData(originData, dataLen, enhanceData, enHancedataLen);
-    if (g_inputEnhanceExist) {
+#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
         EXPECT_EQ(result, SC_SERVICE_ERROR_SERVICE_NOT_EXIST);
-    } else {
+#else
         EXPECT_EQ(result, SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE);
-    }
+#endif
 }

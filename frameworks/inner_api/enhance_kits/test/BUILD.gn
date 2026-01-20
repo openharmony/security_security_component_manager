@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("../../../../security_component.gni")
 
 sec_comp_root_dir = "../../../.."
 
@@ -35,7 +36,9 @@ ohos_unittest("sec_comp_enhance_sdk_test") {
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   cflags_cc = [ "-DHILOG_ENABLE" ]
-
+  if (security_component_enhance_enable) {
+    cflags_cc += [ "-DSECURITY_COMPONENT_ENHANCE_ENABLE" ]
+  }
   deps = [ "${sec_comp_root_dir}/frameworks/inner_api/security_component:libsecurity_component_sdk" ]
 
   external_deps = [
