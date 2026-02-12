@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 #include "sec_comp_entity_test.h"
 
+#include "sec_comp_info.h"
 #include "sec_comp_log.h"
 #include "location_button.h"
 #include "paste_button.h"
@@ -32,6 +33,7 @@ using namespace OHOS::Security::AccessToken;
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEntityTest"};
+static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 }
 
 void SecCompEntityTest::SetUpTestCase()
@@ -174,6 +176,34 @@ HWTEST_F(SecCompEntityTest, CheckClickInfo002, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CheckClickInfo003
+ * @tc.desc: Test touch info with window check failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompEntityTest, CheckClickInfo003, TestSize.Level0)
+{
+    SecCompClickEvent touch = {
+        .type = ClickEventType::KEY_EVENT_TYPE,
+        .point.touchX = ServiceTestCommon::TEST_COORDINATE,
+        .point.touchY = ServiceTestCommon::TEST_COORDINATE,
+        .point.timestamp = 0,
+    };
+    std::string message;
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_INVALID, message), SC_OK);
+
+    touch.type = ClickEventType::POINT_EVENT_TYPE;
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_NO_CROSS, message), SC_OK);
+
+    touch.type = ClickEventType::KEY_EVENT_TYPE;
+    entity_->componentInfo_->displayId_ = FOLD_VIRTUAL_DISPLAY_ID;
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_NO_CROSS, message), SC_OK);
+
+    touch.type = ClickEventType::POINT_EVENT_TYPE;
+    ASSERT_NE(entity_->CheckClickInfo(touch, 0, CrossAxisState::STATE_NO_CROSS, message), SC_OK);
+}
+
+/**
  * @tc.name: CompareComponentBasicInfo001
  * @tc.desc: Test Basic info
  * @tc.type: FUNC
@@ -221,4 +251,91 @@ HWTEST_F(SecCompEntityTest, CheckKeyEvent001, TestSize.Level0)
     ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
     clickInfo.key.keyCode = KEY_NUMPAD_ENTER;
     ASSERT_EQ(SC_OK, entity_->CheckKeyEvent(clickInfo));
+}
+
+/**
+ * @tc.name: CheckClickInfoWithCompatScaleMode001
+ * @tc.desc: Test touch info with isCompatScaleMode = true in PC virtual screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompEntityTest, CheckClickInfoWithCompatScaleMode001, TestSize.Level0)
+{
+    // Simulate PC virtual screen scenario
+    static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
+    entity_->componentInfo_->displayId_ = FOLD_VIRTUAL_DISPLAY_ID;
+
+    // Set component rect at a specific position: rect is (100, 100, 100, 100)
+    double originalY = 100.0;
+    entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.y_ = originalY;
+    entity_->componentInfo_->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->isCompatScaleMode_ = true;
+
+    std::string message;
+    int32_t superFoldOffsetY = 200;
+
+    // Initial touchY = 0, after +offset = 200, which is in rect Y range [100, 200]
+    SecCompClickEvent touch = {
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = ServiceTestCommon::TEST_COORDINATE + 50,
+        .point.touchY = 0,
+        .point.timestamp = static_cast<uint64_t>(
+            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / 1000,
+    };
+
+    // Set up valid extraInfo for enhance check
+    uint8_t buffer[1] = { 0 };
+    touch.extraInfo.dataSize = 1;
+    touch.extraInfo.data = buffer;
+
+    // Test with isCompatScaleMode = true, rect.y_ should NOT be adjusted
+    ASSERT_EQ(entity_->CheckClickInfo(touch, superFoldOffsetY, CrossAxisState::STATE_NO_CROSS, message),
+        SC_OK);
+    // rect_.y_ should remain unchanged when isCompatScaleMode is true
+    ASSERT_DOUBLE_EQ(entity_->componentInfo_->rect_.y_, originalY);
+}
+
+/**
+ * @tc.name: CheckClickInfoWithCompatScaleMode002
+ * @tc.desc: Test touch info with isCompatScaleMode = false in PC virtual screen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompEntityTest, CheckClickInfoWithCompatScaleMode002, TestSize.Level0)
+{
+    // Simulate PC virtual screen scenario
+    static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
+    entity_->componentInfo_->displayId_ = FOLD_VIRTUAL_DISPLAY_ID;
+
+    // Set component rect at a specific position
+    double originalY = 100.0;
+    entity_->componentInfo_->rect_.x_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.y_ = originalY;
+    entity_->componentInfo_->rect_.width_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->rect_.height_ = ServiceTestCommon::TEST_COORDINATE;
+    entity_->componentInfo_->isCompatScaleMode_ = false;
+
+    std::string message;
+    int32_t superFoldOffsetY = 200;
+
+    SecCompClickEvent touch = {
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = ServiceTestCommon::TEST_COORDINATE + 50,
+        .point.touchY = ServiceTestCommon::TEST_COORDINATE + 50,
+        .point.timestamp = static_cast<uint64_t>(
+            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / 1000,
+    };
+
+    // Set up valid extraInfo for enhance check
+    uint8_t buffer[1] = { 0 };
+    touch.extraInfo.dataSize = 1;
+    touch.extraInfo.data = buffer;
+
+    // Test with isCompatScaleMode = false, rect.y_ should be adjusted
+    ASSERT_EQ(entity_->CheckClickInfo(touch, superFoldOffsetY, CrossAxisState::STATE_NO_CROSS, message),
+        SC_OK);
+    // rect_.y_ should be adjusted when isCompatScaleMode is false
+    ASSERT_DOUBLE_EQ(entity_->componentInfo_->rect_.y_, originalY + superFoldOffsetY);
 }

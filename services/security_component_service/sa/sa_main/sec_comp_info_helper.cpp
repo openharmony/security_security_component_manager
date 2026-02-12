@@ -41,6 +41,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, SECURITY_DOMAIN_SECURIT
 static constexpr double MAX_RECT_PERCENT = 0.3F; // 30%
 static constexpr double ZERO_OFFSET = 0.0F;
 static constexpr double MAX_THRESHOLD_PERCENT = 0.1F; // 10%
+static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 const std::string OUT_OF_SCREEN = ", security component is out of screen, security component(x = ";
 const std::string OUT_OF_WINDOW = ", security component is out of window, security component(x = ";
 const std::string SECURITY_COMPONENT_IS_TOO_LARGER =
@@ -70,6 +71,7 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales
     } else {
         comp->scale_ = scales.scaleY;
     }
+    comp->isCompatScaleMode_ = isCompatScaleMode;
     SC_LOG_DEBUG(LABEL, "After adjust x %{public}f, y %{public}f, width %{public}f, height %{public}f",
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
 }
@@ -169,25 +171,31 @@ bool SecCompInfoHelper::IsOutOfScreen(const SecCompRect& rect, double curScreenW
             return true;
         }
     } else {
-        double thresholdX = std::max(rect.width_ * MAX_THRESHOLD_PERCENT, 1.0);
-        double thresholdY = std::max(rect.height_ * MAX_THRESHOLD_PERCENT, 1.0);
-        if (GreatNotEqual(ZERO_OFFSET - thresholdX, rect.x_) ||
-            GreatNotEqual(ZERO_OFFSET - thresholdY, rect.y_) ||
-            GreatNotEqual(rect.x_, curScreenWidth + thresholdX) ||
-            GreatNotEqual(rect.y_, curScreenHeight + thresholdY)) {
+        SecCompRect tmpRect = rect;
+        if (screenInfo.displayId == FOLD_VIRTUAL_DISPLAY_ID &&
+            screenInfo.crossAxisState == CrossAxisState::STATE_NO_CROSS &&
+            screenInfo.isCompatScaleMode) {
+            tmpRect.y_ -= screenInfo.superFoldOffsetY;
+        }
+        double thresholdX = std::max(tmpRect.width_ * MAX_THRESHOLD_PERCENT, 1.0);
+        double thresholdY = std::max(tmpRect.height_ * MAX_THRESHOLD_PERCENT, 1.0);
+        if (GreatNotEqual(ZERO_OFFSET - thresholdX, tmpRect.x_) ||
+            GreatNotEqual(ZERO_OFFSET - thresholdY, tmpRect.y_) ||
+            GreatNotEqual(tmpRect.x_, curScreenWidth + thresholdX) ||
+            GreatNotEqual(tmpRect.y_, curScreenHeight + thresholdY)) {
             SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
-            message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
-                ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
+            message = OUT_OF_SCREEN + std::to_string(tmpRect.x_) + ", y = " + std::to_string(tmpRect.y_) +
+                ", width = " + std::to_string(tmpRect.width_) + ", height = " + std::to_string(tmpRect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
                 ", height = " + std::to_string(curScreenHeight) + ")";
             return true;
         }
 
-        if (GreatNotEqual((rect.x_ + rect.width_), curScreenWidth + thresholdX) ||
-            GreatNotEqual((rect.y_ + rect.height_), curScreenHeight + thresholdY)) {
+        if (GreatNotEqual((tmpRect.x_ + tmpRect.width_), curScreenWidth + thresholdX) ||
+            GreatNotEqual((tmpRect.y_ + tmpRect.height_), curScreenHeight + thresholdY)) {
             SC_LOG_ERROR(LABEL, "SecurityComponentCheckFail: security component is out of screen");
-            message = OUT_OF_SCREEN + std::to_string(rect.x_) + ", y = " + std::to_string(rect.y_) +
-                ", width = " + std::to_string(rect.width_) + ", height = " + std::to_string(rect.height_) +
+            message = OUT_OF_SCREEN + std::to_string(tmpRect.x_) + ", y = " + std::to_string(tmpRect.y_) +
+                ", width = " + std::to_string(tmpRect.width_) + ", height = " + std::to_string(tmpRect.height_) +
                 "), current screen(width = " + std::to_string(curScreenWidth) +
                 ", height = " + std::to_string(curScreenHeight) + ")";
             return true;
