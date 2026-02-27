@@ -377,6 +377,8 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp, std::string& mess
     SecCompRect scaleRect;
     Scales scales = WindowInfoHelper::GetWindowScale(comp->windowId_, isCompatScaleMode, scaleRect);
     if ((!IsEqual(scales.floatingScale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.floatingScale, 0.0)) ||
+        (!IsEqual(scales.scaleX, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.scaleX, 0.0)) ||
+        (!IsEqual(scales.scaleY, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.scaleY, 0.0)) ||
         isCompatScaleMode) {
         AdjustSecCompRect(comp, scales, isCompatScaleMode, scaleRect);
     }
