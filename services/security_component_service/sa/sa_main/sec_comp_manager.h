@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,17 @@ struct ProcessCompInfos {
     AccessToken::AccessTokenID tokenId;
 };
 
+struct ComponentCheckParams {
+    std::shared_ptr<SecCompEntity> sc;
+    std::shared_ptr<SecCompBase> report;
+    std::shared_ptr<SecCompBase> reportComponentInfo;
+    SecCompBase* rawReport;
+    const SecCompCallerInfo* caller;
+    const std::string* bundleName;
+    int32_t scId;
+    std::string* message;
+};
+
 class SecCompManager {
 public:
     static SecCompManager& GetInstance();
@@ -57,7 +68,7 @@ public:
     int32_t UpdateSecurityComponent(int32_t scId, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
-    int32_t StartDialog(const SecCompInfo& info, const std::shared_ptr<SecCompEntity>& sc,
+    int32_t StartDialog(const SecCompInfo& info, std::shared_ptr<SecCompEntity>& sc,
         const std::vector<sptr<IRemoteObject>>& remote);
     int32_t ReportSecurityComponentClickEvent(SecCompInfo& secCompInfo, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller, const std::vector<sptr<IRemoteObject>>& remote, std::string& message);
@@ -86,10 +97,11 @@ private:
         SecCompType type, const std::string& scene, int32_t res);
     int32_t CreateScId();
     void GetFoldOffsetY(const CrossAxisState crossAxisState);
+    int32_t CheckComponentInfoValid(const ComponentCheckParams& params);
+    int32_t CheckRectInfo(const ComponentCheckParams& params);
 
     ffrt::shared_mutex componentInfoLock_;
     std::mutex scIdMtx_;
-    std::mutex superFoldOffsetMtx_;
     std::unordered_map<int32_t, ProcessCompInfos> componentMap_;
     int32_t scIdStart_;
     bool isSaExit_ = false;

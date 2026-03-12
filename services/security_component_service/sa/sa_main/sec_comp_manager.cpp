@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -456,38 +456,32 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
     std::string bundleName = "";
     bmsClient.GetNameForUid(uid, bundleName);
-    if ((reportComponentInfo == nullptr) || (!reportComponentInfo->GetValid())) {
-        SC_LOG_ERROR(LABEL, "report component info invalid");
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
-            sc->GetType());
-        /**
-         * If the ptr of reportComponentInfo is not nullptr, the string of message is not empty only when the icon of
-         * save button is picture.
-         */
-        if (!(reportComponentInfo && sc->AllowToBypassSecurityCheck(message))) {
-            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
-        }
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = sc;
+    checkParams.report = reportComponentInfo;
+    checkParams.rawReport = report;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = scId;
+    checkParams.message = &message;
+
+    int32_t res = CheckComponentInfoValid(checkParams);
+    if (res != SC_OK) {
+        return res;
     }
+
     if (report && (report->isClipped_ || report->hasNonCompatibleChange_)) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CLIP_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY,
             "CALLER_BUNDLE_NAME", bundleName, "COMPONENT_INFO", jsonComponent.dump().c_str());
     }
 
-    SecCompInfoHelper::ScreenInfo screenInfo = {report->displayId_, report->crossAxisState_, report->isWearableDevice_};
-    if ((!SecCompInfoHelper::CheckRectValid(reportComponentInfo->rect_, reportComponentInfo->windowRect_,
-        screenInfo, message, reportComponentInfo->scale_))) {
-        SC_LOG_ERROR(LABEL, "compare component info failed.");
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "CLICK", "SC_TYPE",
-            sc->GetType());
-        if (!sc->AllowToBypassSecurityCheck(message)) {
-            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
-        }
+    res = CheckRectInfo(checkParams);
+    if (res != SC_OK) {
+        return res;
     }
+
     int32_t enhanceRes =
         SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, reportComponentInfo, jsonComponent);
     if (enhanceRes != SC_OK) {
@@ -498,6 +492,47 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     }
 
     sc->componentInfo_ = reportComponentInfo;
+    return SC_OK;
+}
+
+int32_t SecCompManager::CheckComponentInfoValid(const ComponentCheckParams& params)
+{
+    if ((params.report == nullptr) || (!params.report->GetValid())) {
+        SC_LOG_ERROR(LABEL, "report component info invalid");
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", params.caller->uid,
+            "CALLER_BUNDLE_NAME", *params.bundleName,
+            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", params.scId, "CALL_SCENE", "CLICK", "SC_TYPE",
+            params.sc->GetType());
+        if (!(params.report && params.sc->AllowToBypassSecurityCheck(*params.message))) {
+            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        }
+    }
+    return SC_OK;
+}
+
+int32_t SecCompManager::CheckRectInfo(const ComponentCheckParams& params)
+{
+    GetFoldOffsetY(params.report->crossAxisState_);
+
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        params.rawReport->displayId_,
+        params.rawReport->crossAxisState_,
+        params.rawReport->isWearableDevice_,
+        superFoldOffsetY_,
+        params.report->isCompatScaleMode_};
+    if ((!SecCompInfoHelper::CheckRectValid(params.report->rect_, params.report->windowRect_,
+        screenInfo, *params.message, params.report->scale_))) {
+        SC_LOG_ERROR(LABEL, "compare component info failed.");
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
+            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", params.caller->uid,
+            "CALLER_BUNDLE_NAME", *params.bundleName,
+            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", params.scId, "CALL_SCENE", "CLICK", "SC_TYPE",
+            params.sc->GetType());
+        if (!params.sc->AllowToBypassSecurityCheck(*params.message)) {
+            return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
+        }
+    }
     return SC_OK;
 }
 
@@ -515,7 +550,6 @@ static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType 
 
 void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
 {
-    std::unique_lock<std::mutex> lock(superFoldOffsetMtx_);
     if (crossAxisState == CrossAxisState::STATE_INVALID) {
         return;
     }
@@ -551,7 +585,7 @@ int32_t SecCompManager::CheckClickEventParams(const SecCompCallerInfo& caller,
     return SC_OK;
 }
 
-int32_t SecCompManager::StartDialog(const SecCompInfo& info, const std::shared_ptr<SecCompEntity>& sc,
+int32_t SecCompManager::StartDialog(const SecCompInfo& info, std::shared_ptr<SecCompEntity>& sc,
     const std::vector<sptr<IRemoteObject>>& remote)
 {
     int32_t res = SC_SERVICE_ERROR_VALUE_INVALID;
@@ -603,8 +637,6 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
     if (res != SC_OK) {
         return res;
     }
-
-    GetFoldOffsetY(sc->componentInfo_->crossAxisState_);
 
     res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, sc->componentInfo_->crossAxisState_, message);
     if (res != SC_OK) {

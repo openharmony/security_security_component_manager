@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -759,4 +759,306 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentProcess001, TestSize.Level0)
     EXPECT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentProcess(info));
     SecCompManager::GetInstance().componentMap_ = oldmap;
     SecCompManager::GetInstance().isSaExit_ = isSaExit;
+}
+
+/**
+ * @tc.name: CheckComponentInfoValid001
+ * @tc.desc: Test CheckComponentInfoValid with nullptr report
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckComponentInfoValid001, TestSize.Level0)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = LOCATION_COMPONENT;
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::string bundleName = "test.bundle";
+    std::string message;
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = entity;
+    checkParams.report = nullptr;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = ServiceTestCommon::TEST_SC_ID_1;
+    checkParams.message = &message;
+
+    EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID,
+        SecCompManager::GetInstance().CheckComponentInfoValid(checkParams));
+}
+
+/**
+ * @tc.name: CheckComponentInfoValid002
+ * @tc.desc: Test CheckComponentInfoValid with invalid report
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckComponentInfoValid002, TestSize.Level0)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = LOCATION_COMPONENT;
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::string bundleName = "test.bundle";
+    std::string message;
+
+    LocationButton buttonInvalid = BuildInvalidLocationComponent();
+    std::shared_ptr<SecCompBase> report = std::make_shared<LocationButton>(buttonInvalid);
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = entity;
+    checkParams.report = report;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = ServiceTestCommon::TEST_SC_ID_1;
+    checkParams.message = &message;
+
+    EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID,
+        SecCompManager::GetInstance().CheckComponentInfoValid(checkParams));
+}
+
+/**
+ * @tc.name: CheckComponentInfoValid003
+ * @tc.desc: Test CheckComponentInfoValid with valid report
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckComponentInfoValid003, TestSize.Level0)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = LOCATION_COMPONENT;
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::string bundleName = "test.bundle";
+    std::string message;
+
+    LocationButton buttonValid = BuildValidLocationComponent();
+    std::shared_ptr<SecCompBase> report = std::make_shared<LocationButton>(buttonValid);
+    report->SetValid(true);
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = entity;
+    checkParams.report = report;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = ServiceTestCommon::TEST_SC_ID_1;
+    checkParams.message = &message;
+
+    EXPECT_EQ(SC_OK, SecCompManager::GetInstance().CheckComponentInfoValid(checkParams));
+}
+
+/**
+ * @tc.name: CheckRectInfo001
+ * @tc.desc: Test CheckRectInfo with invalid rect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckRectInfo001, TestSize.Level0)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = LOCATION_COMPONENT;
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::string bundleName = "test.bundle";
+    std::string message;
+
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.rect_.x_ = -1000;
+    std::shared_ptr<SecCompBase> report = std::make_shared<LocationButton>(buttonValid);
+    report->SetValid(true);
+    SecCompBase* rawReport = report.get();
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = entity;
+    checkParams.report = report;
+    checkParams.rawReport = rawReport;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = ServiceTestCommon::TEST_SC_ID_1;
+    checkParams.message = &message;
+
+    EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID,
+        SecCompManager::GetInstance().CheckRectInfo(checkParams));
+}
+
+/**
+ * @tc.name: CheckRectInfo002
+ * @tc.desc: Test CheckRectInfo with valid rect
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckRectInfo002, TestSize.Level0)
+{
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = LOCATION_COMPONENT;
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::string bundleName = "test.bundle";
+    std::string message;
+
+    LocationButton buttonValid = BuildValidLocationComponent();
+    std::shared_ptr<SecCompBase> report = std::make_shared<LocationButton>(buttonValid);
+    report->SetValid(true);
+    SecCompBase* rawReport = report.get();
+
+    ComponentCheckParams checkParams;
+    checkParams.sc = entity;
+    checkParams.report = report;
+    checkParams.rawReport = rawReport;
+    checkParams.caller = &caller;
+    checkParams.bundleName = &bundleName;
+    checkParams.scId = ServiceTestCommon::TEST_SC_ID_1;
+    checkParams.message = &message;
+
+    EXPECT_EQ(SC_OK, SecCompManager::GetInstance().CheckRectInfo(checkParams));
+}
+
+/**
+ * @tc.name: CheckClickSecurityComponentInfo002
+ * @tc.desc: Test check click security component info with clipped component
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo002, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    compPtr->type_ = LOCATION_COMPONENT;
+    ASSERT_NE(nullptr, compPtr);
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompClickEvent clickInfo = {};
+    clickInfo.type = ClickEventType::ACCESSIBILITY_EVENT_TYPE;
+    nlohmann::json jsonValid;
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.isClipped_ = true;
+    buttonValid.ToJson(jsonValid);
+    jsonValid[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message;
+    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonValid, caller, remote, message));
+}
+
+/**
+ * @tc.name: CheckClickSecurityComponentInfo003
+ * @tc.desc: Test check click security component info with non compatible change
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo003, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    compPtr->type_ = LOCATION_COMPONENT;
+    ASSERT_NE(nullptr, compPtr);
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompClickEvent clickInfo = {};
+    clickInfo.type = ClickEventType::ACCESSIBILITY_EVENT_TYPE;
+    nlohmann::json jsonValid;
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.hasNonCompatibleChange_ = true;
+    buttonValid.ToJson(jsonValid);
+    jsonValid[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message;
+    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonValid, caller, remote, message));
+}
+
+/**
+ * @tc.name: CheckClickSecurityComponentInfo004
+ * @tc.desc: Test check click security component info with enhance check fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo004, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
+    compPtr->type_ = LOCATION_COMPONENT;
+    ASSERT_NE(nullptr, compPtr);
+
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    ASSERT_EQ(SC_OK,
+        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+
+    SecCompClickEvent clickInfo = {};
+    nlohmann::json jsonValid;
+    LocationButton buttonValid = BuildValidLocationComponent();
+    buttonValid.ToJson(jsonValid);
+    jsonValid[JsonTagConstants::JSON_SC_TYPE] = LOCATION_COMPONENT;
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message;
+    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonValid, caller, remote, message));
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 }

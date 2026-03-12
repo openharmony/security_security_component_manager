@@ -41,6 +41,7 @@ static double g_curScreenWidth = 0.0F;
 static double g_curScreenHeight = 0.0F;
 static double g_testWidth = 0.0F;
 static double g_testHeight = 0.0F;
+static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 
 static bool GetScreenSize()
 {
@@ -186,12 +187,13 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent004, TestSize.Level0)
     rect.width_ = g_testWidth;
     rect.height_ = g_testHeight;
 
-    rect.x_ = g_curScreenWidth - g_testWidth + 1;   // reach the threshold
+    rect.x_ = g_curScreenWidth - g_testWidth + 1.0;   // reach the threshold
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
     rect.x_ = g_testWidth;
-    rect.y_ = g_curScreenHeight - g_testHeight + 1; // reach the threshold
+    rect.y_ = g_curScreenHeight - g_testHeight + 1.0; // reach the threshold
 
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
+    rect.y_ = g_testHeight;
 
     rect.x_ = g_curScreenWidth - g_testWidth + 1.1; // exceed the threshold
     ASSERT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, scale));
@@ -581,6 +583,54 @@ HWTEST_F(SecCompInfoHelperTest, IsOutOfScreen001, TestSize.Level0)
     rect.x_ = 2.0f;
     rect.y_ = 3.7f;
     ASSERT_FALSE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+}
+
+/**
+ * @tc.name: IsOutOfScreen002
+ * @tc.desc: Test IsOutOfScreen
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, IsOutOfScreen002, TestSize.Level0)
+{
+    SecCompRect rect = GetDefaultRect();
+    std::string message;
+    SecCompInfoHelper::ScreenInfo screenInfo = {
+        .displayId = 0,
+        .crossAxisState = CrossAxisState::STATE_INVALID,
+        .isWearable = false,
+        .superFoldOffsetY = 1.0f
+    };
+    double curScreenHeight = 10.0f;
+    double curScreenWidth = 10.0f;
+    rect.x_ = 2.0f;
+    rect.y_ = 2.0f;
+    rect.width_ = 6.0f;
+    rect.height_ = 3.0f;
+
+    ASSERT_FALSE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = -2.0f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 12.0f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    rect.x_ = 2.0f;
+    rect.y_ = -2.0f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+    
+    rect.y_ = 12.0f;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    screenInfo.displayId = FOLD_VIRTUAL_DISPLAY_ID;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    screenInfo.crossAxisState = CrossAxisState::STATE_NO_CROSS;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
+
+    screenInfo.isCompatScaleMode = true;
+    ASSERT_TRUE(SecCompInfoHelper::IsOutOfScreen(rect, curScreenWidth, curScreenHeight, message, screenInfo));
 }
 
 /**
