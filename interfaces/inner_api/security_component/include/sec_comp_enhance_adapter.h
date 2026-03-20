@@ -88,6 +88,7 @@ public:
     virtual void RegisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
     // unregiter scid to enhance client
     virtual void UnregisterScIdEnhance(const uintptr_t caller, int32_t scId) = 0;
+    virtual void Update() = 0;
 };
 
 #ifndef SEC_COMP_SERVICE_COMPILE_ENABLE
