@@ -46,16 +46,21 @@
 
 | **接口申明** | **接口描述** |
 | --- | --- |
-| int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId); | 注册安全控件 |
-| int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo); | 更新安全控件信息 |
+| int32_t RegisterSecurityComponent(SecCompType type, std::string& componentInfo, int32_t& scId); | 注册安全控件 |
+| int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo); | 更新安全控件信息 |
 | int32_t UnregisterSecurityComponent(int32_t scId); | 取消注册安全控件 |
-| int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr&lt;IRemoteObject&gt; callerToken); | 上报点击事件，申请临时授权 |
+| int32_t ReportSecurityComponentClickEvent(SecCompInfo& SecCompInfo, sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback, std::string& message); | 上报点击事件，申请临时授权 |
+| bool VerifySavePermission(AccessToken::AccessTokenID tokenId); | 校验保存控件权限 |
+| int32_t PreRegisterSecCompProcess(); | 预注册安全控件|
+| bool IsServiceExist(); | 校验安全控件服务是否存在|
+| bool LoadService(); | 加载安全控件服务|
+| bool IsSystemAppCalling(); | 校验调用方是否为系统应用|
+| bool HasCustomPermissionForSecComp(); | 校验调用方是否有自定义保存控件的权限|
 | int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen); | 设置安全控件增强的配置，供多模服务使用 |
 | int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen, uint8_t* enhanceData, uint32_t& enHancedataLen); | 获取点击事件的安全增强数据，供多模服务使用 |
-| bool VerifySavePermission(AccessToken::AccessTokenID tokenId); | 校验保存控件权限 |
 
 ## 相关仓
 
-**[arkui\_ace\_engine](https://gitee.com/openharmony/arkui_ace_engine/blob/master/README_zh.md)**
+**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine/blob/master/README_zh.md)**
 
-**[multimodalinput\_input](https://gitee.com/openharmony/multimodalinput_input/blob/master/README_zh.md)**
+**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input/blob/master/README_zh.md)**

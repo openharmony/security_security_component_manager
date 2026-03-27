@@ -47,16 +47,21 @@ The security component manager service provides the following functions:
 
 | **API**| **Description**|
 | --- | --- |
-| int32_t RegisterSecurityComponent(SecCompType type, const std::string& componentInfo, int32_t& scId); | Registers a security component.|
-| int32_t UpdateSecurityComponent(int32_t scId, const std::string& componentInfo); | Updates security component information.|
+| int32_t RegisterSecurityComponent(SecCompType type, std::string& componentInfo, int32_t& scId); | Registers a security component.|
+| int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo); | Updates security component information.|
 | int32_t UnregisterSecurityComponent(int32_t scId); | Unregisters a security component.|
-| int32_t ReportSecurityComponentClickEvent(int32_t scId, const std::string& componentInfo, const SecCompClickEvent& clickInfo, sptr&lt;IRemoteObject&gt; callerToken); | Reports a click event to apply for temporary authorization.|
+| int32_t ReportSecurityComponentClickEvent(SecCompInfo& SecCompInfo, sptr<IRemoteObject> callerToken, OnFirstUseDialogCloseFunc&& callback, std::string& message); | Reports a click event to apply for temporary authorization.|
+| bool VerifySavePermission(AccessToken::AccessTokenID tokenId); | Verifies saving permission.|
+| int32_t PreRegisterSecCompProcess(); | Preregisters a security component.|
+| bool IsServiceExist(); | Verifies whether security component service exists.|
+| bool LoadService(); | Loads security component service.|
+| bool IsSystemAppCalling(); | Verifies whether calling app is a system app.|
+| bool HasCustomPermissionForSecComp(); | Verifies whether calling app has the permission "ohos.permission.CUSTOMIZE_SAVE_BUTTON".|
 | int32_t SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen); | Sets enhanced configuration of the security component for multimodal services.|
 | int32_t GetPointerEventEnhanceData(void* data, uint32_t dataLen, uint8_t* enhanceData, uint32_t& enHancedataLen); | Obtains security enhancement data of the click event for multimodal services.|
-| bool ReduceAfterVerifySavePermission(AccessToken::AccessTokenID tokenId); | Cancels the saving of the component permissions after verification.|
 
 ## Repositories Involved
 
-**[arkui\_ace\_engine](https://gitee.com/openharmony/arkui_ace_engine/blob/master/README.md)**
+**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine/blob/master/README.md)**
 
-**[multimodalinput\_input](https://gitee.com/openharmony/multimodalinput_input/blob/master/README.md)**
+**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input/blob/master/README.md)**
