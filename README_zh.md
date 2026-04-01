@@ -61,6 +61,6 @@
 
 ## 相关仓
 
-**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine/blob/master/README_zh.md)**
+**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine)**
 
-**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input/blob/master/README_zh.md)**
+**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input)**
