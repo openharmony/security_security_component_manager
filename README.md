@@ -62,6 +62,6 @@ The security component manager service provides the following functions:
 
 ## Repositories Involved
 
-**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine/blob/master/README.md)**
+**[arkui\_ace\_engine](https://gitcode.com/openharmony/arkui_ace_engine)**
 
-**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input/blob/master/README.md)**
+**[multimodalinput\_input](https://gitcode.com/openharmony/multimodalinput_input)**
