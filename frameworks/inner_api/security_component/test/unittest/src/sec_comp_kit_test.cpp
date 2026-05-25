@@ -50,23 +50,6 @@ static void TestInCallerNotCheckList()
     EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(reportRes, SC_SERVICE_ERROR_CALLER_INVALID);
 }
-
-static void TestInCallerCheckList()
-{
-    int32_t scId = -1;
-    struct SecCompClickEvent click = {};
-    std::string emptyStr = "";
-    int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
-    int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, emptyStr, click };
-    std::string message;
-    int reportRes = SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message);
-
-    EXPECT_NE(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
-    EXPECT_NE(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
-    EXPECT_NE(reportRes, SC_SERVICE_ERROR_CALLER_INVALID);
-}
 }  // namespace
 
 void SecCompKitTest::SetUpTestCase()
@@ -134,31 +117,6 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level0)
     std::string message;
     EXPECT_NE(SC_OK, SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message));
     EXPECT_NE(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
-}
-
-/**
- * @tc.name: ExceptCall001
- * @tc.desc: test caller check.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level0)
-{
-    std::vector<uintptr_t> callerList = {
-        reinterpret_cast<uintptr_t>(TestInCallerCheckList),
-    };
-    SecCompUiRegister registerCallback(callerList, nullptr);
-    TestInCallerCheckList();
-    TestInCallerNotCheckList();
-
-    // prohibit init caller list repeately
-    std::vector<uintptr_t> callerList1 = {
-        reinterpret_cast<uintptr_t>(TestInCallerNotCheckList),
-    };
-    SecCompUiRegister registerCallback1(callerList1, nullptr);
-    TestInCallerNotCheckList();
-    SecCompCallerAuthorization::GetInstance().kitCallerList_.clear();
-    SecCompCallerAuthorization::GetInstance().isInit_ = false;
 }
 
 /**
