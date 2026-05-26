@@ -415,6 +415,25 @@ HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level0)
 }
 
 /*
+ * @tc.name: SetFirstUseMap002
+ * @tc.desc: Test SetFirstUseMap with null event handler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, SetFirstUseMap002, TestSize.Level0)
+{
+    FirstUseDialog diag;
+    diag.secHandler_ = nullptr;
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    entity->componentInfo_ = std::make_shared<SaveButton>();
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    entity->tokenId_ = 0;
+
+    EXPECT_EQ(diag.SetFirstUseMap(entity), true);
+    EXPECT_EQ(SAVE_BUTTON_FIRST_USE, static_cast<uint64_t>(diag.firstUseMap_[0]));
+}
+
+/*
  * @tc.name: NotifyFirstUseDialog001
  * @tc.desc: Test NotifyFirstUseDialog
  * @tc.type: FUNC

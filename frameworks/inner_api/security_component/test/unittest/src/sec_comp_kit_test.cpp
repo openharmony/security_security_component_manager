@@ -34,6 +34,9 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompKitTest"};
 constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 
+static void TestInCallerNotCheckList() __attribute__((noinline, aligned(8192)));
+static void TestInCallerCheckList() __attribute__((noinline, aligned(8192)));
+
 static void TestInCallerNotCheckList()
 {
     int32_t scId = -1;

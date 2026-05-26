@@ -52,6 +52,34 @@ public:
 }  // namespace OHOS
 
 /**
+ * @tc.name: TryGetWindowInfo001
+ * @tc.desc: Test null window info is skipped
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo001, TestSize.Level0)
+{
+    auto oldResult = WindowManager::GetInstance().result_;
+    auto oldList = WindowManager::GetInstance().list_;
+    WindowManager::GetInstance().result_ = WMError::WM_OK;
+    std::vector<sptr<AccessibilityWindowInfo>> list;
+    list.emplace_back(nullptr);
+    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
+    compWin->wid_ = 1;
+    list.emplace_back(compWin);
+    WindowManager::GetInstance().list_ = list;
+
+    sptr<AccessibilityWindowInfo> windowInfo = nullptr;
+    EXPECT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, windowInfo));
+    EXPECT_NE(nullptr, windowInfo);
+    if (windowInfo != nullptr) {
+        EXPECT_EQ(1, windowInfo->wid_);
+    }
+    WindowManager::GetInstance().list_ = oldList;
+    WindowManager::GetInstance().result_ = oldResult;
+}
+
+/**
  * @tc.name: CheckOtherWindowCoverComp001
  * @tc.desc: Test pinter event cross other window
  * @tc.type: FUNC
