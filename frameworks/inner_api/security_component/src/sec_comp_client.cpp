@@ -46,7 +46,7 @@ SecCompClient& SecCompClient::GetInstance()
     if (instance == nullptr) {
         std::lock_guard<std::mutex> lock(g_instanceMutex);
         if (instance == nullptr) {
-            SecCompClient* tmp = new (std::nothrow)SecCompClient();
+            SecCompClient* tmp = new SecCompClient();
             instance = std::move(tmp);
         }
     }

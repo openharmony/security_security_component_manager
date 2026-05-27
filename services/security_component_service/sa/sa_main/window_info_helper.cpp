@@ -37,10 +37,11 @@ bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::Accessibil
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }
-    auto iter = std::find_if(infos.begin(), infos.end(), [windowId](const sptr<Rosen::AccessibilityWindowInfo> info) {
-        return windowId == info->wid_;
-    });
-    if ((iter == infos.end()) || (*iter == nullptr)) {
+    auto iter = std::find_if(infos.begin(), infos.end(),
+        [windowId](const sptr<Rosen::AccessibilityWindowInfo>& info) {
+            return (info != nullptr) && (windowId == info->wid_);
+        });
+    if (iter == infos.end()) {
         return false;
     }
     windowInfo = *iter;

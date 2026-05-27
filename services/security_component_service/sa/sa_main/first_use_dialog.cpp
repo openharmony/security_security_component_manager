@@ -473,6 +473,10 @@ void FirstUseDialog::SendSaveEventHandler(void)
     });
 
     SC_LOG_INFO(LABEL, "Delay first_use_record json");
+    if (secHandler_ == nullptr) {
+        SC_LOG_ERROR(LABEL, "event handler invalid.");
+        return;
+    }
     secHandler_->ProxyPostTask(delayed);
 }
 
