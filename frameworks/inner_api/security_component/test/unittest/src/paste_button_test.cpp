@@ -26,6 +26,7 @@ using namespace OHOS::Security::SecurityComponent;
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "PasteButtonTest"};
+static const std::string WRONG_TYPE = "wrongType";
 }
 
 void PasteButtonTest::SetUpTestCase()
@@ -186,4 +187,31 @@ HWTEST_F(PasteButtonTest, IsCorrespondenceType001, TestSize.Level1)
     EXPECT_TRUE(button.IsCorrespondenceType());
     button.type_ = LOCATION_COMPONENT;
     EXPECT_FALSE(button.IsCorrespondenceType());
+}
+
+/**
+ * @tc.name: FromJson001
+ * @tc.desc: Test paste button from wrong isSmartEdgeState json
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PasteButtonTest, FromJson001, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    PasteButton comp;
+    std::string message;
+    bool isClicked = true;
+    TestCommon::BuildPasteComponentInfo(jsonComponent);
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = WRONG_TYPE;
+    EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = true;
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+    EXPECT_TRUE(comp.isSmartEdgeState_);
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+    EXPECT_FALSE(comp.isSmartEdgeState_);
 }

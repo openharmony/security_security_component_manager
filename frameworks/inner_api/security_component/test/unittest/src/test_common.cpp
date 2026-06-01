@@ -97,6 +97,7 @@ void TestCommon::BuildLocationComponentInfo(nlohmann::json& jsonComponent)
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
     jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
 }
 
 void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
@@ -129,6 +130,7 @@ void TestCommon::BuildSaveComponentInfo(nlohmann::json& jsonComponent)
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
     jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
 }
 
 void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
@@ -161,6 +163,7 @@ void TestCommon::BuildPasteComponentInfo(nlohmann::json& jsonComponent)
     jsonComponent[JsonTagConstants::JSON_IS_CUSTOMIZABLE] = false;
     jsonComponent[JsonTagConstants::JSON_TIP_POSITION] = TipPosition::ABOVE_BOTTOM;
     jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = false;
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
 }
 }  // namespace SecurityComponent
 }  // namespace Security

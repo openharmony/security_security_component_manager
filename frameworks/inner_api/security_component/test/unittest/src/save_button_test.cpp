@@ -775,7 +775,34 @@ HWTEST_F(SaveButtonTest, FromJson020, TestSize.Level1)
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_TEXT_SET_TAG] = true;
     jsonComponent[JsonTagConstants::JSON_IS_OVERLAY_NODE_SET_TAG] = WRONG_TYPE;
     EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
-    
+
     jsonComponent[JsonTagConstants::JSON_IS_ARKUI_COMPONENT] = WRONG_TYPE;
     EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
+}
+
+/**
+ * @tc.name: FromJson021
+ * @tc.desc: Test save button from wrong isSmartEdgeState json
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SaveButtonTest, FromJson021, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    SaveButton comp;
+    std::string message;
+    bool isClicked = true;
+    TestCommon::BuildSaveComponentInfo(jsonComponent);
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = WRONG_TYPE;
+    EXPECT_FALSE(comp.FromJson(jsonComponent, message, isClicked));
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = true;
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+    EXPECT_TRUE(comp.isSmartEdgeState_);
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
+    EXPECT_TRUE(comp.FromJson(jsonComponent, message, isClicked));
+    EXPECT_FALSE(comp.isSmartEdgeState_);
 }
