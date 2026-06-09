@@ -24,7 +24,7 @@ using namespace OHOS::Security::SecurityComponent;
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEnhanceTest"};
-static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 172;
+static constexpr uint32_t SEC_COMP_ENHANCE_CFG_SIZE = 184;
 static constexpr uint32_t MAX_HMAC_SIZE = 160;
 }  // namespace
 

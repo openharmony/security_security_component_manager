@@ -113,7 +113,7 @@ int32_t SecCompEnhanceAdapter::GetPointerEventEnhanceData(void* data, uint32_t d
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
-int32_t SecCompEnhanceAdapter::CheckExtraInfo(const SecCompClickEvent& clickInfo)
+int32_t SecCompEnhanceAdapter::CheckExtraInfo(SecCompClickEvent& clickInfo)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
