@@ -39,6 +39,7 @@ ohos_source_set("sec_comp_service_proxy") {
     cfi_cross_dso = true
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   output_values = get_target_outputs(":sec_comp_service_interface")
 
@@ -60,6 +61,7 @@ ohos_source_set("sec_comp_service_proxy") {
 }
 
 ohos_source_set("sec_comp_no_cfi_service_proxy") {
+  branch_protector_ret = "pac_ret"
   output_values = get_target_outputs(":sec_comp_service_interface")
 
   include_dirs = [ "${sec_comp_root_dir}/frameworks/common/include" ]
@@ -85,6 +87,7 @@ ohos_source_set("sec_comp_service_stub") {
     cfi_cross_dso = true
     debug = false
   }
+  branch_protector_ret = "pac_ret"
 
   output_values = get_target_outputs(":sec_comp_service_interface")
 
@@ -106,6 +109,7 @@ ohos_source_set("sec_comp_service_stub") {
 }
 
 ohos_source_set("sec_comp_service_stub_no_cfi") {
+  branch_protector_ret = "pac_ret"
   output_values = get_target_outputs(":sec_comp_service_interface")
 
   include_dirs = [ "${sec_comp_root_dir}/frameworks/common/include" ]
