@@ -143,10 +143,12 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
     if (std::find(RETRY_CODE_LIST.begin(), RETRY_CODE_LIST.end(), res) == RETRY_CODE_LIST.end()) {
         return res;
     }
-
-    std::unique_lock<std::mutex> lock(secCompSaMutex_);
-    auto waitStatus = secCompSACon_.wait_for(lock, std::chrono::milliseconds(SA_DIED_TIME_OUT),
-        [this]() { return serviceAbilityNeedLoadFlag_; });
+    bool waitStatus = false;
+    {
+        std::unique_lock<std::mutex> lock(secCompSaMutex_);
+        waitStatus = secCompSACon_.wait_for(lock, std::chrono::milliseconds(SA_DIED_TIME_OUT),
+            [this]() { return serviceAbilityNeedLoadFlag_; });
+    }
     if (waitStatus) {
         proxy = GetProxy(true);
         if (proxy != nullptr) {
