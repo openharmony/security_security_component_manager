@@ -67,12 +67,13 @@ private:
     void GetSecCompSa();
     void LoadSecCompSa();
     sptr<ISecCompService> GetProxy(bool doLoadSa);
-    void GetProxyFromRemoteObject(const sptr<IRemoteObject>& remoteObject);
+    void InstallProxyLocked(const sptr<IRemoteObject>& remoteObject);
     int32_t TryRegisterSecurityComponent(SecCompType type, const std::string& componentInfo,
         int32_t& scId, sptr<ISecCompService> proxy);
 
     std::mutex cvLock_;
     bool readyFlag_ = false;
+    sptr<IRemoteObject> loadedRemoteObject_ = nullptr;
     std::condition_variable secComCon_;
     std::mutex proxyMutex_;
     bool serviceAbilityNeedLoadFlag_ = false;

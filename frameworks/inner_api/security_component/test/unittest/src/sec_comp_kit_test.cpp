@@ -25,6 +25,8 @@
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
 #include "test_common.h"
+#include <atomic>
+#include <thread>
 
 using namespace testing::ext;
 using namespace OHOS::Security::SecurityComponent;
@@ -222,9 +224,47 @@ HWTEST_F(SecCompKitTest, FinishStartSAFail001, TestSize.Level0)
 {
     SecCompClient::GetInstance().FinishStartSAFail();
     EXPECT_EQ(SecCompClient::GetInstance().readyFlag_, false);
+    EXPECT_EQ(nullptr, SecCompClient::GetInstance().loadedRemoteObject_);
     SecCompClient::GetInstance().OnRemoteDiedHandle();
     EXPECT_EQ(nullptr, SecCompClient::GetInstance().proxy_);
-    SecCompClient::GetInstance().GetProxyFromRemoteObject(nullptr);
+    SecCompClient::GetInstance().InstallProxyLocked(nullptr);
+}
+
+/**
+ * @tc.name: FinishStartSASuccess001
+ * @tc.desc: Test successful sa load caches state for waiting thread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, FinishStartSASuccess001, TestSize.Level0)
+{
+    SecCompClient::GetInstance().readyFlag_ = false;
+    SecCompClient::GetInstance().loadedRemoteObject_ = nullptr;
+    SecCompClient::GetInstance().FinishStartSASuccess(nullptr);
+    EXPECT_EQ(true, SecCompClient::GetInstance().readyFlag_);
+    EXPECT_EQ(nullptr, SecCompClient::GetInstance().loadedRemoteObject_);
+}
+
+/**
+ * @tc.name: WaitForSecCompSa001
+ * @tc.desc: Test wait is released after successful sa load callback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompKitTest, WaitForSecCompSa001, TestSize.Level0)
+{
+    SecCompClient::GetInstance().readyFlag_ = false;
+    SecCompClient::GetInstance().loadedRemoteObject_ = nullptr;
+    std::atomic<bool> waitReturned { false };
+    std::thread waitThread([&waitReturned]() {
+        SecCompClient::GetInstance().WaitForSecCompSa();
+        waitReturned.store(true);
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    SecCompClient::GetInstance().FinishStartSASuccess(nullptr);
+    waitThread.join();
+    EXPECT_EQ(true, waitReturned.load());
+    EXPECT_EQ(true, SecCompClient::GetInstance().readyFlag_);
 }
 
 /**
