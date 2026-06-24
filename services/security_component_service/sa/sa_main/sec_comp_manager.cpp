@@ -208,8 +208,6 @@ void SecCompManager::NotifyProcessForeground(int32_t pid)
     }
     SecCompPermManager::GetInstance().CancelAppRevokingPermisions(iter->second.tokenId);
     iter->second.isForeground = true;
-
-    SC_LOG_INFO(LABEL, "App pid %{public}d to foreground", pid);
 }
 
 void SecCompManager::NotifyProcessBackground(int32_t pid)
@@ -708,7 +706,6 @@ bool SecCompManager::HasCustomPermissionForSecComp()
         AccessToken::TypePermissionState::PERMISSION_GRANTED) {
         return true;
     }
-    SC_LOG_INFO(LABEL, "Permission denied(tokenID=%{public}d)", callingTokenID);
     return false;
 }
 }  // namespace SecurityComponent

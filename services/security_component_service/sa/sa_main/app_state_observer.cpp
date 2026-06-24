@@ -55,11 +55,9 @@ void AppStateObserver::AddProcessToForegroundSet(int32_t pid, const SecCompProce
     for (auto iter = foregrandProcList_.begin(); iter != foregrandProcList_.end(); ++iter) {
         if (pid == -1) {
             if (iter->uid == data.uid) {
-                SC_LOG_INFO(LABEL, "uid %{public}d is already in foreground", data.uid);
                 return;
             }
         } else if (pid == iter->pid) {
-            SC_LOG_INFO(LABEL, "pid %{public}d is already in foreground", pid);
             return;
         }
     }
@@ -110,16 +108,12 @@ void AppStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &proc
 
 void AppStateObserver::OnProcessDied(const AppExecFwk::ProcessData& processData)
 {
-    SC_LOG_INFO(LABEL, "OnProcessDied die %{public}s pid %{public}d",
-        processData.bundleName.c_str(), processData.pid);
     RemoveProcessFromForegroundSet(processData.pid);
     SecCompManager::GetInstance().NotifyProcessDied(processData.pid, false);
 }
 
 void AppStateObserver::OnAppCacheStateChanged(const AppExecFwk::AppStateData &appStateData)
 {
-    SC_LOG_INFO(LABEL, "OnAppCacheStateChanged pid %{public}d",
-        appStateData.pid);
     if (appStateData.state != APP_STATE_CACHED) {
         return;
     }
