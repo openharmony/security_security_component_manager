@@ -58,6 +58,7 @@ SecCompClient::SecCompClient()
 
 SecCompClient::~SecCompClient()
 {
+    std::unique_lock<std::mutex> lock(proxyMutex_);
     if (proxy_ == nullptr) {
         return;
     }
@@ -449,6 +450,7 @@ bool SecCompClient::StartLoadSecCompSa()
     {
         std::unique_lock<std::mutex> lock(cvLock_);
         readyFlag_ = false;
+        loadedRemoteObject_ = nullptr;
     }
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
@@ -478,7 +480,7 @@ bool SecCompClient::TryToGetSecCompSa()
     if (!secCompSa) {
         return false;
     }
-    GetProxyFromRemoteObject(secCompSa);
+    InstallProxyLocked(secCompSa);
     return true;
 }
 
@@ -497,10 +499,10 @@ void SecCompClient::WaitForSecCompSa()
 
 void SecCompClient::FinishStartSASuccess(const sptr<IRemoteObject>& remoteObject)
 {
-    GetProxyFromRemoteObject(remoteObject);
     // get lock which wait_for release and send a notice so that wait_for can out of block
     {
         std::unique_lock<std::mutex> lock(cvLock_);
+        loadedRemoteObject_ = remoteObject;
         readyFlag_ = true;
         secComCon_.notify_one();
     }
@@ -515,6 +517,7 @@ void SecCompClient::FinishStartSAFail()
     SC_LOG_ERROR(LABEL, "get security component sa failed.");
     // get lock which wait_for release and send a notice
     std::unique_lock<std::mutex> lock(cvLock_);
+    loadedRemoteObject_ = nullptr;
     readyFlag_ = false;
     secComCon_.notify_one();
 }
@@ -550,7 +553,7 @@ void SecCompClient::OnRemoteDiedHandle()
     }
 }
 
-void SecCompClient::GetProxyFromRemoteObject(const sptr<IRemoteObject>& remoteObject)
+void SecCompClient::InstallProxyLocked(const sptr<IRemoteObject>& remoteObject)
 {
     if (remoteObject == nullptr) {
         return;
@@ -572,6 +575,10 @@ void SecCompClient::GetProxyFromRemoteObject(const sptr<IRemoteObject>& remoteOb
         SC_LOG_ERROR(LABEL, "iface_cast get null");
         return;
     }
+    if (proxy_ != nullptr) {
+        remoteObject->RemoveDeathRecipient(serviceDeathObserver);
+        return;
+    }
     proxy_ = proxy;
     serviceDeathObserver_ = serviceDeathObserver;
     SC_LOG_INFO(LABEL, "GetSystemAbility %{public}d success", SA_ID_SECURITY_COMPONENT_SERVICE);
@@ -589,6 +596,15 @@ sptr<ISecCompService> SecCompClient::GetProxy(bool doLoadSa)
     }
 
     LoadSecCompSa();
+    sptr<IRemoteObject> remoteObject = nullptr;
+    {
+        std::unique_lock<std::mutex> cvLock(cvLock_);
+        remoteObject = loadedRemoteObject_;
+        loadedRemoteObject_ = nullptr;
+    }
+    if (remoteObject != nullptr && proxy_ == nullptr) {
+        InstallProxyLocked(remoteObject);
+    }
     return proxy_;
 }
 }  // namespace SecurityComponent
