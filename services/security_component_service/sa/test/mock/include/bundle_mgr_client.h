@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+constexpr int32_t BYPASS_TEST_UID = 99999;
+}
 
 class BundleMgrClient {
 public:
@@ -29,6 +32,11 @@ public:
 
     ErrCode GetNameForUid(const int uid, std::string &name)
     {
+        if (uid == BYPASS_TEST_UID) {
+            name = "test.bypass";
+            return 0;
+        }
+        name = "";
         return 0;
     }
     bool GetBundleInfo(const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo,

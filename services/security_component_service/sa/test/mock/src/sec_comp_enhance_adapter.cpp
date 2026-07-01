@@ -244,6 +244,12 @@ void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
 {
     SC_LOG_DEBUG(LABEL, "AddSecurityComponentProcess success");
 }
+
+bool SecCompEnhanceAdapter::IsBypassPermitted(const std::string& bundleName)
+{
+    SC_LOG_DEBUG(LABEL, "IsBypassPermitted success");
+    return bundleName == "test.bypass";
+}
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS

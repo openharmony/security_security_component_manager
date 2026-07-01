@@ -99,6 +99,8 @@ private:
     void GetFoldOffsetY(const CrossAxisState crossAxisState);
     int32_t CheckComponentInfoValid(const ComponentCheckParams& params);
     int32_t CheckRectInfo(const ComponentCheckParams& params);
+    bool AllowToBypassArkuiCheck(const SecCompCallerInfo& caller);
+    bool IsPasteboardPermissionGranted(const SecCompCallerInfo& caller, const std::shared_ptr<SecCompEntity>& sc);
 
     ffrt::shared_mutex componentInfoLock_;
     std::mutex scIdMtx_;

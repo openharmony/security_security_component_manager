@@ -26,6 +26,9 @@
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
 #include "sec_comp_enhance_adapter.h"
+#define private public
+#include "sec_comp_manager.h"
+#undef private
 #include "service_test_common.h"
 #include "system_ability.h"
 #include "token_setproc.h"
@@ -40,6 +43,7 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompServiceMockTest"};
 static AccessTokenID g_selfTokenId = 0;
+constexpr int32_t BYPASS_TEST_UID = 99999;
 }
 
 void SecCompServiceMockTest::SetUpTestCase()
@@ -85,6 +89,22 @@ HWTEST_F(SecCompServiceMockTest, WriteError001, TestSize.Level0)
     secCompService_->Initialize();
     SecCompRawdata rawReply;
     EXPECT_EQ(SC_OK, secCompService_->WriteError(SC_SERVICE_ERROR_VALUE_INVALID, rawReply));
+}
+
+/**
+ * @tc.name: AllowToBypassArkuiCheck001
+ * @tc.desc: Test arkui message bypass with mocked enhance whitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompServiceMockTest, AllowToBypassArkuiCheck001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = BYPASS_TEST_UID,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    EXPECT_TRUE(SecCompManager::GetInstance().AllowToBypassArkuiCheck(caller));
 }
 
 /**

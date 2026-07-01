@@ -70,6 +70,9 @@ public:
     // notify process registered
     virtual void AddSecurityComponentProcess(int32_t pid) = 0;
 
+    // check whether caller bundle matches vendor-defined bypass rule
+    virtual bool IsBypassPermitted(const std::string& bundleName) = 0;
+
     virtual bool EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output) = 0;
     virtual bool EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output) = 0;
 };
@@ -119,6 +122,7 @@ public:
     static void UnregisterScIdEnhance(int32_t scId);
 
     static void AddSecurityComponentProcess(int32_t pid);
+    static bool IsBypassPermitted(const std::string& bundleName);
 
     static bool EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output);
     static bool EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output);
