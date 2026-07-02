@@ -94,10 +94,19 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level0)
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
     SecCompEnhanceAdapter::AddSecurityComponentProcess(0);
     SecCompEnhanceAdapter::isEnhanceSrvHandlerInit = false;
+    ASSERT_FALSE(SecCompEnhanceAdapter::IsBypassPermitted("test.bundle"));
+}
 
+/**
+ * @tc.name: EnhanceAdapter002
+ * @tc.desc: test enhance adapter serialize and component check fallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter002, TestSize.Level0)
+{
     OHOS::MessageParcel input;
     OHOS::MessageParcel output;
-    OHOS::MessageParcel reply;
     SecCompRawdata inputData;
     SecCompRawdata outputData;
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;

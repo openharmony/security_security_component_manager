@@ -138,6 +138,17 @@ void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
     }
 }
 
+bool SecCompEnhanceAdapter::IsBypassPermitted(const std::string& bundleName)
+{
+    if (!isEnhanceSrvHandlerInit) {
+        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
+    }
+    if (srvHandler != nullptr) {
+        return srvHandler->IsBypassPermitted(bundleName);
+    }
+    return false;
+}
+
 __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
 {
     if (!isEnhanceClientHandlerInit) {

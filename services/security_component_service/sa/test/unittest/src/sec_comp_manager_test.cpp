@@ -762,6 +762,121 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentProcess001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: AllowToBypassArkuiCheck001
+ * @tc.desc: Test arkui message bypass fallback without enhance whitelist
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, AllowToBypassArkuiCheck001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    EXPECT_FALSE(SecCompManager::GetInstance().AllowToBypassArkuiCheck(caller));
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEventBypass001
+ * @tc.desc: Test paste component click bypass when app already has read pasteboard permission
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEventBypass001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+
+    nlohmann::json jsonPaste;
+    std::shared_ptr<PasteButton> compPtr = std::make_shared<PasteButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = PASTE_COMPONENT;
+    compPtr->ToJson(jsonPaste);
+    jsonPaste[JsonTagConstants::JSON_SC_TYPE] = PASTE_COMPONENT;
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(
+        ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompClickEvent clickInfo = {};
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message = "arkui check failed";
+
+    ASSERT_EQ(0, AccessTokenKit::GrantPermission(ServiceTestCommon::TEST_TOKEN_ID,
+        "ohos.permission.READ_PASTEBOARD", 0));
+    EXPECT_EQ(SC_OK, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonPaste, caller, remote, message));
+    ASSERT_EQ(0, AccessTokenKit::RevokePermission(ServiceTestCommon::TEST_TOKEN_ID,
+        "ohos.permission.READ_PASTEBOARD", 0));
+    SecCompManager::GetInstance().DeleteSecurityComponentFromList(ServiceTestCommon::TEST_PID_1,
+        ServiceTestCommon::TEST_SC_ID_1);
+}
+
+/**
+ * @tc.name: IsPasteboardPermissionGranted001
+ * @tc.desc: Test pasteboard permission check with non-paste component
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, IsPasteboardPermissionGranted001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+    std::shared_ptr<SaveButton> compPtr = std::make_shared<SaveButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = SAVE_COMPONENT;
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+
+    EXPECT_FALSE(SecCompManager::GetInstance().IsPasteboardPermissionGranted(caller, entity));
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEventMessage001
+ * @tc.desc: Test report click event fail when arkui message is not empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEventMessage001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1
+    };
+
+    std::shared_ptr<SaveButton> compPtr = std::make_shared<SaveButton>();
+    ASSERT_NE(nullptr, compPtr);
+    compPtr->type_ = SAVE_COMPONENT;
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(
+        compPtr, ServiceTestCommon::TEST_TOKEN_ID, ServiceTestCommon::TEST_SC_ID_1, 1, 1);
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(
+        ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompClickEvent clickInfo = {};
+    nlohmann::json jsonValid;
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    std::string message = "arkui check failed";
+
+    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonValid, caller, remote, message));
+    SecCompManager::GetInstance().DeleteSecurityComponentFromList(ServiceTestCommon::TEST_PID_1,
+        ServiceTestCommon::TEST_SC_ID_1);
+}
+
+/**
  * @tc.name: CheckComponentInfoValid001
  * @tc.desc: Test CheckComponentInfoValid with nullptr report
  * @tc.type: FUNC

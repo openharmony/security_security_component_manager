@@ -43,6 +43,7 @@ static std::mutex g_instanceMutex;
 const std::string START_DIALOG = "start dialog, onclick will be trap after dialog closed.";
 constexpr int32_t SA_ID_SECURITY_COMPONENT_SERVICE = 3506;
 const std::string CUSTOMIZE_SAVE_BUTTON = "ohos.permission.CUSTOMIZE_SAVE_BUTTON";
+const std::string READ_PASTEBOARD_PERMISSION = "ohos.permission.READ_PASTEBOARD";
 }
 
 SecCompManager::SecCompManager()
@@ -534,6 +535,29 @@ int32_t SecCompManager::CheckRectInfo(const ComponentCheckParams& params)
     return SC_OK;
 }
 
+bool SecCompManager::AllowToBypassArkuiCheck(const SecCompCallerInfo& caller)
+{
+    std::string bundleName = "";
+    OHOS::AppExecFwk::BundleMgrClient bmsClient;
+    if (bmsClient.GetNameForUid(caller.uid, bundleName) != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Failed to get bundle name for UID %{public}d", caller.uid);
+    }
+    if (SecCompEnhanceAdapter::IsBypassPermitted(bundleName)) {
+        return true;
+    }
+    return false;
+}
+
+bool SecCompManager::IsPasteboardPermissionGranted(
+    const SecCompCallerInfo& caller, const std::shared_ptr<SecCompEntity>& sc)
+{
+    if (sc->GetType() != PASTE_COMPONENT) {
+        return false;
+    }
+    return AccessToken::AccessTokenKit::VerifyAccessToken(caller.tokenId, READ_PASTEBOARD_PERMISSION) ==
+        AccessToken::TypePermissionState::PERMISSION_GRANTED;
+}
+
 static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType eventType, int32_t scId,
     SecCompType scType)
 {
@@ -626,8 +650,13 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
+    if (IsPasteboardPermissionGranted(caller, sc)) {
+        SC_LOG_INFO(LABEL, "Caller already has %{public}s, skip paste component click check and grant.",
+            READ_PASTEBOARD_PERMISSION.c_str());
+        return SC_OK;
+    }
     if (!message.empty()) {
-        if (!sc->AllowToBypassSecurityCheck(message)) {
+        if (!sc->AllowToBypassSecurityCheck(message) && !AllowToBypassArkuiCheck(caller)) {
             return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
         }
     }
