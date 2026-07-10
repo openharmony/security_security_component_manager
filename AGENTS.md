@@ -9,11 +9,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Repository | security_component_manager |
 | Subsystem | security |
 | Language | C/C++ |
-| Last Modified | 2026-01-31 |
+| Last Modified | 2026-07-10 |
+
+## Scope
+
+This instruction file applies to the repository root unless a deeper `AGENTS.md` overrides it for a subdirectory.
 
 ## Overview
 
 This is the security_component_manager repository providing a service called **Security Component Manager** - a system ability (SA ID: 3506) that allows applications to access temporary permissions through security components (e.g., PasteButton, SaveButton) without permanent authorization. When a user clicks a security component, the app receives temporary permission to access sensitive data.
+
+## Working Agreement For Agents
+
+Before editing code, state:
+
+1. Task category: API / framework / service / enhance adapter / test / build config / documentation.
+2. Files or directories you plan to modify.
+3. Constraints discovered from this file and any routed documents.
+
+If the task touches permissions, authorization lifecycle, public headers, SA profile, or enhancement callbacks, read the matching routing section below before editing.
 
 ## Build System
 
@@ -208,6 +222,38 @@ The codebase follows OpenHarmony's System Ability pattern with three main layers
 - `SecCompEntity` - Represents individual security components
 - `AppStateObserver` - Monitors app lifecycle (foreground/background transitions)
 
+## Where To Look
+
+| Task | Primary paths | Notes |
+| -------- | -------- | -------- |
+| Change public component API or data types | `interfaces/inner_api/security_component/`, `interfaces/inner_api/security_component_common/` | Treat as compatibility-sensitive. Check API references before editing. |
+| Change client-side kit or IPC entry | `frameworks/inner_api/security_component/`, `frameworks/common/` | Verify IPC call flow still matches service behavior. |
+| Change enhancement capability loading or callbacks | `frameworks/enhance_adapter/`, `frameworks/inner_api/enhance_kits/` | Do not weaken validation or add heavy logic on critical paths. |
+| Change service authorization logic | `services/security_component_service/` | Check authorization lifecycle, app state handling, and dialog interaction assumptions. |
+| Change SA startup or profile | `services/security_component_service/sa/sa_main/`, `services/security_component_service/sa/sa_profile/` | Confirm SA ID, profile fields, and startup behavior remain compatible. |
+| Add or update tests | `*/test/unittest/`, `test/fuzztest/` | Prefer adding coverage near the touched interface or service flow. |
+
+## Knowledge Routing
+
+### Task-based routing
+
+- If changing `PasteButton`, `SaveButton`, or shared component attributes, read the matching files in `## API Reference` before editing interfaces or behavior.
+- If changing code under `frameworks/enhance_adapter/`, read the adapter source there first and preserve the contract expected by `libsecurity_component_client_enhance.z.so` and `libsecurity_component_service_enhance.z.so`.
+- If changing service authorization flow, app background behavior, or dialog interaction, review `## Architecture`, `## Constraints and Limitations`, and the related repository `applications/standard/permission_manager`.
+- If changing ArkUI-facing semantics or component registration flow, review the related repository `foundation/arkui/ace_engine` to confirm the caller-side expectation.
+
+### Path-based routing
+
+- `interfaces/`: treat as public contract surface; read all relevant API reference documents before editing.
+- `frameworks/inner_api/security_component/`: inspect both the client entry and the service-side stub/proxy path before changing request or reply fields.
+- `services/security_component_service/`: inspect manager, entity, and app state observer together when changing lifecycle logic.
+
+### Vocabulary-based routing
+
+- If the task mentions `PasteButton`, `SaveButton`, `SecCompKit`, or `SecCompBase`, inspect `interfaces/inner_api/security_component/` and the matching API reference documents.
+- If the task mentions `enhance`, `probe`, `challenge`, `anti-overlay`, or `genuine click`, inspect `frameworks/enhance_adapter/` and `frameworks/inner_api/enhance_kits/`.
+- If the task mentions `dialog`, `permission_manager`, `access_token`, or temporary authorization, inspect service authorization logic and related repository references.
+
 ## API Reference
 
 - [Public API for PasteButton](../../../docs/zh-cn/application-dev/reference/apis-arkui/arkui-ts/ts-security-components-savebutton-sys.md)
@@ -218,7 +264,35 @@ The codebase follows OpenHarmony's System Ability pattern with three main layers
 
 ## Constraints and Limitations
 
-Due to the click-to-authorize nature of security components, the system imposes many restrictions to protect user privacy from malicious applications. App developers must ensure that security components are clearly visible on the app interface and can be clearly identified by users, to prevent authorization failures due to overlay, obfuscation, or other factors.
+When modifying this repository, preserve the following development constraints:
+
+- Keep null checks and parameter validation intact on all IPC, dialog callback, registration, and click-report paths. Do not remove defensive handling for null pointers, invalid tokens, malformed parcel data, or invalid component info.
+- Preserve the behavioral difference between `PasteButton` and `SaveButton`. `PasteButton` maps to clipboard read privilege and does not use the first-use confirmation dialog flow, while `SaveButton` maps to media library write privilege and includes first-use dialog handling.
+- Preserve temporary authorization semantics and lifecycle checks. Do not weaken click validation, background-state handling, or the logic that limits authorization to the expected user interaction flow.
+- Preserve anti-abuse checks around overlay detection, challenge or extra-info validation, caller verification, and genuine click verification.
+- Keep service, framework, and interface layering stable. Business logic changes usually need related checks in service manager, entity validation, dialog flow, and client IPC handling together rather than isolated edits in a single file.
+- Maintain compatibility of public structs, IPC field meanings, and SA-facing behavior unless the task explicitly requires a reviewed compatibility change.
+
+## Do Not
+
+- Do not change public header signatures, exported data structures, callback semantics, error behavior, or authorization semantics under `interfaces/` without explicit compatibility review.
+- Do not change the temporary authorization lifecycle for security components unless the task explicitly requires it and the impact is reviewed end-to-end. This includes first-use dialog behavior, background revocation timing, and click-to-authorize assumptions.
+- Do not bypass, weaken, stub out, or silently reorder enhancement checks related to challenge verification, callback verification, anti-overlay protection, caller verification, or genuine click validation.
+- Do not add blocking or expensive logic to performance-sensitive paths such as `SecCompEnhanceKit::InitClientEnhance()` and `SecCompKit::RegisterSecurityComponent()`.
+- Do not change SA identity, profile fields, startup behavior, or IPC-facing request/response fields casually. These may affect cross-process compatibility.
+- Do not edit generated artifacts or derived outputs directly. Modify the source definition, profile input, or build input first, then regenerate when the workflow requires it.
+- Do not modify dependency direction to make service code depend on UI-layer repositories directly.
+- Do not remove, repurpose, or silently weaken existing diagnostic logs, fault attribution, or security-related events without checking downstream observability impact.
+- Do not treat README-style architecture text as sufficient proof. Verify behavior in the relevant source files before changing control flow.
+
+## Ask Before
+
+- Ask before changing any file under `interfaces/` if the change alters observable API behavior or compatibility.
+- Ask before changing authorization timing, permission scope, dialog trigger conditions, or lifecycle semantics.
+- Ask before changing `services/security_component_service/sa/sa_profile/` or anything that may affect SA registration, deployment, or service identity.
+- Ask before introducing a new dependency, changing build targets, or altering cross-repository interaction assumptions with `ace_engine` or `permission_manager`.
+- Ask before changing log levels, event names, event fields, or other DFX behavior used for security diagnosis, compatibility tracking, or fault attribution.
+- Ask before removing tests, fuzz targets, or security validations.
 
 ## Dependencies
 
@@ -248,8 +322,44 @@ Security components are performance-sensitive. Avoid adding time-consuming logic
 
 **Note:** These interfaces are called during critical paths (app startup, component registration) and must complete quickly to avoid degrading user experience.
 
+## Minimum Validation
+
+- For changes in `interfaces/` or client kits, build at least the module target and the affected unit tests.
+- For changes in service logic, build the module and the service-related unit tests. If authorization flow changes, prefer running the relevant service tests and callback tests.
+- For changes in enhancement adapter logic, build the module and the enhancement adapter or enhancement sdk unit tests.
+- For changes in fuzz entry points or IPC parsing, build the affected fuzz targets when possible.
+- If only documentation is changed, state that no code validation was required.
+- This repository does not currently define a dedicated lint or standalone API compatibility check in this file. If such checks are unavailable for the task, state that explicitly in the final response.
+
+Use the commands in `## Build System` for module builds, unit test builds, and fuzz test builds.
+
+If you cannot run validation, report:
+
+1. What was not run.
+2. Why it was not run.
+3. The resulting risk.
+
+## Done Definition
+
+A task is done only when:
+
+1. The changed files match the requested scope.
+2. Routed documents and code paths were checked for the touched behavior.
+3. Relevant build or test validation was run, or the gap is explicitly reported.
+4. Public API, authorization semantics, and enhancement/security constraints were either preserved or explicitly escalated.
+
+## Final Response Expectations
+
+In the final response, include:
+
+1. What changed.
+2. Which constraints were considered.
+3. What validation was run.
+4. What could not be validated, if anything.
+
 ## History Record
 
 | Version | Date | Content | Author |
 | -------- | -------- | -------- | -------- |
+| v1.1 | 2026-07-10 | Add agent routing, constraints, and validation guidance | harylee |
 | v1.0 | 2026-01-31 | Init AGENTS.md | harylee |
