@@ -61,6 +61,31 @@ HWTEST_F(LocationButtonTest, ToJsonStr001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ToJsonStr002
+ * @tc.desc: Test ToJsonStr with isSmartEdgeState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(LocationButtonTest, ToJsonStr002, TestSize.Level1)
+{
+    nlohmann::json jsonComponent;
+    LocationButton button;
+    std::string message;
+    bool isClicked = true;
+
+    TestCommon::BuildLocationComponentInfo(jsonComponent);
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = true;
+    EXPECT_TRUE(button.FromJson(jsonComponent, message, isClicked));
+    EXPECT_TRUE(button.isSmartEdgeState_);
+    EXPECT_EQ(jsonComponent.dump(), button.ToJsonStr());
+
+    jsonComponent[JsonTagConstants::JSON_IS_SMART_EDGE_STATE] = false;
+    EXPECT_TRUE(button.FromJson(jsonComponent, message, isClicked));
+    EXPECT_FALSE(button.isSmartEdgeState_);
+    EXPECT_EQ(jsonComponent.dump(), button.ToJsonStr());
+}
+
+/**
  * @tc.name: CompareComponentBasicInfo001
  * @tc.desc: Test CompareComponentBasicInfo other is null
  * @tc.type: FUNC

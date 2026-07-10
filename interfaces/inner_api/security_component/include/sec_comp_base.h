@@ -97,6 +97,7 @@ public:
     static const std::string JSON_IS_CUSTOMIZABLE;
     static const std::string JSON_TIP_POSITION;
     static const std::string JSON_IS_ARKUI_COMPONENT;
+    static const std::string JSON_IS_SMART_EDGE_STATE;
 };
 
 class __attribute__((visibility("default"))) SecCompBase {
@@ -168,6 +169,7 @@ public:
     bool isClickEvent_ = false;
     bool isArkuiComponent_ = false;
     bool isCompatScaleMode_ = false;
+    bool isSmartEdgeState_ = false;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;

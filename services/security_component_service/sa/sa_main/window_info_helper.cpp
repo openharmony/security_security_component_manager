@@ -39,7 +39,7 @@ bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::Accessibil
     }
     auto iter = std::find_if(infos.begin(), infos.end(),
         [windowId](const sptr<Rosen::AccessibilityWindowInfo>& info) {
-            return (info != nullptr) && (windowId == info->wid_);
+            return (info != nullptr) && (windowId == info->wid_ || (info->wid_ == 1 && windowId == info->innerWid_));
         });
     if (iter == infos.end()) {
         return false;

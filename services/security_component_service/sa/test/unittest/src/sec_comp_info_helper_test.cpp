@@ -727,6 +727,42 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect002, TestSize.Level0)
 }
 
 /**
+ * @tc.name: AdjustSecCompRect003
+ * @tc.desc: Test AdjustSecCompRect with isSmartEdgeState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect003, TestSize.Level0)
+{
+    nlohmann::json jsonComponent;
+    ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
+    std::string message;
+    SecCompRect scaleRect;
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    Scales scales;
+    scales.floatingScale = 0.8f;
+    scales.scaleX = 0.9f;
+    scales.scaleY = 0.8f;
+
+    comp->rect_.x_ = 10.0f;
+    comp->rect_.y_ = 5.0f;
+    comp->rect_.width_ = 20.0f;
+    comp->rect_.height_ = 10.0f;
+    comp->windowRect_.x_ = 0.0f;
+    comp->windowRect_.y_ = 0.0f;
+    comp->windowRect_.width_ = 200.0f;
+    comp->windowRect_.height_ = 100.0f;
+
+    comp->isSmartEdgeState_ = true;
+    SecCompInfoHelper::AdjustSecCompRect(comp, scales, false, scaleRect);
+    EXPECT_TRUE(IsEqual(comp->rect_.width_, 18));
+    EXPECT_TRUE(IsEqual(comp->rect_.height_, 8));
+    EXPECT_TRUE(IsEqual(comp->rect_.x_, 9));
+    EXPECT_TRUE(IsEqual(comp->rect_.y_, 4));
+    EXPECT_TRUE(IsEqual(comp->scale_, 0.9f));
+}
+
+/**
  * @tc.name: CheckComponentValid001
  * @tc.desc: Test CheckComponentValid with invalid color
  * @tc.type: FUNC
@@ -859,7 +895,11 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid006, TestSize.Level0)
     comp->isArkuiComponent_ = false;
     comp->bgColor_.value = 0x0C000000;
     ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
-    
+
+    comp->isSmartEdgeState_ = true;
+    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+
+    comp->isSmartEdgeState_ = false;
     comp->bgColor_.value = 0x00000000;
     ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
 }
