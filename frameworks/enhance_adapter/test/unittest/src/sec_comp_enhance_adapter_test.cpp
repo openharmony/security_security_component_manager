@@ -75,7 +75,7 @@ HWTEST_F(SecCompEnhanceAdapterTest, EnhanceAdapter001, TestSize.Level0)
 
     SecCompEnhanceAdapter::isEnhanceInputHandlerInit = false;
     SecCompClickEvent touchInfo = {};
-    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::CheckExtraInfo(touchInfo));
+    ASSERT_EQ(SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE, SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(touchInfo));
 
     SecCompEnhanceAdapter::isEnhanceClientHandlerInit = false;
     std::string componentInfo;

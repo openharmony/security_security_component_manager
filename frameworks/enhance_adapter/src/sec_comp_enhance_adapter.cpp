@@ -113,7 +113,7 @@ int32_t SecCompEnhanceAdapter::GetPointerEventEnhanceData(void* data, uint32_t d
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
-int32_t SecCompEnhanceAdapter::CheckExtraInfo(SecCompClickEvent& clickInfo)
+int32_t SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(SecCompClickEvent& clickInfo)
 {
     if (!isEnhanceSrvHandlerInit) {
         InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
@@ -123,7 +123,7 @@ int32_t SecCompEnhanceAdapter::CheckExtraInfo(SecCompClickEvent& clickInfo)
             SC_LOG_ERROR(LABEL, "HMAC info is invalid");
             return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
         }
-        return srvHandler->CheckExtraInfo(clickInfo);
+        return srvHandler->CheckAndUpdateExtraInfo(clickInfo);
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }

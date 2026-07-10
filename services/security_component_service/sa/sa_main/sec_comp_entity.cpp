@@ -155,7 +155,7 @@ int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t supe
         return res;
     }
 
-    res = SecCompEnhanceAdapter::CheckExtraInfo(clickInfo);
+    res = SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(clickInfo);
     if (res == SC_SERVICE_ERROR_CLICK_EVENT_INVALID) {
         SC_LOG_ERROR(LABEL, "Click ExtraInfo is invalid");
         return res;

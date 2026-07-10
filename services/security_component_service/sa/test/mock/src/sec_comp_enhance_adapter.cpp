@@ -38,9 +38,9 @@ int32_t SecCompEnhanceAdapter::GetPointerEventEnhanceData(void* data, uint32_t d
     return SC_OK;
 }
 
-int32_t SecCompEnhanceAdapter::CheckExtraInfo(SecCompClickEvent& clickInfo)
+int32_t SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(SecCompClickEvent& clickInfo)
 {
-    SC_LOG_DEBUG(LABEL, "CheckExtraInfo success");
+    SC_LOG_DEBUG(LABEL, "CheckAndUpdateExtraInfo success");
     return SC_OK;
 }
 
