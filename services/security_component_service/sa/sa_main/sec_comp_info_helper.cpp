@@ -16,12 +16,13 @@
 
 #include <cstdint>
 #include <iomanip>
+#include <set>
 #include <sstream>
 
 #include "accesstoken_kit.h"
-#include "display.h"
 #include "display_info.h"
-#include "display_manager.h"
+#include "display_lite.h"
+#include "display_manager_lite.h"
 #include "ipc_skeleton.h"
 #include "location_button.h"
 #include "paste_button.h"
@@ -108,8 +109,8 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
 
 static bool GetScreenSize(double& width, double& height, SecCompInfoHelper::ScreenInfo& screenInfo)
 {
-    sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(screenInfo.displayId);
+    sptr<OHOS::Rosen::DisplayLite> display =
+        OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(screenInfo.displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;

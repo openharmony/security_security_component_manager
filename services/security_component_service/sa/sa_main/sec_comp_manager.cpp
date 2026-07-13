@@ -16,9 +16,9 @@
 
 #include "bundle_mgr_client.h"
 #include "delay_exit_task.h"
-#include "display.h"
 #include "display_info.h"
-#include "display_manager.h"
+#include "display_lite.h"
+#include "display_manager_lite.h"
 #include "first_use_dialog.h"
 #include "hisysevent.h"
 #include "isec_comp_service.h"
@@ -582,7 +582,7 @@ void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
     if (superFoldOffsetY_ != 0) {
         return;
     }
-    auto foldCreaseRegion = OHOS::Rosen::DisplayManager::GetInstance().GetCurrentFoldCreaseRegion();
+    auto foldCreaseRegion = OHOS::Rosen::DisplayManagerLite::GetInstance().GetCurrentFoldCreaseRegion();
     if (foldCreaseRegion == nullptr) {
         SC_LOG_ERROR(LABEL, "foldCreaseRegion is nullptr");
         return;

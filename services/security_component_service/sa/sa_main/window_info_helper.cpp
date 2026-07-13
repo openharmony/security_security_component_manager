@@ -18,6 +18,7 @@
 #include <vector>
 #include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
+#include "wm_mini_client.h"
 
 namespace OHOS {
 namespace Security {
@@ -31,15 +32,15 @@ static constexpr int32_t GET_WINDOW_REPEAT_TIMES = 10;
 }
 
 bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, int32_t userId,
-    sptr<Rosen::AccessibilityWindowInfo>& windowInfo)
+    sptr<MiniAccessibilityWindowInfo>& windowInfo)
 {
-    std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance(userId).GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
+    std::vector<sptr<MiniAccessibilityWindowInfo>> infos;
+    if (Rosen::WMClientMini::GetAccessibilityWindowInfo(userId, infos) != MiniWMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }
     auto iter = std::find_if(infos.begin(), infos.end(),
-        [windowId](const sptr<Rosen::AccessibilityWindowInfo>& info) {
+        [windowId](const sptr<MiniAccessibilityWindowInfo>& info) {
             return (info != nullptr) && (windowId == info->wid_ || (info->wid_ == 1 && windowId == info->innerWid_));
         });
     if (iter == infos.end()) {
@@ -55,7 +56,7 @@ Scales WindowInfoHelper::GetWindowScale(int32_t windowId, int32_t userId, bool& 
     Scales scales;
     scales.floatingScale = FULL_SCREEN_SCALE;
     auto sleepTime = std::chrono::milliseconds(GET_WINDOW_WAITTIME_MILLISECONDS);
-    sptr<Rosen::AccessibilityWindowInfo> windowInfo = nullptr;
+    sptr<MiniAccessibilityWindowInfo> windowInfo = nullptr;
     int32_t i = 0;
     for (i = 0; i < GET_WINDOW_REPEAT_TIMES; ++i) {
         if (TryGetWindowInfo(windowId, userId, windowInfo)) {
@@ -92,7 +93,7 @@ std::string GetSecCompWindowMsg(int32_t compWinId, const SecCompRect& secRect,
     return message;
 }
 
-std::string GetCoveredWindowMsg(const Rosen::Rect& windowRect)
+std::string GetCoveredWindowMsg(const MiniRect& windowRect)
 {
     std::string coveredWindowMessage = ", the size of window covering security component is (x = " +
         std::to_string(windowRect.posX_) + ", y = " + std::to_string(windowRect.posY_) +
@@ -100,7 +101,7 @@ std::string GetCoveredWindowMsg(const Rosen::Rect& windowRect)
     return coveredWindowMessage;
 }
 
-static bool IsRectInWindRect(const Rosen::Rect& windRect, const SecCompRect& secRect)
+static bool IsRectInWindRect(const MiniRect& windRect, const SecCompRect& secRect)
 {
     // left or right
     if ((secRect.x_ + secRect.width_ <= windRect.posX_) ||
@@ -173,8 +174,8 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         SC_LOG_INFO(LABEL, "UI extension can not check");
         return true;
     }
-    std::vector<sptr<Rosen::UnreliableWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance(userId).GetUnreliableWindowInfo(compWinId, infos) != Rosen::WMError::WM_OK) {
+    std::vector<sptr<MiniUnreliableWindowInfo>> infos;
+    if (Rosen::WMClientMini::GetUnreliableWindowInfo(compWinId, userId, infos) != MiniWMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }

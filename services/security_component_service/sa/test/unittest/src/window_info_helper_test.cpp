@@ -348,7 +348,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo001, TestSize.Level0)
     list.emplace_back(win2);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
@@ -375,7 +375,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo002, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_NE(nullptr, windowInfo);
@@ -399,7 +399,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo003, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(101, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_EQ(nullptr, windowInfo);
@@ -425,7 +425,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo004, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
@@ -457,7 +457,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo005, TestSize.Level0)
     list.emplace_back(compWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo = nullptr;
+    sptr<MiniAccessibilityWindowInfo> windowInfo = nullptr;
     EXPECT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     EXPECT_NE(nullptr, windowInfo);

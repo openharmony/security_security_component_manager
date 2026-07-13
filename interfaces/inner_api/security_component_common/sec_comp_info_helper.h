@@ -19,7 +19,7 @@
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
 #include "sec_comp_info.h"
-#include "display_manager.h"
+#include "dm_common.h"
 
 namespace OHOS {
 namespace Security {
