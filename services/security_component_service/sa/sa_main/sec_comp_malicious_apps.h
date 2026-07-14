@@ -17,6 +17,7 @@
 
 #include <mutex>
 #include <set>
+#include <unordered_map>
 
 namespace OHOS {
 namespace Security {
@@ -28,10 +29,12 @@ public:
     bool IsInMaliciousAppList(int32_t pid, int32_t uid);
     void AddAppToMaliciousAppList(int32_t pid);
     void RemoveAppFromMaliciousAppList(int32_t pid);
+    void ResetAppMaliciousFailCount(int32_t pid);
     bool IsMaliciousAppListEmpty();
 
 private:
     std::set<int32_t> maliciousAppList_; // pid set
+    std::unordered_map<int32_t, uint32_t> maliciousFailCountMap_; // pid -> continuous enhance fail count
     std::mutex maliciousMtx_;
 };
 }  // namespace SecurityComponent

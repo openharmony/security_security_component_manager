@@ -358,6 +358,7 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level0)
     EXPECT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
         SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
+    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
 
     LocationButton buttonInvalid = BuildInvalidLocationComponent();
     buttonInvalid.ToJson(jsonInvalid);
@@ -371,6 +372,7 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level0)
     EXPECT_EQ(SC_OK,
         SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonValid, caller, scId));
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
+    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
 }
 
 /**
@@ -393,6 +395,7 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level0)
     EXPECT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
         SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
+    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
 
     std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
     compPtr->type_ = LOCATION_COMPONENT;
@@ -413,6 +416,7 @@ HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level0)
     EXPECT_EQ(SC_OK,
         SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
+    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
 }
 
 /**
@@ -681,11 +685,62 @@ HWTEST_F(SecCompManagerTest, ExitWhenAppMgrDied001, TestSize.Level0)
 HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level0)
 {
     SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
+    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
     ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsMaliciousAppListEmpty());
     int32_t scId = INVALID_SC_ID;
     const std::string scene = "";
     int32_t res = SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL;
     SecCompManager::GetInstance().SendCheckInfoEnhanceSysEvent(scId, LOCATION_COMPONENT, scene, res);
+}
+
+/**
+ * @tc.name: MaliciousAppListThreshold001
+ * @tc.desc: Test malicious app list only takes effect after more than three continuous failures
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold001, TestSize.Level0)
+{
+    constexpr int32_t TEST_UID = 1;
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_FALSE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1,
+        TEST_UID));
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, TEST_UID));
+
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+}
+
+/**
+ * @tc.name: MaliciousAppListThreshold002
+ * @tc.desc: Test malicious app fail count is reset after success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold002, TestSize.Level0)
+{
+    constexpr int32_t TEST_UID = 1;
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.ResetAppMaliciousFailCount(ServiceTestCommon::TEST_PID_1);
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_FALSE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1,
+        TEST_UID));
+
+    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, TEST_UID));
+
+    SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 }
 
 /**
