@@ -52,6 +52,7 @@ ohos_source_set("security_component_framework_src_set") {
 
   external_deps = [
     "access_token:libtokenid_sdk",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -120,6 +121,7 @@ ohos_source_set("security_component_enhance_adapter_service_src_set") {
   public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
@@ -158,6 +160,7 @@ ohos_source_set("security_component_no_cfi_framework_src_set") {
 
   external_deps = [
     "access_token:libtokenid_sdk",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
@@ -188,6 +191,7 @@ ohos_source_set("security_component_no_cfi_enhance_adapter_src_set") {
   public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
