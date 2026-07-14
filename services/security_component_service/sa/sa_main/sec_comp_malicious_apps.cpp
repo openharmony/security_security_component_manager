@@ -14,11 +14,16 @@
  */
 #include "sec_comp_malicious_apps.h"
 
+#include "sec_comp_log.h"
+
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
 namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
+    LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompMaliciousApps"};
 static constexpr int32_t ROOT_UID = 0;
+static constexpr uint32_t MAX_CONTINUOUS_ENHANCE_FAIL_COUNT = 3;
 }
 
 bool SecCompMaliciousApps::IsInMaliciousAppList(int32_t pid, int32_t uid)
@@ -33,13 +38,27 @@ bool SecCompMaliciousApps::IsInMaliciousAppList(int32_t pid, int32_t uid)
 void SecCompMaliciousApps::AddAppToMaliciousAppList(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(maliciousMtx_);
-    maliciousAppList_.insert(pid);
+    uint32_t& failCount = maliciousFailCountMap_[pid];
+    failCount++;
+    if (failCount > MAX_CONTINUOUS_ENHANCE_FAIL_COUNT) {
+        maliciousAppList_.insert(pid);
+        SC_LOG_WARN(LABEL, "Pid %{public}d entered malicious app list, failCount=%{public}u", pid, failCount);
+        return;
+    }
+    SC_LOG_INFO(LABEL, "Pid %{public}d malicious failCount=%{public}u", pid, failCount);
 }
 
 void SecCompMaliciousApps::RemoveAppFromMaliciousAppList(int32_t pid)
 {
     std::lock_guard<std::mutex> lock(maliciousMtx_);
     maliciousAppList_.erase(pid);
+    maliciousFailCountMap_.erase(pid);
+}
+
+void SecCompMaliciousApps::ResetAppMaliciousFailCount(int32_t pid)
+{
+    std::lock_guard<std::mutex> lock(maliciousMtx_);
+    maliciousFailCountMap_.erase(pid);
 }
 
 bool SecCompMaliciousApps::IsMaliciousAppListEmpty()
