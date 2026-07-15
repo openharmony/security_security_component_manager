@@ -135,7 +135,8 @@ int32_t SecCompEntity::CheckClickInfo(SecCompClickEvent& clickInfo, int32_t supe
     }
     message.clear();
     if ((GetType() != SecCompType::SAVE_COMPONENT) &&
-        !WindowInfoHelper::CheckOtherWindowCoverComp(componentInfo_->windowId_, componentInfo_->rect_, message)) {
+        !WindowInfoHelper::CheckOtherWindowCoverComp(
+            componentInfo_->windowId_, componentInfo_->rect_, userId_, message)) {
         SC_LOG_ERROR(LABEL, "Component may be covered by other window");
         if (!AllowToBypassSecurityCheck(message)) {
             return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;

@@ -176,6 +176,7 @@ bool SecCompService::GetCallerInfo(SecCompCallerInfo& caller)
     caller.tokenId = tokenId;
     caller.pid = pid;
     caller.uid = uid;
+    caller.userId = uid / BASE_USER_RANGE;
     return true;
 }
 
@@ -245,6 +246,7 @@ int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
     caller.tokenId = IPCSkeleton::GetCallingTokenID();
     caller.pid = IPCSkeleton::GetCallingPid();
     caller.uid = IPCSkeleton::GetCallingUid();
+    caller.userId = caller.uid / BASE_USER_RANGE;
     if ((caller.uid != ROOT_UID)
         && (AccessToken::AccessTokenKit::GetTokenTypeFlag(caller.tokenId) != AccessToken::TOKEN_HAP)) {
         SC_LOG_ERROR(LABEL, "Get caller tokenId invalid");
@@ -264,23 +266,23 @@ int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
         return res;
     }
 
-    int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
     std::string bundleName = "";
-    if (bmsClient.GetNameForUid(uid, bundleName) != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Failed to get bundle name for UID %{public}d", uid);
+    int32_t ret = bmsClient.GetNameForUid(caller.uid, bundleName);
+    if (ret != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Failed to get bundle name, uid=%{public}d, ret=%{public}d", caller.uid, ret);
         return res;
     }
 
     AppExecFwk::BundleInfo bundleInfo;
-    int32_t userId = uid / BASE_USER_RANGE;
-    if (bmsClient.GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, userId) != SC_OK) {
+    if (bmsClient.GetBundleInfo(
+        bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, caller.userId) != SC_OK) {
         SC_LOG_ERROR(LABEL, "Failed to get bundle info for bundle name %{public}s", bundleName.c_str());
         return res;
     }
 
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
-        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", IPCSkeleton::GetCallingUid(),
+        HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", caller.uid,
         "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALLER_BUNDLE_NAME", bundleName, "CALLER_BUNDLE_VERSION",
         bundleInfo.versionName, "SC_ID", scId, "SC_TYPE", type);
     return res;
@@ -433,6 +435,7 @@ int32_t SecCompService::UnregisterSecurityComponentBody(int32_t scId)
     caller.tokenId = IPCSkeleton::GetCallingTokenID();
     caller.pid = IPCSkeleton::GetCallingPid();
     caller.uid = IPCSkeleton::GetCallingUid();
+    caller.userId = caller.uid / BASE_USER_RANGE;
 
     return SecCompManager::GetInstance().UnregisterSecurityComponent(scId, caller);
 }

@@ -39,6 +39,7 @@ struct SecCompCallerInfo {
     AccessToken::AccessTokenID tokenId;
     int32_t uid;
     int32_t pid;
+    int32_t userId;
 };
 
 struct ProcessCompInfos {

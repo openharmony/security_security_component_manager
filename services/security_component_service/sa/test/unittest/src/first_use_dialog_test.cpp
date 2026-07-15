@@ -16,12 +16,14 @@
 
 #include <cstdio>
 #include "accesstoken_kit.h"
+#include "ability_manager_client.h"
 #include "i_sec_comp_dialog_callback.h"
 #include "location_button.h"
 #include "save_button.h"
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
 #include "sec_event_handler.h"
+#include "service_test_common.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -38,6 +40,12 @@ static const std::string INVALID_PATH = "/invalid_path";
 static const std::string DATA_FOLDER = "/data";
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
+
+static std::shared_ptr<SecCompEntity> CreateTestEntity()
+{
+    SecCompOwnerInfo owner = { 0, 0, 0, ServiceTestCommon::TEST_USER_ID };
+    return std::make_shared<SecCompEntity>(nullptr, 0, owner);
+}
 }
 
 void FirstUseDialogTest::SetUpTestCase()
@@ -68,6 +76,7 @@ void FirstUseDialogTest::TearDownTestCase()
 void FirstUseDialogTest::SetUp()
 {
     SC_LOG_INFO(LABEL, "setup");
+    AAFwk::AbilityManagerClient::GetInstance()->lastUserId_ = -1;
     struct stat fstat = {};
     if (stat(SEC_COMP_SRV_CFG_FILE.c_str(), &fstat) != 0) {
         return;
@@ -381,7 +390,7 @@ public:
 HWTEST_F(FirstUseDialogTest, SetFirstUseMap001, TestSize.Level0)
 {
     FirstUseDialog diag;
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
 
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_NE(nullptr, runner);
@@ -424,7 +433,7 @@ HWTEST_F(FirstUseDialogTest, SetFirstUseMap002, TestSize.Level0)
 {
     FirstUseDialog diag;
     diag.secHandler_ = nullptr;
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
     entity->componentInfo_ = std::make_shared<SaveButton>();
     entity->componentInfo_->type_ = SAVE_COMPONENT;
     entity->tokenId_ = 0;
@@ -450,7 +459,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
     EXPECT_EQ(diag.NotifyFirstUseDialog(nullptr, nullptr, nullptr, displayInfo),
         SC_SERVICE_ERROR_VALUE_INVALID);
 
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
     // no handler
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, nullptr, nullptr, displayInfo),
         SC_SERVICE_ERROR_VALUE_INVALID);
@@ -488,29 +497,45 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog001, TestSize.Level0)
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
 
-    // first use save button
-    diag.firstUseMap_[0] = 0;
+    // wait for event handler done
+    sleep(3);
+}
+
+/*
+ * @tc.name: NotifyFirstUseDialog003
+ * @tc.desc: Test NotifyFirstUseDialog with SaveButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog003, TestSize.Level0)
+{
+    FirstUseDialog diag;
+    const FirstUseDialog::DisplayInfo displayInfo = {0, CrossAxisState::STATE_INVALID, 0};
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(nullptr, runner);
+    diag.secHandler_ = std::make_shared<SecEventHandler>(runner);
+
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
     entity->componentInfo_ = std::make_shared<SaveButton>();
     entity->componentInfo_->type_ = SAVE_COMPONENT;
+    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
+
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
-
-    // second use save button
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     EXPECT_EQ(0, static_cast<uint64_t>(diag.firstUseMap_[0]));
 
     diag.firstUseMap_[0] = SAVE_BUTTON_FIRST_USE;
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo), SC_OK);
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, AAFwk::AbilityManagerClient::GetInstance()->lastUserId_);
 
     diag.firstUseMap_[0] = LOCATION_BUTTON_FIRST_USE;
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
-
     diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject, displayInfo);
-
-    // wait for event handler done
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, AAFwk::AbilityManagerClient::GetInstance()->lastUserId_);
     sleep(3);
 }
 
@@ -528,7 +553,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog002, TestSize.Level0)
     const FirstUseDialog::DisplayInfo displayInfo = {0, CrossAxisState::STATE_INVALID, 0};
 
     // entity
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     ASSERT_NE(nullptr, runner);
     // handler
@@ -553,6 +578,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog002, TestSize.Level0)
     std::string message = "message";
     EXPECT_EQ(true, entity->AllowToBypassSecurityCheck(message));
     diag.StartToastAbility(entity, testRemoteObject, displayInfo);
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, AAFwk::AbilityManagerClient::GetInstance()->lastUserId_);
 
     // wait for event handler done
     sleep(3);
@@ -572,7 +598,8 @@ HWTEST_F(FirstUseDialogTest, GrantDialogWaitEntity001, TestSize.Level0)
     diag.dialogWaitMap_[0] = nullptr;
     EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_COMPONENT_NOT_EXIST);
 
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 1, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
+    entity->tokenId_ = 1;
     diag.dialogWaitMap_[0] = entity;
     EXPECT_EQ(diag.GrantDialogWaitEntity(0), SC_SERVICE_ERROR_PERMISSION_OPER_FAIL);
 
@@ -605,7 +632,7 @@ HWTEST_F(FirstUseDialogTest, OnDialogClosed001, TestSize.Level0)
     data.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
     data.WriteInt32(ISecCompDialogCallback::ON_DIALOG_FAILED);
     EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data, reply, option), 0);
-    
+
     MessageParcel data1;
     data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
     data1.WriteInt32(ISecCompDialogCallback::ON_DIALOG_CLOSED);
@@ -613,7 +640,8 @@ HWTEST_F(FirstUseDialogTest, OnDialogClosed001, TestSize.Level0)
     FirstUseDialog::GetInstance().dialogWaitMap_[0] = nullptr;
     EXPECT_EQ(srvCallback->OnRemoteRequest(ISecCompDialogCallback::ON_DIALOG_CLOSED, data1, reply, option), 0);
 
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 1, 0, 0, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
+    entity->tokenId_ = 1;
     FirstUseDialog::GetInstance().dialogWaitMap_[0] = entity;
     data1.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
     data1.WriteInt32(ISecCompDialogCallback::ON_DIALOG_CLOSED);
@@ -641,8 +669,9 @@ HWTEST_F(FirstUseDialogTest, OnDialogClosed001, TestSize.Level0)
 HWTEST_F(FirstUseDialogTest, RemoveDialogWaitEntitys001, TestSize.Level0)
 {
     FirstUseDialog diag;
-    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(nullptr, 0, 0, 0, 0);
-    std::shared_ptr<SecCompEntity> entity1 = std::make_shared<SecCompEntity>(nullptr, 0, 0, 1, 0);
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
+    std::shared_ptr<SecCompEntity> entity1 = CreateTestEntity();
+    entity1->pid_ = 1;
     diag.dialogWaitMap_[0] = entity;
     diag.dialogWaitMap_[1] = entity1;
     diag.RemoveDialogWaitEntitys(1);

@@ -43,6 +43,7 @@ public:
     void SetUp()
     {
         SC_LOG_INFO(LABEL, "setup");
+        WindowManager::GetInstance().lastUserId_ = -1;
     };
 
     void TearDown() {};
@@ -51,6 +52,44 @@ public:
 }  // namespace Security
 }  // namespace OHOS
 
+/**
+ * @tc.name: GetWindowScale001
+ * @tc.desc: Test get window scale with user id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WindowInfoHelperTest, GetWindowScale001, TestSize.Level0)
+{
+    auto oldResult = WindowManager::GetInstance().result_;
+    auto oldList = WindowManager::GetInstance().list_;
+    WindowManager::GetInstance().result_ = WMError::WM_OK;
+    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
+    compWin->wid_ = 1;
+    compWin->scaleVal_ = 1.0;
+    compWin->scaleX_ = 0.5;
+    compWin->scaleY_ = 0.75;
+    compWin->scaleRect_ = Rosen::Rect { 1, 2, 3, 4 };
+    compWin->isCompatScaleMode_ = true;
+    WindowManager::GetInstance().list_ = { compWin };
+
+    bool isCompatScaleMode = false;
+    SecCompRect scaleRect;
+    Scales scales =
+        WindowInfoHelper::GetWindowScale(1, ServiceTestCommon::TEST_USER_ID, isCompatScaleMode, scaleRect);
+
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
+    EXPECT_TRUE(isCompatScaleMode);
+    EXPECT_FLOAT_EQ(1.0, scales.floatingScale);
+    EXPECT_FLOAT_EQ(0.5, scales.scaleX);
+    EXPECT_FLOAT_EQ(0.75, scales.scaleY);
+    EXPECT_EQ(1, scaleRect.x_);
+    EXPECT_EQ(2, scaleRect.y_);
+    EXPECT_EQ(3, scaleRect.width_);
+    EXPECT_EQ(4, scaleRect.height_);
+
+    WindowManager::GetInstance().list_ = oldList;
+    WindowManager::GetInstance().result_ = oldResult;
+}
 
 /**
  * @tc.name: CheckOtherWindowCoverComp001
@@ -103,7 +142,8 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp001, TestSize.Level0)
     };
 
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
 }
 
 /**
@@ -128,7 +168,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp002, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
 }
 
 /**
@@ -153,7 +193,8 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp003, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE, ServiceTestCommon::TEST_COORDINATE
     };
     std::string message;
-    ASSERT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
 }
 
 /**
@@ -186,7 +227,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp004, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE / 2, ServiceTestCommon::TEST_COORDINATE / 2
     };
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
 }
 
 /**
@@ -219,7 +260,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp005, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE / 2, ServiceTestCommon::TEST_COORDINATE / 2
     };
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
 }
 
 /**
@@ -252,7 +293,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp006, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE / 2, ServiceTestCommon::TEST_COORDINATE / 2
     };
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
 }
 
 /**
@@ -285,7 +326,7 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp007, TestSize.Level0)
         ServiceTestCommon::TEST_COORDINATE / 2, ServiceTestCommon::TEST_COORDINATE / 2
     };
     std::string message;
-    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, message));
+    ASSERT_FALSE(WindowInfoHelper::CheckOtherWindowCoverComp(0, compRect, ServiceTestCommon::TEST_USER_ID, message));
 }
 
 /**
@@ -308,11 +349,12 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo001, TestSize.Level0)
     WindowManager::GetInstance().list_ = list;
 
     sptr<AccessibilityWindowInfo> windowInfo;
-    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, windowInfo));
+    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
 
-    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, windowInfo));
+    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, ServiceTestCommon::TEST_USER_ID, windowInfo));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(1, windowInfo->wid_);
 }
@@ -334,7 +376,8 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo002, TestSize.Level0)
     WindowManager::GetInstance().list_ = list;
 
     sptr<AccessibilityWindowInfo> windowInfo;
-    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, windowInfo));
+    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, ServiceTestCommon::TEST_USER_ID, windowInfo));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(1, windowInfo->wid_);
     EXPECT_EQ(100, windowInfo->innerWid_);
@@ -357,7 +400,8 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo003, TestSize.Level0)
     WindowManager::GetInstance().list_ = list;
 
     sptr<AccessibilityWindowInfo> windowInfo;
-    ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(101, windowInfo));
+    ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(101, ServiceTestCommon::TEST_USER_ID, windowInfo));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_EQ(nullptr, windowInfo);
 }
 
@@ -382,16 +426,17 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo004, TestSize.Level0)
     WindowManager::GetInstance().list_ = list;
 
     sptr<AccessibilityWindowInfo> windowInfo;
-    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, windowInfo));
+    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
 
-    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, windowInfo));
+    ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, ServiceTestCommon::TEST_USER_ID, windowInfo));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(1, windowInfo->wid_);
     EXPECT_EQ(100, windowInfo->innerWid_);
 
-    ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(999, windowInfo));
+    ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(999, ServiceTestCommon::TEST_USER_ID, windowInfo));
 }
 
 /**
@@ -413,7 +458,8 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo005, TestSize.Level0)
     WindowManager::GetInstance().list_ = list;
 
     sptr<AccessibilityWindowInfo> windowInfo = nullptr;
-    EXPECT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, windowInfo));
+    EXPECT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, ServiceTestCommon::TEST_USER_ID, windowInfo));
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     EXPECT_NE(nullptr, windowInfo);
     if (windowInfo != nullptr) {
         EXPECT_EQ(1, windowInfo->wid_);

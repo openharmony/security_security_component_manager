@@ -198,7 +198,8 @@ HWTEST_F(SecCompPermManagerTest, GrantTempPermission001, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildSaveComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(SAVE_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(
+        SAVE_COMPONENT, jsonComponent, ServiceTestCommon::TEST_USER_ID, message);
     ASSERT_NE(nullptr, comp);
     std::shared_ptr<SecCompBase> shared_comp(comp);
 

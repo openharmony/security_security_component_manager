@@ -43,6 +43,19 @@ static double g_testWidth = 0.0F;
 static double g_testHeight = 0.0F;
 static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 
+static SecCompBase* ParseTestComponent(SecCompType type, const nlohmann::json& jsonComponent, std::string& message)
+{
+    return SecCompInfoHelper::ParseComponent(type, jsonComponent, ServiceTestCommon::TEST_USER_ID, message);
+}
+
+static bool CheckTestComponentValid(SecCompBase* comp, std::string& message)
+{
+    if (comp != nullptr) {
+        comp->userId_ = ServiceTestCommon::TEST_USER_ID;
+    }
+    return SecCompInfoHelper::CheckComponentValid(comp, message);
+}
+
 static bool GetScreenSize()
 {
     sptr<OHOS::Rosen::Display> display =
@@ -92,9 +105,10 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent001, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_NE(nullptr, comp);
     ASSERT_TRUE(comp->GetValid());
+    ASSERT_EQ(ServiceTestCommon::TEST_USER_ID, comp->userId_);
 }
 
 /**
@@ -107,11 +121,11 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent002, TestSize.Level0)
 {
     nlohmann::json jsonComponent;
     std::string message;
-    ASSERT_EQ(nullptr, SecCompInfoHelper::ParseComponent(UNKNOWN_SC_TYPE, jsonComponent, message));
+    ASSERT_EQ(nullptr, ParseTestComponent(UNKNOWN_SC_TYPE, jsonComponent, message));
 
-    ASSERT_EQ(nullptr, SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message));
-    ASSERT_EQ(nullptr, SecCompInfoHelper::ParseComponent(PASTE_COMPONENT, jsonComponent, message));
-    ASSERT_EQ(nullptr, SecCompInfoHelper::ParseComponent(SAVE_COMPONENT, jsonComponent, message));
+    ASSERT_EQ(nullptr, ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message));
+    ASSERT_EQ(nullptr, ParseTestComponent(PASTE_COMPONENT, jsonComponent, message));
+    ASSERT_EQ(nullptr, ParseTestComponent(SAVE_COMPONENT, jsonComponent, message));
 }
 
 /**
@@ -126,11 +140,11 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent003, TestSize.Level0)
     std::string message;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
 
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     jsonComponent[JsonTagConstants::JSON_SC_TYPE] = UNKNOWN_SC_TYPE;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_EQ(nullptr, comp);
 }
 
@@ -273,7 +287,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level0)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
 
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     jsonComponent[JsonTagConstants::JSON_PARENT_TAG] = nlohmann::json {
@@ -285,7 +299,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent006, TestSize.Level0)
         { JsonTagConstants::JSON_RIGHT_CLIP_TAG, 0.0 },
         { JsonTagConstants::JSON_PARENT_TAG_TAG, "" },
     };
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -301,22 +315,22 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent007, TestSize.Level0)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
 
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = ServiceTestCommon::TEST_DIMENSION;
     sizeJson[JsonTagConstants::JSON_ICON_SIZE_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     sizeJson[JsonTagConstants::JSON_ICON_SIZE_TAG] = ServiceTestCommon::TEST_DIMENSION;
     sizeJson[JsonTagConstants::JSON_TEXT_ICON_PADDING_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -331,18 +345,18 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent008, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& sizeJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingJson = sizeJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
     paddingJson[JsonTagConstants::JSON_TOP_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     paddingJson[JsonTagConstants::JSON_TOP_TAG] = ServiceTestCommon::TEST_DIMENSION;
     paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -357,18 +371,18 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent009, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& sizesJson = jsonComponent[JsonTagConstants::JSON_SIZE_TAG];
     auto& paddingsJson = sizesJson[JsonTagConstants::JSON_PADDING_SIZE_TAG];
     paddingsJson[JsonTagConstants::JSON_BOTTOM_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     paddingsJson[JsonTagConstants::JSON_BOTTOM_TAG] = ServiceTestCommon::TEST_DIMENSION;
     paddingsJson[JsonTagConstants::JSON_LEFT_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -383,17 +397,17 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent010, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& colorJson = jsonComponent[JsonTagConstants::JSON_COLORS_TAG];
     colorJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_INVALID;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     colorJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_RED;
     colorJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_INVALID;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -408,7 +422,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
@@ -416,7 +430,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent011, TestSize.Level0)
         { JsonTagConstants::JSON_ICON_TAG, NO_ICON },
         { JsonTagConstants::JSON_BG_TAG, SecCompBackground::CIRCLE },
     };
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -431,22 +445,22 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent012, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& colorsJson = jsonComponent[JsonTagConstants::JSON_COLORS_TAG];
     colorsJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_YELLOW;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     colorsJson[JsonTagConstants::JSON_FONT_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_RED;
     colorsJson[JsonTagConstants::JSON_ICON_COLOR_TAG] = ServiceTestCommon::TEST_COLOR_YELLOW;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
     styleJson[JsonTagConstants::JSON_BG_TAG] = SecCompBackground::NO_BG_TYPE;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -461,7 +475,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
@@ -471,14 +485,14 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent013, TestSize.Level0)
     paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = ServiceTestCommon::TEST_DIMENSION;
     paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -493,7 +507,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level0)
     nlohmann::json jsonComponent;
     std::string message;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     auto& styleJson = jsonComponent[JsonTagConstants::JSON_STYLE_TAG];
@@ -504,14 +518,14 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent014, TestSize.Level0)
     paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_LEFT_TAG] = MIN_PADDING_WITHOUT_BG;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 
     paddingJson[JsonTagConstants::JSON_TOP_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_RIGHT_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_BOTTOM_TAG] = MIN_PADDING_WITHOUT_BG;
     paddingJson[JsonTagConstants::JSON_LEFT_TAG] = ServiceTestCommon::TEST_DIMENSION;
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -527,7 +541,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
 
     jsonComponent[JsonTagConstants::JSON_STYLE_TAG] = nlohmann::json {
@@ -540,7 +554,7 @@ HWTEST_F(SecCompInfoHelperTest, ParseComponent015, TestSize.Level0)
         { JsonTagConstants::JSON_ICON_COLOR_TAG, ServiceTestCommon::TEST_COLOR_BLACK },
         { JsonTagConstants::JSON_BG_COLOR_TAG, ServiceTestCommon::TEST_COLOR_YELLOW }
     };
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_FALSE(comp->GetValid());
 }
 
@@ -645,7 +659,7 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect001, TestSize.Level0)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
     SecCompRect scaleRect;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     Scales scales;
     scales.floatingScale = 0.8f;
     scales.scaleX = 0.9f;
@@ -684,7 +698,7 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect002, TestSize.Level0)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
     SecCompRect scaleRect;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     Scales scales;
     scales.floatingScale = 0.8f;
     scales.scaleX = 0.8f;
@@ -738,7 +752,7 @@ HWTEST_F(SecCompInfoHelperTest, AdjustSecCompRect003, TestSize.Level0)
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
     SecCompRect scaleRect;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     Scales scales;
     scales.floatingScale = 0.8f;
     scales.scaleX = 0.9f;
@@ -773,16 +787,16 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid001, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_TRUE(comp->GetValid());
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
     jsonComponent[JsonTagConstants::JSON_COLORS_TAG] = nlohmann::json {
         { JsonTagConstants::JSON_FONT_COLOR_TAG, ServiceTestCommon::TEST_COLOR_RED },
         { JsonTagConstants::JSON_ICON_COLOR_TAG, ServiceTestCommon::TEST_COLOR_BLACK },
         { JsonTagConstants::JSON_BG_COLOR_TAG, ServiceTestCommon::TEST_COLOR_WHITE }
     };
-    comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 }
 
 /**
@@ -796,16 +810,16 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid002, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     comp->text_ = UNKNOWN_TEXT;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 
     comp->text_ = static_cast<int32_t>(LocationDesc::SELECT_LOCATION);
     comp->icon_ = UNKNOWN_ICON;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 
     comp->text_ = UNKNOWN_TEXT;
-    ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_FALSE(CheckTestComponentValid(comp, message));
 }
 
 /**
@@ -819,12 +833,12 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid003, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     comp->type_ = SecCompType::UNKNOWN_SC_TYPE;
-    ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_FALSE(CheckTestComponentValid(comp, message));
 
     comp->type_ = SecCompType::MAX_SC_TYPE;
-    ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_FALSE(CheckTestComponentValid(comp, message));
 }
 
 /**
@@ -838,7 +852,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
 
     Rosen::WindowManager::GetInstance().result_ = Rosen::WMError::WM_OK;
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> list;
@@ -854,7 +868,7 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid004, TestSize.Level0)
     otherWin->scaleVal_ = 0.0;
     list.emplace_back(otherWin);
     Rosen::WindowManager::GetInstance().list_ = list;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 }
 
 /**
@@ -868,10 +882,10 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
 
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 }
 
 /**
@@ -885,21 +899,21 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid006, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* comp = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* comp = ParseTestComponent(LOCATION_COMPONENT, jsonComponent, message);
     ASSERT_NE(nullptr, comp);
 
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
     comp->isArkuiComponent_ = true;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 
     comp->isArkuiComponent_ = false;
     comp->bgColor_.value = 0x0C000000;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 
     comp->isSmartEdgeState_ = true;
-    ASSERT_TRUE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_TRUE(CheckTestComponentValid(comp, message));
 
     comp->isSmartEdgeState_ = false;
     comp->bgColor_.value = 0x00000000;
-    ASSERT_FALSE(SecCompInfoHelper::CheckComponentValid(comp, message));
+    ASSERT_FALSE(CheckTestComponentValid(comp, message));
 }

@@ -34,6 +34,11 @@ namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompEntityTest"};
 static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
+
+static SecCompOwnerInfo BuildOwnerInfo(AccessTokenID tokenId)
+{
+    return { tokenId, 1, 1, ServiceTestCommon::TEST_USER_ID };
+}
 }
 
 void SecCompEntityTest::SetUpTestCase()
@@ -52,7 +57,7 @@ void SecCompEntityTest::SetUp()
     std::shared_ptr<LocationButton> component = std::make_shared<LocationButton>();
     ASSERT_NE(nullptr, component);
 
-    entity_ = std::make_shared<SecCompEntity>(component, 1, 1, 1, 1);
+    entity_ = std::make_shared<SecCompEntity>(component, 1, BuildOwnerInfo(1));
     ASSERT_NE(nullptr, entity_);
 
     Rosen::WindowManager::GetInstance().SetDefaultSecCompScene();
@@ -98,7 +103,7 @@ HWTEST_F(SecCompEntityTest, GrantTempPermission002, TestSize.Level0)
     std::shared_ptr<PasteButton> pasteComponent = std::make_shared<PasteButton>();
     ASSERT_NE(nullptr, pasteComponent);
 
-    entity_ = std::make_shared<SecCompEntity>(pasteComponent, 0, 1, 1, 1);
+    entity_ = std::make_shared<SecCompEntity>(pasteComponent, 1, BuildOwnerInfo(0));
     ASSERT_NE(nullptr, entity_);
 
     ASSERT_EQ(SC_SERVICE_ERROR_PERMISSION_OPER_FAIL, entity_->GrantTempPermission());
@@ -214,7 +219,8 @@ HWTEST_F(SecCompEntityTest, CompareComponentBasicInfo001, TestSize.Level0)
     nlohmann::json jsonComponent;
     ServiceTestCommon::BuildLocationComponentJson(jsonComponent);
     std::string message;
-    SecCompBase* other = SecCompInfoHelper::ParseComponent(LOCATION_COMPONENT, jsonComponent, message);
+    SecCompBase* other = SecCompInfoHelper::ParseComponent(
+        LOCATION_COMPONENT, jsonComponent, ServiceTestCommon::TEST_USER_ID, message);
     bool isRectCheck = true;
     ASSERT_FALSE(entity_->CompareComponentBasicInfo(other, isRectCheck));
 }

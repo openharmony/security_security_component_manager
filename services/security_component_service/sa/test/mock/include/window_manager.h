@@ -86,6 +86,13 @@ public:
         return instance;
     };
 
+    static WindowManager& GetInstance(int32_t userId)
+    {
+        WindowManager& instance = GetInstance();
+        instance.lastUserId_ = userId;
+        return instance;
+    };
+
     WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list)
     {
         list = list_;
@@ -122,6 +129,7 @@ public:
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> list_;
     std::vector<sptr<Rosen::UnreliableWindowInfo>> info_;
     WMError result_ = OHOS::Rosen::WMError::WM_OK;
+    int32_t lastUserId_ = -1;
 private:
     ~WindowManager() {};
 };
@@ -131,6 +139,13 @@ public:
     static WindowManager& GetInstance()
     {
         static WindowManager instance;
+        return instance;
+    };
+
+    static WindowManager& GetInstance(int32_t userId)
+    {
+        WindowManager& instance = GetInstance();
+        instance.lastUserId_ = userId;
         return instance;
     };
 
@@ -162,6 +177,7 @@ public:
     }
 
     WindowManager() {};
+    int32_t lastUserId_ = -1;
 private:
     ~WindowManager() {};
 };

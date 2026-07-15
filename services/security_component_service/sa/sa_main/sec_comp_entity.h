@@ -24,11 +24,18 @@
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
+struct SecCompOwnerInfo {
+    AccessToken::AccessTokenID tokenId;
+    int32_t pid;
+    int32_t uid;
+    int32_t userId;
+};
+
 class SecCompEntity {
 public:
-    SecCompEntity(std::shared_ptr<SecCompBase> component,
-        AccessToken::AccessTokenID token, int32_t scId, int32_t pid, int32_t uid)
-        : componentInfo_(component), tokenId_(token), scId_(scId), pid_(pid), uid_(uid) {};
+    SecCompEntity(std::shared_ptr<SecCompBase> component, int32_t scId, const SecCompOwnerInfo& owner)
+        : componentInfo_(component), tokenId_(owner.tokenId), scId_(scId), pid_(owner.pid), uid_(owner.uid),
+          userId_(owner.userId) {};
     ~SecCompEntity() = default;
     int32_t RevokeTempPermission();
     int32_t GrantTempPermission();
@@ -92,6 +99,7 @@ public:
     int32_t scId_;
     int32_t pid_;
     int32_t uid_;
+    int32_t userId_;
     bool isCustomAuthorized_ = false;
     bool bypassSecurityCheck_ = false;
 
