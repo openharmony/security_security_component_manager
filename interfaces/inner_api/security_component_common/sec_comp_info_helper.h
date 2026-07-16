@@ -46,7 +46,7 @@ struct ScreenInfo {
     OHOS::Rosen::ScreenShape screenShape;
 };
 
-    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
+    static SecCompBase* ParseComponent(SecCompType type, const nlohmann::json& jsonComponent, int32_t userId,
         std::string& message, bool isClicked = false);
     static bool CheckComponentValid(SecCompBase* comp, std::string& message);
     static bool CheckRectValid(const SecCompRect& rect, const SecCompRect& windowRect, ScreenInfo& screenInfo,
@@ -54,7 +54,6 @@ struct ScreenInfo {
     static double GetDistance(DimensionT x1, DimensionT y1, DimensionT x2, DimensionT y2);
 
 private:
-    static Scales GetWindowScale(int32_t windowId);
     static void AdjustSecCompRect(SecCompBase* comp, const Scales scales, bool isCompatScaleMode,
         SecCompRect& windowRect);
     static bool IsOutOfWatchScreen(const SecCompRect& rect, double radius, std::string& message);

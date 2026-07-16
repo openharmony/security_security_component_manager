@@ -37,10 +37,13 @@ public:
         return instance_;
     }
 
-    ErrCode StartExtensionAbility(const Want &want, sptr<IRemoteObject> callerToken)
+    ErrCode StartExtensionAbility(const Want &want, sptr<IRemoteObject> callerToken, int32_t userId = -1)
     {
+        lastUserId_ = userId;
         return 0;
     }
+
+    int32_t lastUserId_ = -1;
 };
 }  // namespace AAFwk
 }  // namespace OHOS

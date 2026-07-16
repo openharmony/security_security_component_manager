@@ -353,7 +353,7 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     }
 
     std::string message;
-    SecCompBase* componentPtr = SecCompInfoHelper::ParseComponent(type, jsonComponent, message);
+    SecCompBase* componentPtr = SecCompInfoHelper::ParseComponent(type, jsonComponent, caller.userId, message);
     std::shared_ptr<SecCompBase> component(componentPtr);
     if (component == nullptr) {
         SC_LOG_ERROR(LABEL, "Parse component info invalid");
@@ -378,8 +378,8 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     malicious_.ResetAppMaliciousFailCount(caller.pid);
 
     int32_t registerId = CreateScId();
-    std::shared_ptr<SecCompEntity> entity =
-        std::make_shared<SecCompEntity>(component, caller.tokenId, registerId, caller.pid, caller.uid);
+    SecCompOwnerInfo owner = { caller.tokenId, caller.pid, caller.uid, caller.userId };
+    std::shared_ptr<SecCompEntity> entity = std::make_shared<SecCompEntity>(component, registerId, owner);
     bool isCustomAuthorized = SecCompManager::GetInstance().HasCustomPermissionForSecComp();
     entity->SetCustomAuthorizationStatus(isCustomAuthorized);
     int32_t ret = AddSecurityComponentToList(caller.pid, caller.tokenId, entity);
@@ -408,7 +408,7 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
     std::string message;
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, sc->userId_, message);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     if (reportComponentInfo == nullptr) {
         SC_LOG_ERROR(LABEL, "Update component info invalid");
@@ -451,7 +451,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     const nlohmann::json& jsonComponent, const SecCompCallerInfo& caller, std::string& message)
 {
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, Check security component", caller.pid);
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, message, true);
+    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, sc->userId_, message, true);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     int32_t uid = IPCSkeleton::GetCallingUid();
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
@@ -542,8 +542,9 @@ bool SecCompManager::AllowToBypassArkuiCheck(const SecCompCallerInfo& caller)
 {
     std::string bundleName = "";
     OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    if (bmsClient.GetNameForUid(caller.uid, bundleName) != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Failed to get bundle name for UID %{public}d", caller.uid);
+    int32_t ret = bmsClient.GetNameForUid(caller.uid, bundleName);
+    if (ret != SC_OK) {
+        SC_LOG_ERROR(LABEL, "Failed to get bundle name, uid=%{public}d, ret=%{public}d", caller.uid, ret);
     }
     if (SecCompEnhanceAdapter::IsBypassPermitted(bundleName)) {
         return true;

@@ -25,6 +25,7 @@ class ServiceTestCommon {
 public:
     static constexpr int32_t TEST_UID_1 = 1;
     static constexpr int32_t TEST_UID_2 = 2;
+    static constexpr int32_t TEST_USER_ID = 100;
     static constexpr int32_t TEST_PID_1 = 1;
     static constexpr int32_t TEST_PID_2 = 2;
     static constexpr int32_t TEST_PID_3 = 3;

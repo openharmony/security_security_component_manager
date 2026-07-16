@@ -417,7 +417,8 @@ void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> enti
         return;
     }
 
-    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
+    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
+        want, callerToken, entity->userId_);
     SC_LOG_INFO(LABEL, "Start toast ability res %{public}d", startRes);
 }
 
@@ -456,7 +457,8 @@ bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
         return false;
     }
 
-    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, callerToken);
+    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
+        want, callerToken, entity->userId_);
     SC_LOG_INFO(LABEL, "Start ability res %{public}d", startRes);
     if (startRes != 0) {
         dialogWaitMap_.erase(scId);

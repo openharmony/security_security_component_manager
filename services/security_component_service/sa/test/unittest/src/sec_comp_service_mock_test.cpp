@@ -102,7 +102,8 @@ HWTEST_F(SecCompServiceMockTest, AllowToBypassArkuiCheck001, TestSize.Level0)
     SecCompCallerInfo caller = {
         .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
         .uid = BYPASS_TEST_UID,
-        .pid = ServiceTestCommon::TEST_PID_1
+        .pid = ServiceTestCommon::TEST_PID_1,
+        .userId = ServiceTestCommon::TEST_USER_ID
     };
     EXPECT_TRUE(SecCompManager::GetInstance().AllowToBypassArkuiCheck(caller));
 }

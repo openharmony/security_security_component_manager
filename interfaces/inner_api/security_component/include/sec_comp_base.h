@@ -170,6 +170,7 @@ public:
     bool isArkuiComponent_ = false;
     bool isCompatScaleMode_ = false;
     bool isSmartEdgeState_ = false;
+    int32_t userId_ = 0;
 protected:
     virtual bool IsTextIconTypeValid(std::string& message, bool isClicked) = 0;
     virtual bool IsCorrespondenceType() = 0;

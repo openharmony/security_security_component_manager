@@ -76,7 +76,7 @@ void SecCompInfoHelper::AdjustSecCompRect(SecCompBase* comp, const Scales scales
         comp->rect_.x_, comp->rect_.y_, comp->rect_.width_, comp->rect_.height_);
 }
 
-SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent,
+SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann::json& jsonComponent, int32_t userId,
     std::string& message, bool isClicked)
 {
     SecCompBase* comp = nullptr;
@@ -100,6 +100,7 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
         return comp;
     }
 
+    comp->userId_ = userId;
     comp->SetValid(CheckComponentValid(comp, message));
     comp->isClickEvent_ = isClicked;
     return comp;
@@ -383,7 +384,7 @@ bool SecCompInfoHelper::CheckComponentValid(SecCompBase* comp, std::string& mess
 
     bool isCompatScaleMode = false;
     SecCompRect scaleRect;
-    Scales scales = WindowInfoHelper::GetWindowScale(comp->windowId_, isCompatScaleMode, scaleRect);
+    Scales scales = WindowInfoHelper::GetWindowScale(comp->windowId_, comp->userId_, isCompatScaleMode, scaleRect);
     if ((!IsEqual(scales.floatingScale, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.floatingScale, 0.0)) ||
         (!IsEqual(scales.scaleX, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.scaleX, 0.0)) ||
         (!IsEqual(scales.scaleY, WindowInfoHelper::FULL_SCREEN_SCALE) && !IsEqual(scales.scaleY, 0.0)) ||

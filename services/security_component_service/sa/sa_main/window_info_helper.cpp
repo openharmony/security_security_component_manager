@@ -30,10 +30,11 @@ static constexpr int32_t GET_WINDOW_WAITTIME_MILLISECONDS = 1; // 1ms
 static constexpr int32_t GET_WINDOW_REPEAT_TIMES = 10;
 }
 
-bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::AccessibilityWindowInfo>& windowInfo)
+bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, int32_t userId,
+    sptr<Rosen::AccessibilityWindowInfo>& windowInfo)
 {
     std::vector<sptr<Rosen::AccessibilityWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance().GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
+    if (Rosen::WindowManager::GetInstance(userId).GetAccessibilityWindowInfo(infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }
@@ -48,7 +49,8 @@ bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, sptr<Rosen::Accessibil
     return true;
 }
 
-Scales WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMode, SecCompRect& scaleRect)
+Scales WindowInfoHelper::GetWindowScale(int32_t windowId, int32_t userId, bool& isCompatScaleMode,
+    SecCompRect& scaleRect)
 {
     Scales scales;
     scales.floatingScale = FULL_SCREEN_SCALE;
@@ -56,7 +58,7 @@ Scales WindowInfoHelper::GetWindowScale(int32_t windowId, bool& isCompatScaleMod
     sptr<Rosen::AccessibilityWindowInfo> windowInfo = nullptr;
     int32_t i = 0;
     for (i = 0; i < GET_WINDOW_REPEAT_TIMES; ++i) {
-        if (TryGetWindowInfo(windowId, windowInfo)) {
+        if (TryGetWindowInfo(windowId, userId, windowInfo)) {
             break;
         }
         std::this_thread::sleep_for(sleepTime);
@@ -163,14 +165,16 @@ static bool IsOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect
     }
     return true;
 }
-bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, std::string& message)
+
+bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCompRect& secRect, int32_t userId,
+    std::string& message)
 {
     if ((static_cast<uint32_t>(compWinId) & UI_EXTENSION_MASK) == UI_EXTENSION_MASK) {
         SC_LOG_INFO(LABEL, "UI extension can not check");
         return true;
     }
     std::vector<sptr<Rosen::UnreliableWindowInfo>> infos;
-    if (Rosen::WindowManager::GetInstance().GetUnreliableWindowInfo(compWinId, infos) != Rosen::WMError::WM_OK) {
+    if (Rosen::WindowManager::GetInstance(userId).GetUnreliableWindowInfo(compWinId, infos) != Rosen::WMError::WM_OK) {
         SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
         return false;
     }
