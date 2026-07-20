@@ -311,6 +311,13 @@ When modifying this repository, preserve the following development constraints:
 
 ## Common issues
 
+### Registration-Time Information And Validation
+
+- Do not treat registration-time validation and click-time authorization validation as equivalent. Security-component registration does not need to perform every security check that depends on live runtime state; checks that are strongly tied to click authorization, window state, interaction timing, or dynamic environment state should remain on the click path unless the task explicitly requires a reviewed behavior change.
+- Before adding information retrieval, state queries, or security checks to the registration flow, first determine whether that data is truly required at registration time. Do not move data collection or validation from the click or authorization path into the registration path by default only because the same shared validation logic can be reused.
+- Registration may happen when the component has just become visible, while window properties, UI state, or related system state are still updating and have not yet converged. In that timing window, retrieved window information, display information, scaling state, coverage relationship, or other runtime security-relevant state may be stale, incomplete, or unstable, causing false validation failures or incorrect component state updates.
+- If new information retrieval or security validation must run during registration, verify end-to-end that the required data is already stable at registration time, and review the data acquisition path, timing assumptions, fallback behavior on retrieval failure, and the responsibility boundary between registration-time checks and click-time checks.
+
 ### Performance-Sensitive Interfaces
 
 Security components are performance-sensitive. Avoid adding time-consuming logic to the following interfaces during development:
