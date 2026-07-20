@@ -375,6 +375,7 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
         malicious_.AddAppToMaliciousAppList(caller.pid);
         return enhanceRes;
     }
+    malicious_.ResetAppMaliciousFailCount(caller.pid);
 
     int32_t registerId = CreateScId();
     std::shared_ptr<SecCompEntity> entity =
@@ -431,6 +432,7 @@ int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::js
         return enhanceRes;
     }
 
+    malicious_.ResetAppMaliciousFailCount(caller.pid);
     sc->componentInfo_ = reportComponentInfo;
     return SC_OK;
 }
@@ -490,6 +492,7 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
         return enhanceRes;
     }
 
+    malicious_.ResetAppMaliciousFailCount(caller.pid);
     sc->componentInfo_ = reportComponentInfo;
     return SC_OK;
 }
@@ -676,6 +679,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 
+    malicious_.ResetAppMaliciousFailCount(caller.pid);
     return StartDialog(info, sc, remote);
 }
 
