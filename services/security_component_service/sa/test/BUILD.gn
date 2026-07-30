@@ -46,6 +46,8 @@ ohos_unittest("sec_comp_service_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/wm_mini_client.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/wm_mini_client_test.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
@@ -98,7 +100,7 @@ ohos_unittest("sec_comp_service_test") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
+    "window_manager:libdm_lite",
   ]
 }
 
@@ -137,6 +139,8 @@ ohos_unittest("sec_comp_service_mock_test") {
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/wm_mini_client.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/wm_mini_client_test.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/accesstoken_kit.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_app_mgr_proxy.cpp",
     "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/mock_iservice_registry.cpp",
@@ -179,7 +183,41 @@ ohos_unittest("sec_comp_service_mock_test") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
+    "window_manager:libdm_lite",
+  ]
+}
+
+ohos_unittest("wm_mini_client_ipc_test") {
+  subsystem_name = "accesscontrol"
+  part_name = "security_component_manager"
+  module_name = "security_component_manager"
+  module_out_path = part_name + "/" + module_name
+
+  include_dirs = [
+    "${sec_comp_root_dir}/frameworks/common/include",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main",
+    "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/include",
+  ]
+
+  sources = [
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/wm_mini_client.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/sa_main/wm_mini_client_adapter.cpp",
+    "${sec_comp_root_dir}/services/security_component_service/sa/test/mock/src/wm_mini_client_test.cpp",
+    "unittest/src/wm_mini_client_ipc_test.cpp",
+  ]
+
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-DWM_MINI_CLIENT_IPC_TEST",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "ipc:ipc_core",
   ]
 }
 
@@ -188,5 +226,6 @@ group("unittest") {
   deps = [
     ":sec_comp_service_mock_test",
     ":sec_comp_service_test",
+    ":wm_mini_client_ipc_test",
   ]
 }

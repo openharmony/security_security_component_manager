@@ -16,10 +16,10 @@
 #define I_SECURITY_COMPONENT_INFO_HELPER_H
 
 #include "accesstoken_kit.h"
+#include "dm_common.h"
 #include "nlohmann/json.hpp"
 #include "sec_comp_base.h"
 #include "sec_comp_info.h"
-#include "display_manager.h"
 
 namespace OHOS {
 namespace Security {

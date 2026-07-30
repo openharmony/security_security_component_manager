@@ -37,6 +37,7 @@
         "hisysevent",
         "hitrace",
         "graphic_2d",
+        "init",
         "ipc",
         "json",
         "safwk",
