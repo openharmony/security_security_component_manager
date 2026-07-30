@@ -35,8 +35,9 @@ bool WindowInfoHelper::TryGetWindowInfo(int32_t windowId, int32_t userId,
     sptr<MiniAccessibilityWindowInfo>& windowInfo)
 {
     std::vector<sptr<MiniAccessibilityWindowInfo>> infos;
-    if (Rosen::WMClientMini::GetAccessibilityWindowInfo(userId, infos) != MiniWMError::WM_OK) {
-        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
+    MiniWMError ret = Rosen::WMClientMini::GetAccessibilityWindowInfo(userId, infos);
+    if (ret != MiniWMError::WM_OK) {
+        SC_LOG_ERROR(LABEL, "Get window info failed, ret=%{public}d", static_cast<int32_t>(ret));
         return false;
     }
     auto iter = std::find_if(infos.begin(), infos.end(),
@@ -65,7 +66,7 @@ Scales WindowInfoHelper::GetWindowScale(int32_t windowId, int32_t userId, bool& 
         std::this_thread::sleep_for(sleepTime);
     }
     if ((i >= GET_WINDOW_REPEAT_TIMES) || (windowInfo == nullptr)) {
-        SC_LOG_WARN(LABEL, "Cannot find AccessibilityWindowInfo, return default scale");
+        SC_LOG_WARN(LABEL, "Cannot find window info, return default scale");
         return scales;
     }
     isCompatScaleMode = windowInfo->isCompatScaleMode_;
@@ -175,8 +176,10 @@ bool WindowInfoHelper::CheckOtherWindowCoverComp(int32_t compWinId, const SecCom
         return true;
     }
     std::vector<sptr<MiniUnreliableWindowInfo>> infos;
-    if (Rosen::WMClientMini::GetUnreliableWindowInfo(compWinId, userId, infos) != MiniWMError::WM_OK) {
-        SC_LOG_ERROR(LABEL, "Get AccessibilityWindowInfo failed");
+    MiniWMError ret = Rosen::WMClientMini::GetUnreliableWindowInfo(compWinId, userId, infos);
+    if (ret != MiniWMError::WM_OK) {
+        SC_LOG_ERROR(LABEL, "Get unreliable window info failed, ret=%{public}d",
+            static_cast<int32_t>(ret));
         return false;
     }
 

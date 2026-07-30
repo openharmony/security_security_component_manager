@@ -76,6 +76,8 @@ sc_service_sources = [
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_comp_service.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/sec_event_handler.cpp",
   "${sec_comp_dir}/services/security_component_service/sa/sa_main/window_info_helper.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/sa_main/wm_mini_client.cpp",
+  "${sec_comp_dir}/services/security_component_service/sa/test/mock/src/wm_mini_client_test.cpp",
 ]
 
 sc_mock_sources = [

@@ -19,17 +19,12 @@
 #include <string>
 #include <vector>
 
-#ifdef TDD_ENABLE
-#include "window_manager.h"
-#else
 #include <parcel.h>
 #include <refbase.h>
-#endif
 
 namespace OHOS {
 namespace Security {
 namespace SecurityComponent {
-#ifndef TDD_ENABLE
 using DisplayId = uint64_t;
 using WindowMode = uint32_t;
 using WindowType = uint32_t;
@@ -61,7 +56,8 @@ enum class MiniWMError : int32_t {
     WM_ERROR_IPC_FAILED,
 };
 
-struct MiniRect {
+class MiniRect {
+public:
     int32_t posX_ = 0;
     int32_t posY_ = 0;
     uint32_t width_ = 0;
@@ -108,21 +104,15 @@ public:
     float scaleX_ { 1.0f };
     float scaleY_ { 1.0f };
 };
-#else
-using MiniWMError = OHOS::Rosen::WMError;
-using MiniRect = OHOS::Rosen::Rect;
-using MiniAccessibilityWindowInfo = OHOS::Rosen::AccessibilityWindowInfo;
-using MiniUnreliableWindowInfo = OHOS::Rosen::UnreliableWindowInfo;
-#endif
 }  // namespace SecurityComponent
 }  // namespace Security
 
 namespace Rosen {
-class __attribute__((visibility("default"))) WMClientMini {
+class WMClientMini {
 public:
-    static Security::SecurityComponent::MiniWMError GetAccessibilityWindowInfo(
+    static Security::SecurityComponent::MiniWMError GetAccessibilityWindowInfo(int32_t userId,
         std::vector<sptr<Security::SecurityComponent::MiniAccessibilityWindowInfo>>& infos);
-    static Security::SecurityComponent::MiniWMError GetUnreliableWindowInfo(int32_t windowId,
+    static Security::SecurityComponent::MiniWMError GetUnreliableWindowInfo(int32_t windowId, int32_t userId,
         std::vector<sptr<Security::SecurityComponent::MiniUnreliableWindowInfo>>& infos);
 };
 }  // namespace Rosen

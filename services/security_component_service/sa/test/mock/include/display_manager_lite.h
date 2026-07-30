@@ -19,6 +19,7 @@
 #include "display_info.h"
 #include "display_lite.h"
 #include "dm_common.h"
+#include "fold_screen_info.h"
 
 namespace OHOS::Rosen {
 class DisplayManagerLite {
@@ -29,14 +30,14 @@ public:
         return instance;
     }
 
-    sptr<DisplayLite> GetDisplayById(uint64_t displayId)
+    sptr<DisplayLite> GetDisplayById(DisplayId displayId)
     {
         return sptr<DisplayLite>::MakeSptr();
     }
 
-    sptr<DisplayInfo> GetCurrentFoldCreaseRegion()
+    sptr<FoldCreaseRegion> GetCurrentFoldCreaseRegion()
     {
-        return sptr<DisplayInfo>::MakeSptr();
+        return sptr<FoldCreaseRegion>::MakeSptr();
     }
 };
 }

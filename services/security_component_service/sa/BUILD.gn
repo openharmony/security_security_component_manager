@@ -168,9 +168,9 @@ ohos_shared_library("security_component_common") {
   cflags = [ "-DHILOG_ENABLE" ]
 
   deps = [
+    ":wm_mini_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_service_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
-    ":libwm_mini",
   ]
 
   external_deps = [
@@ -191,7 +191,7 @@ ohos_shared_library("security_component_common") {
   ]
 }
 
-ohos_shared_library("libwm_mini") {
+ohos_source_set("wm_mini_src_set") {
   subsystem_name = "security"
   part_name = "security_component_manager"
 
@@ -207,7 +207,11 @@ ohos_shared_library("libwm_mini") {
     "${sec_comp_root_dir}/frameworks/common/include",
   ]
 
-  sources = [ "sa_main/wm_mini_client.cpp" ]
+  sources = [
+    "sa_main/wm_mini_client.cpp",
+    "sa_main/wm_mini_client_adapter.cpp",
+    "sa_main/wm_mini_client_environment.cpp",
+  ]
 
   cflags_cc = [
     "-DHILOG_ENABLE",
@@ -220,6 +224,7 @@ ohos_shared_library("libwm_mini") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
