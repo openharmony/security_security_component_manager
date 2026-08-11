@@ -479,7 +479,8 @@ HWTEST_F(SecCompManagerTest, AddSecurityComponentToList004, TestSize.Level0)
         managerInstance->componentMap_[pid].compList.emplace_back(entity);
     }
 
-    ASSERT_NE(managerInstance->AddSecurityComponentToList(pid, 0, entity), SC_SERVICE_ERROR_VALUE_INVALID);
+    ASSERT_EQ(SC_OK, managerInstance->AddSecurityComponentToList(pid, 0, entity));
+    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, managerInstance->AddSecurityComponentToList(pid, 0, entity));
 }
 
 /**

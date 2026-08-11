@@ -330,6 +330,42 @@ HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp007, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CheckOtherWindowCoverComp008
+ * @tc.desc: Test a negative-coordinate window outside the rounded corner does not cover the component
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WindowInfoHelperTest, CheckOtherWindowCoverComp008, TestSize.Level0)
+{
+    constexpr int32_t componentWindowId = 0;
+    constexpr int32_t coverWindowId = 1;
+    constexpr int32_t componentLayer = 1;
+    constexpr int32_t coverWindowLayer = 2;
+    constexpr int32_t windowPosition = -10;
+    constexpr uint32_t windowSize = 5;
+    constexpr double componentPosition = -8.0;
+    constexpr double componentSize = 100.0;
+    constexpr double borderRadius = 20.0;
+
+    WindowManager::GetInstance().result_ = WMError::WM_OK;
+    sptr<UnreliableWindowInfo> compWin = new UnreliableWindowInfo();
+    compWin->windowId_ = componentWindowId;
+    compWin->zOrder_ = componentLayer;
+
+    sptr<UnreliableWindowInfo> cornerWin = new UnreliableWindowInfo();
+    cornerWin->windowId_ = coverWindowId;
+    cornerWin->zOrder_ = coverWindowLayer;
+    cornerWin->windowRect_ = Rosen::Rect { windowPosition, windowPosition, windowSize, windowSize };
+    WindowManager::GetInstance().info_ = { compWin, cornerWin };
+
+    SecCompRect compRect = { componentPosition, componentPosition, componentSize, componentSize };
+    compRect.borderRadius_.leftTop = borderRadius;
+    std::string message;
+    EXPECT_TRUE(WindowInfoHelper::CheckOtherWindowCoverComp(
+        componentWindowId, compRect, ServiceTestCommon::TEST_USER_ID, message));
+}
+
+/**
  * @tc.name: TryGetWindowInfo001
  * @tc.desc: Test TryGetWindowInfo with normal windowId match
  * @tc.type: FUNC
