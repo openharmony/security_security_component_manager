@@ -142,6 +142,37 @@ MiniUnreliableWindowInfo* WmMiniClientAdapter::CreateUnreliableWindowInfo()
     return new (std::nothrow) MiniUnreliableWindowInfo();
 }
 #elif defined(FUZZ_ENABLE)
+namespace {
+constexpr uint32_t FUZZ_WINDOW_COVERAGE_MASK = 0x20000000;
+constexpr int32_t FUZZ_COVERED_WINDOW_ID_OFFSET = 1;
+constexpr uint32_t FUZZ_COVERED_WINDOW_LAYER = 1;
+constexpr uint32_t FUZZ_COVERED_WINDOW_RECT_SIZE = 96;
+constexpr float FUZZ_COVERED_WINDOW_FLOATING_SCALE = 0.5F;
+
+sptr<MiniUnreliableWindowInfo> CreateMiniUnreliableWindowInfo(int32_t windowId)
+{
+    sptr<MiniUnreliableWindowInfo> info = new (std::nothrow) MiniUnreliableWindowInfo();
+    if (info == nullptr) {
+        return nullptr;
+    }
+    info->windowId_ = windowId;
+    return info;
+}
+
+sptr<MiniUnreliableWindowInfo> CreateCoveredWindowInfo(int32_t windowId)
+{
+    sptr<MiniUnreliableWindowInfo> info = CreateMiniUnreliableWindowInfo(windowId + FUZZ_COVERED_WINDOW_ID_OFFSET);
+    if (info == nullptr) {
+        return nullptr;
+    }
+    info->zOrder_ = FUZZ_COVERED_WINDOW_LAYER;
+    info->windowRect_.width_ = FUZZ_COVERED_WINDOW_RECT_SIZE;
+    info->windowRect_.height_ = FUZZ_COVERED_WINDOW_RECT_SIZE;
+    info->floatingScale_ = FUZZ_COVERED_WINDOW_FLOATING_SCALE;
+    return info;
+}
+}
+
 MiniWMError WmMiniClientAdapter::GetWindowInfo(int32_t userId,
     std::vector<sptr<MiniAccessibilityWindowInfo>>& infos)
 {
@@ -163,12 +194,21 @@ MiniWMError WmMiniClientAdapter::GetUnreliableWindowInfo(int32_t windowId, int32
 {
     (void)userId;
     infos.clear();
-    sptr<MiniUnreliableWindowInfo> info = new (std::nothrow) MiniUnreliableWindowInfo();
-    if (info == nullptr) {
+    sptr<MiniUnreliableWindowInfo> componentWindow = CreateMiniUnreliableWindowInfo(windowId);
+    if (componentWindow == nullptr) {
         return MiniWMError::WM_ERROR_NO_MEM;
     }
-    info->windowId_ = windowId;
-    infos.emplace_back(info);
+    infos.emplace_back(componentWindow);
+
+    if ((static_cast<uint32_t>(windowId) & FUZZ_WINDOW_COVERAGE_MASK) == 0) {
+        return MiniWMError::WM_OK;
+    }
+
+    sptr<MiniUnreliableWindowInfo> coveredWindow = CreateCoveredWindowInfo(windowId);
+    if (coveredWindow == nullptr) {
+        return MiniWMError::WM_ERROR_NO_MEM;
+    }
+    infos.emplace_back(coveredWindow);
     return MiniWMError::WM_OK;
 }
 
