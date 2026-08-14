@@ -30,6 +30,8 @@
 #include "sec_comp_service.h"
 #include "securec.h"
 #include "token_setproc.h"
+#include "window_info_helper.h"
+#include "wm_mini_client.h"
 
 
 using namespace OHOS::Security::SecurityComponent;
@@ -37,6 +39,16 @@ using namespace OHOS::Security::AccessToken;
 
 static constexpr uint64_t MAX_TOUCH_INTERVAL = 5000000L; // 5000ms
 static constexpr uint64_t TIME_CONVERSION_UNIT = 1000;
+static constexpr uint32_t FUZZ_WINDOW_COVERAGE_MASK = 0x20000000U;
+static constexpr uint32_t FUZZ_WINDOW_RANDOM_MASK = 0x1fffffffU;
+static constexpr int32_t COMPONENT_POSITION_RANGE = 64;
+static constexpr uint32_t COMPONENT_SIZE_RANGE = 128;
+static constexpr uint32_t BORDER_RADIUS_RANGE = 32;
+static constexpr uint32_t COVERED_WINDOW_SIZE = 48;
+static constexpr uint32_t TOUCH_HOT_AREA_COUNT_RANGE = 4;
+static constexpr uint32_t TOUCH_HOT_AREA_OVER_LIMIT_COUNT = 10001;
+static constexpr uint32_t RANDOM_RANGE_OFFSET = 1;
+static constexpr int32_t REGISTER_REPLY_SUCCESS = 0;
 static int32_t g_scId = 0;
 static std::shared_ptr<SecCompService> g_service;
 static uint32_t g_type;
@@ -132,6 +144,29 @@ static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t si
     g_service->OnStop();
 }
 
+static bool ReadRegisterReply(MessageParcel& reply, int32_t& scId)
+{
+    SecCompRawdata replyData;
+    int32_t errCode = reply.ReadInt32();
+    if (errCode != REGISTER_REPLY_SUCCESS) {
+        return false;
+    }
+    if (!reply.ReadUint32(replyData.size)) {
+        return false;
+    }
+    auto readRawReply = reply.ReadRawData(replyData.size);
+    if (readRawReply == nullptr) {
+        return false;
+    }
+    int32_t res = replyData.RawDataCpy(readRawReply);
+    if (res != SC_OK) {
+        return false;
+    }
+    MessageParcel deserializedReply;
+    SecCompEnhanceAdapter::EnhanceClientDeserialize(replyData, deserializedReply);
+    return deserializedReply.ReadInt32(res) && deserializedReply.ReadInt32(scId);
+}
+
 static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
 {
     uint32_t code =
@@ -140,7 +175,6 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
     MessageParcel input;
     SecCompRawdata inputData;
     MessageParcel reply;
-    SecCompRawdata replyData;
     CompoRandomGenerator generator(data, size);
 
     g_type = generator.GetScType();
@@ -161,29 +195,7 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
     input.WriteRawData(inputData.data, inputData.size);
     MessageOption option(MessageOption::TF_SYNC);
     g_service->OnRemoteRequest(code, input, reply, option);
-    int32_t errCode = reply.ReadInt32();
-    if (errCode != 0) {
-        return;
-    }
-    if (!reply.ReadUint32(replyData.size)) {
-        return;
-    }
-    auto readRawReply = reply.ReadRawData(replyData.size);
-    if (readRawReply == nullptr) {
-        return;
-    }
-    int32_t res = replyData.RawDataCpy(readRawReply);
-    if (res != SC_OK) {
-        return;
-    }
-    MessageParcel deserializedReply;
-    SecCompEnhanceAdapter::EnhanceClientDeserialize(replyData, deserializedReply);
-    if (!deserializedReply.ReadInt32(res)) {
-        return;
-    }
-    if (!deserializedReply.ReadInt32(g_scId)) {
-        return;
-    }
+    (void)ReadRegisterReply(reply, g_scId);
 }
 
 static void UpdateSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
@@ -301,6 +313,148 @@ static void VerifySavePermissionStubFuzzTest(const uint8_t *data, size_t size)
     g_service->OnRemoteRequest(code, input, reply, option);
 }
 
+static void WriteAccessibilityWindowInfoParcel(MessageParcel& parcel, CompoRandomGenerator& generator,
+    uint32_t touchHotAreaCount, bool writeTouchHotAreas)
+{
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteBool(generator.GetData<bool>());
+    parcel.WriteBool(generator.GetData<bool>());
+    parcel.WriteUint64(generator.GetData<uint64_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteFloat(generator.GetData<float>());
+    parcel.WriteFloat(generator.GetData<float>());
+    parcel.WriteFloat(generator.GetData<float>());
+    parcel.WriteBool(generator.GetData<bool>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteString(generator.GetMessage());
+    parcel.WriteUint32(touchHotAreaCount);
+    if (!writeTouchHotAreas) {
+        return;
+    }
+    for (uint32_t i = 0; i < touchHotAreaCount; ++i) {
+        parcel.WriteInt32(generator.GetData<int32_t>());
+        parcel.WriteInt32(generator.GetData<int32_t>());
+        parcel.WriteUint32(generator.GetData<uint32_t>());
+        parcel.WriteUint32(generator.GetData<uint32_t>());
+    }
+}
+
+static void WriteUnreliableWindowInfoParcel(MessageParcel& parcel, CompoRandomGenerator& generator)
+{
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteInt32(generator.GetData<int32_t>());
+    parcel.WriteUint32(generator.GetData<uint32_t>());
+    parcel.WriteFloat(generator.GetData<float>());
+    parcel.WriteFloat(generator.GetData<float>());
+    parcel.WriteFloat(generator.GetData<float>());
+}
+
+static int32_t GenerateWindowCoverageId(CompoRandomGenerator& generator)
+{
+    return static_cast<int32_t>((generator.GetData<uint32_t>() & FUZZ_WINDOW_RANDOM_MASK) | FUZZ_WINDOW_COVERAGE_MASK);
+}
+
+static SecCompRect GenerateRandomComponentRect(CompoRandomGenerator& generator)
+{
+    SecCompRect rect = {
+        static_cast<double>(generator.GetData<int32_t>() % COMPONENT_POSITION_RANGE),
+        static_cast<double>(generator.GetData<int32_t>() % COMPONENT_POSITION_RANGE),
+        static_cast<double>(generator.GetData<uint32_t>() % COMPONENT_SIZE_RANGE + RANDOM_RANGE_OFFSET),
+        static_cast<double>(generator.GetData<uint32_t>() % COMPONENT_SIZE_RANGE + RANDOM_RANGE_OFFSET)
+    };
+    rect.borderRadius_.leftTop = generator.GetData<uint32_t>() % BORDER_RADIUS_RANGE;
+    rect.borderRadius_.rightTop = generator.GetData<uint32_t>() % BORDER_RADIUS_RANGE;
+    rect.borderRadius_.leftBottom = generator.GetData<uint32_t>() % BORDER_RADIUS_RANGE;
+    rect.borderRadius_.rightBottom = generator.GetData<uint32_t>() % BORDER_RADIUS_RANGE;
+    return rect;
+}
+
+static SecCompRect GenerateCoveredComponentRect(CompoRandomGenerator& generator)
+{
+    uint32_t coveredWidth = generator.GetData<uint32_t>() % COVERED_WINDOW_SIZE + RANDOM_RANGE_OFFSET;
+    uint32_t coveredHeight = generator.GetData<uint32_t>() % COVERED_WINDOW_SIZE + RANDOM_RANGE_OFFSET;
+    return {
+        static_cast<double>(generator.GetData<uint32_t>() %
+            (COVERED_WINDOW_SIZE - coveredWidth + RANDOM_RANGE_OFFSET)),
+        static_cast<double>(generator.GetData<uint32_t>() %
+            (COVERED_WINDOW_SIZE - coveredHeight + RANDOM_RANGE_OFFSET)),
+        static_cast<double>(coveredWidth),
+        static_cast<double>(coveredHeight)
+    };
+}
+
+static void ExerciseWindowCoverFuzzPath(CompoRandomGenerator& generator, int32_t windowId, int32_t userId)
+{
+    bool isCompatScaleMode = false;
+    SecCompRect scaleRect;
+    WindowInfoHelper::GetWindowScale(windowId, userId, isCompatScaleMode, scaleRect);
+
+    std::string message;
+    SecCompRect componentRect = GenerateRandomComponentRect(generator);
+    WindowInfoHelper::CheckOtherWindowCoverComp(windowId, componentRect, userId, message);
+
+    SecCompRect coveredComponentRect = GenerateCoveredComponentRect(generator);
+    WindowInfoHelper::CheckOtherWindowCoverComp(windowId, coveredComponentRect, userId, message);
+}
+
+static void ExerciseAccessibilityWindowInfoFuzzPath(CompoRandomGenerator& generator, int32_t userId)
+{
+    std::vector<sptr<MiniAccessibilityWindowInfo>> accessibilityInfos;
+    Rosen::WMClientMini::GetAccessibilityWindowInfo(userId, accessibilityInfos);
+    MiniAccessibilityWindowInfo accessibilityInfo;
+    MessageParcel accessibilityParcel;
+    uint32_t touchHotAreaCount = generator.GetData<uint32_t>() % TOUCH_HOT_AREA_COUNT_RANGE + RANDOM_RANGE_OFFSET;
+    WriteAccessibilityWindowInfoParcel(accessibilityParcel, generator, touchHotAreaCount, true);
+    MiniAccessibilityWindowInfo* unmarshalledAccessibilityInfo =
+        MiniAccessibilityWindowInfo::Unmarshalling(accessibilityParcel);
+    delete unmarshalledAccessibilityInfo;
+    accessibilityInfo.Marshalling(accessibilityParcel);
+
+    MessageParcel invalidAccessibilityParcel;
+    WriteAccessibilityWindowInfoParcel(invalidAccessibilityParcel, generator, TOUCH_HOT_AREA_OVER_LIMIT_COUNT, false);
+    MiniAccessibilityWindowInfo::Unmarshalling(invalidAccessibilityParcel);
+}
+
+static void ExerciseUnreliableWindowInfoFuzzPath(CompoRandomGenerator& generator, int32_t windowId, int32_t userId)
+{
+    std::vector<sptr<MiniUnreliableWindowInfo>> unreliableInfos;
+    Rosen::WMClientMini::GetUnreliableWindowInfo(windowId, userId, unreliableInfos);
+    MiniUnreliableWindowInfo unreliableInfo;
+    MessageParcel unreliableParcel;
+    WriteUnreliableWindowInfoParcel(unreliableParcel, generator);
+    MiniUnreliableWindowInfo* unmarshalledUnreliableInfo =
+        MiniUnreliableWindowInfo::Unmarshalling(unreliableParcel);
+    delete unmarshalledUnreliableInfo;
+    unreliableInfo.Marshalling(unreliableParcel);
+
+    MessageParcel invalidUnreliableParcel;
+    invalidUnreliableParcel.WriteInt32(generator.GetData<int32_t>());
+    MiniUnreliableWindowInfo::Unmarshalling(invalidUnreliableParcel);
+}
+
+static void ExerciseWindowInfoFuzzPaths(CompoRandomGenerator& generator)
+{
+    int32_t windowId = GenerateWindowCoverageId(generator);
+    int32_t userId = generator.GetData<int32_t>();
+    ExerciseWindowCoverFuzzPath(generator, windowId, userId);
+    ExerciseAccessibilityWindowInfoFuzzPath(generator, userId);
+    ExerciseUnreliableWindowInfoFuzzPath(generator, windowId, userId);
+}
+
 static void SecurityComponentFuzzTest(const uint8_t *data, size_t size)
 {
     PreRegisterSecCompProcessStubFuzzTest(data, size);
@@ -309,6 +463,8 @@ static void SecurityComponentFuzzTest(const uint8_t *data, size_t size)
     UpdateSecurityComponentStubFuzzTest(data, size);
     UnRegisterSecurityComponentStubFuzzTest(data, size);
     VerifySavePermissionStubFuzzTest(data, size);
+    CompoRandomGenerator generator(data, size);
+    ExerciseWindowInfoFuzzPaths(generator);
 }
 } // namespace OHOS
 
