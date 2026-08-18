@@ -654,18 +654,23 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         SC_LOG_ERROR(LABEL, "Can not find target component");
         return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
     }
-    if (IsPasteboardPermissionGranted(caller, sc)) {
-        SC_LOG_INFO(LABEL, "Caller already has %{public}s, skip paste component click check and grant.",
-            READ_PASTEBOARD_PERMISSION.c_str());
-        return SC_OK;
-    }
     if (!message.empty()) {
         if (!sc->AllowToBypassSecurityCheck(message) && !AllowToBypassArkuiCheck(caller)) {
+            if (IsPasteboardPermissionGranted(caller, sc)) {
+                SC_LOG_INFO(LABEL, "Caller already has %{public}s, bypass paste component security check.",
+                    READ_PASTEBOARD_PERMISSION.c_str());
+                return SC_OK;
+            }
             return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
         }
     }
     res = CheckClickSecurityComponentInfo(sc, info.scId, compJson, caller, message);
     if (res != SC_OK) {
+        if (IsPasteboardPermissionGranted(caller, sc)) {
+            SC_LOG_INFO(LABEL, "Caller already has %{public}s, bypass paste component security check.",
+                READ_PASTEBOARD_PERMISSION.c_str());
+            return SC_OK;
+        }
         return res;
     }
 
@@ -676,7 +681,11 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
         if (res == SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL) {
             malicious_.AddAppToMaliciousAppList(caller.pid);
         }
-
+        if (IsPasteboardPermissionGranted(caller, sc)) {
+            SC_LOG_INFO(LABEL, "Caller already has %{public}s, bypass paste component security check.",
+                READ_PASTEBOARD_PERMISSION.c_str());
+            return SC_OK;
+        }
         return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
     }
 

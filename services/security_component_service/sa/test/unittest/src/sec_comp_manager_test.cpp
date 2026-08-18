@@ -25,6 +25,7 @@
 #include "mock_system_ability_proxy.h"
 #include "save_button.h"
 #include "sec_comp_err.h"
+#include "sec_comp_info_helper.h"
 #include "service_test_common.h"
 #include "system_ability.h"
 
@@ -867,6 +868,50 @@ HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEventBypass001, TestSiz
         secCompInfo, jsonPaste, caller, remote, message));
     ASSERT_EQ(0, AccessTokenKit::RevokePermission(ServiceTestCommon::TEST_TOKEN_ID,
         "ohos.permission.READ_PASTEBOARD", 0));
+    SecCompManager::GetInstance().DeleteSecurityComponentFromList(ServiceTestCommon::TEST_PID_1,
+        ServiceTestCommon::TEST_SC_ID_1);
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEventGrantPastePermission001
+ * @tc.desc: Test grant temporary paste permission after successful click checks
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, ReportSecurityComponentClickEventGrantPastePermission001, TestSize.Level0)
+{
+    SecCompCallerInfo caller = {
+        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
+        .uid = 1,
+        .pid = ServiceTestCommon::TEST_PID_1,
+        .userId = ServiceTestCommon::TEST_USER_ID
+    };
+    nlohmann::json jsonPaste;
+    ServiceTestCommon::BuildPasteComponentJson(jsonPaste);
+    std::string message;
+    std::shared_ptr<SecCompBase> compPtr(SecCompInfoHelper::ParseComponent(
+        PASTE_COMPONENT, jsonPaste, ServiceTestCommon::TEST_USER_ID, message));
+    ASSERT_NE(nullptr, compPtr);
+    ASSERT_TRUE(message.empty());
+    std::shared_ptr<SecCompEntity> entity =
+        std::make_shared<SecCompEntity>(compPtr, ServiceTestCommon::TEST_SC_ID_1, BuildOwnerInfo());
+    ASSERT_EQ(SC_OK, SecCompManager::GetInstance().AddSecurityComponentToList(
+        ServiceTestCommon::TEST_PID_1, 0, entity));
+
+    SecCompClickEvent clickInfo = {
+        .type = ClickEventType::ACCESSIBILITY_EVENT_TYPE,
+    };
+    std::vector<sptr<IRemoteObject>> remote = { nullptr, nullptr };
+    SecCompInfo secCompInfo{ ServiceTestCommon::TEST_SC_ID_1, "", clickInfo };
+    ASSERT_EQ(0, AccessTokenKit::GrantPermission(ServiceTestCommon::TEST_TOKEN_ID,
+        "ohos.permission.READ_PASTEBOARD", 0));
+    EXPECT_EQ(SC_OK, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
+        secCompInfo, jsonPaste, caller, remote, message));
+    EXPECT_TRUE(SecCompPermManager::GetInstance().VerifyPermission(
+        ServiceTestCommon::TEST_TOKEN_ID, PASTE_COMPONENT));
+    ASSERT_EQ(0, AccessTokenKit::RevokePermission(ServiceTestCommon::TEST_TOKEN_ID,
+        "ohos.permission.READ_PASTEBOARD", 0));
+    SecCompPermManager::GetInstance().RevokeAppPermisionsImmediately(ServiceTestCommon::TEST_TOKEN_ID);
     SecCompManager::GetInstance().DeleteSecurityComponentFromList(ServiceTestCommon::TEST_PID_1,
         ServiceTestCommon::TEST_SC_ID_1);
 }
