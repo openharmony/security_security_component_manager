@@ -17,22 +17,27 @@
 #include <cstdint>
 #include <iremote_object.h>
 #include <refbase.h>
+#include <string>
 #include <vector>
 
 namespace OHOS {
 namespace Rosen {
 using DisplayId = uint64_t;
-using WindowMode = uint32_t;
-using WindowType = uint32_t;
+enum class WindowMode : uint32_t {
+    WINDOW_MODE_UNDEFINED = 0,
+};
+enum class WindowType : uint32_t {
+    WINDOW_TYPE_APP_MAIN_WINDOW = 1,
+};
 enum class WMError : int32_t {
     WM_OK = 0,
 };
 
 struct Rect {
-    int32_t posX_;
-    int32_t posY_;
-    uint32_t width_;
-    uint32_t height_;
+    int32_t posX_ = 0;
+    int32_t posY_ = 0;
+    uint32_t width_ = 0;
+    uint32_t height_ = 0;
 };
 
 class AccessibilityWindowInfo : public Parcelable {
@@ -44,21 +49,23 @@ public:
         return true;
     };
 
-    int32_t wid_;
-    int32_t innerWid_;
-    int32_t uiNodeId_;
+    int32_t wid_ = 0;
+    int32_t innerWid_ = 0;
+    int32_t uiNodeId_ = 0;
     Rect windowRect_;
     bool focused_ { false };
     bool isDecorEnable_ { false };
-    DisplayId displayId_;
-    uint32_t layer_;
-    WindowMode mode_;
-    WindowType type_;
-    float scaleVal_;
-    float scaleX_;
-    float scaleY_;
-    Rect scaleRect_;
+    DisplayId displayId_ = 0;
+    uint32_t layer_ = 0;
+    WindowMode mode_ = WindowMode::WINDOW_MODE_UNDEFINED;
+    WindowType type_ {};
+    float scaleVal_ = 0.0f;
+    float scaleX_ = 0.0f;
+    float scaleY_ = 0.0f;
     bool isCompatScaleMode_ { false };
+    Rect scaleRect_;
+    std::string bundleName_;
+    std::vector<Rect> touchHotAreas_;
 };
 
 class UnreliableWindowInfo : public Parcelable {
@@ -93,13 +100,14 @@ public:
         return instance;
     };
 
-    WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list)
+    WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list) const
     {
         list = list_;
         return result_;
     };
     WMError GetUnreliableWindowInfo(int32_t windowId, std::vector<sptr<UnreliableWindowInfo>>& infos) const
     {
+        lastWindowId_ = windowId;
         infos = info_;
         return result_;
     }
@@ -130,6 +138,7 @@ public:
     std::vector<sptr<Rosen::UnreliableWindowInfo>> info_;
     WMError result_ = OHOS::Rosen::WMError::WM_OK;
     int32_t lastUserId_ = -1;
+    mutable int32_t lastWindowId_ = -1;
 private:
     ~WindowManager() {};
 };
@@ -149,7 +158,7 @@ public:
         return instance;
     };
 
-    WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list)
+    WMError GetAccessibilityWindowInfo(std::vector<sptr<Rosen::AccessibilityWindowInfo>>& list) const
     {
         sptr<AccessibilityWindowInfo> compWin = sptr<AccessibilityWindowInfo>::MakeSptr();
         compWin->wid_ = 0;

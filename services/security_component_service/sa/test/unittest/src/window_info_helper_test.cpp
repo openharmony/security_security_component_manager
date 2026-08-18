@@ -44,6 +44,7 @@ public:
     {
         SC_LOG_INFO(LABEL, "setup");
         WindowManager::GetInstance().lastUserId_ = -1;
+        WindowManager::GetInstance().lastWindowId_ = -1;
     };
 
     void TearDown() {};
@@ -51,6 +52,70 @@ public:
 }  // namespace SecurityComponent
 }  // namespace Security
 }  // namespace OHOS
+
+/**
+ * @tc.name: WMClientMiniGetWindowInfo001
+ * @tc.desc: Test WMClientMini gets window info with user id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WindowInfoHelperTest, WMClientMiniGetWindowInfo001, TestSize.Level0)
+{
+    auto oldResult = WindowManager::GetInstance().result_;
+    auto oldList = WindowManager::GetInstance().list_;
+    WindowManager::GetInstance().result_ = WMError::WM_OK;
+
+    sptr<AccessibilityWindowInfo> compWin = new AccessibilityWindowInfo();
+    compWin->wid_ = 10;
+    compWin->innerWid_ = 20;
+    WindowManager::GetInstance().list_ = { compWin };
+
+    std::vector<sptr<MiniAccessibilityWindowInfo>> infos;
+    auto ret = WMClientMini::GetAccessibilityWindowInfo(ServiceTestCommon::TEST_USER_ID, infos);
+
+    EXPECT_EQ(MiniWMError::WM_OK, ret);
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
+    ASSERT_EQ(1, infos.size());
+    ASSERT_NE(nullptr, infos[0]);
+    EXPECT_EQ(10, infos[0]->wid_);
+    EXPECT_EQ(20, infos[0]->innerWid_);
+
+    WindowManager::GetInstance().list_ = oldList;
+    WindowManager::GetInstance().result_ = oldResult;
+}
+
+/**
+ * @tc.name: WMClientMiniGetUnreliableWindowInfo001
+ * @tc.desc: Test WMClientMini gets unreliable window info with window id and user id
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WindowInfoHelperTest, WMClientMiniGetUnreliableWindowInfo001, TestSize.Level0)
+{
+    auto oldResult = WindowManager::GetInstance().result_;
+    auto oldInfo = WindowManager::GetInstance().info_;
+    WindowManager::GetInstance().result_ = WMError::WM_OK;
+
+    sptr<UnreliableWindowInfo> compWin = new UnreliableWindowInfo();
+    compWin->windowId_ = 30;
+    compWin->zOrder_ = 2;
+    WindowManager::GetInstance().info_ = { compWin };
+
+    constexpr int32_t testWindowId = 30;
+    std::vector<sptr<MiniUnreliableWindowInfo>> infos;
+    auto ret = WMClientMini::GetUnreliableWindowInfo(testWindowId, ServiceTestCommon::TEST_USER_ID, infos);
+
+    EXPECT_EQ(MiniWMError::WM_OK, ret);
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
+    EXPECT_EQ(testWindowId, WindowManager::GetInstance().lastWindowId_);
+    ASSERT_EQ(1, infos.size());
+    ASSERT_NE(nullptr, infos[0]);
+    EXPECT_EQ(testWindowId, infos[0]->windowId_);
+    EXPECT_EQ(2, infos[0]->zOrder_);
+
+    WindowManager::GetInstance().info_ = oldInfo;
+    WindowManager::GetInstance().result_ = oldResult;
+}
 
 /**
  * @tc.name: GetWindowScale001
@@ -384,7 +449,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo001, TestSize.Level0)
     list.emplace_back(win2);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
@@ -411,7 +476,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo002, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(100, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_NE(nullptr, windowInfo);
@@ -435,7 +500,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo003, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_FALSE(WindowInfoHelper::TryGetWindowInfo(101, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     ASSERT_EQ(nullptr, windowInfo);
@@ -461,7 +526,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo004, TestSize.Level0)
     list.emplace_back(smartEdgeWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo;
+    sptr<MiniAccessibilityWindowInfo> windowInfo;
     ASSERT_TRUE(WindowInfoHelper::TryGetWindowInfo(0, ServiceTestCommon::TEST_USER_ID, windowInfo));
     ASSERT_NE(nullptr, windowInfo);
     EXPECT_EQ(0, windowInfo->wid_);
@@ -493,7 +558,7 @@ HWTEST_F(WindowInfoHelperTest, TryGetWindowInfo005, TestSize.Level0)
     list.emplace_back(compWin);
     WindowManager::GetInstance().list_ = list;
 
-    sptr<AccessibilityWindowInfo> windowInfo = nullptr;
+    sptr<MiniAccessibilityWindowInfo> windowInfo = nullptr;
     EXPECT_TRUE(WindowInfoHelper::TryGetWindowInfo(1, ServiceTestCommon::TEST_USER_ID, windowInfo));
     EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, WindowManager::GetInstance().lastUserId_);
     EXPECT_NE(nullptr, windowInfo);

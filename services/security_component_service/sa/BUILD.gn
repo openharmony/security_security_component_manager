@@ -168,6 +168,7 @@ ohos_shared_library("security_component_common") {
   cflags = [ "-DHILOG_ENABLE" ]
 
   deps = [
+    ":wm_mini_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_service_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
   ]
@@ -186,8 +187,48 @@ ohos_shared_library("security_component_common") {
     "json:nlohmann_json_static",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
-    "window_manager:libwm",
+    "window_manager:libdm_lite",
+  ]
+}
+
+ohos_source_set("wm_mini_src_set") {
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  include_dirs = [
+    "sa_main",
+    "${sec_comp_root_dir}/frameworks/common/include",
+  ]
+
+  sources = [
+    "sa_main/wm_mini_client.cpp",
+    "sa_main/wm_mini_client_adapter.cpp",
+    "sa_main/wm_mini_client_environment.cpp",
+  ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-fvisibility=hidden",
+  ]
+  cflags = [ "-DHILOG_ENABLE" ]
+
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -281,8 +322,7 @@ ohos_source_set("security_component_service_src_set") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "window_manager:libdm",
-    "window_manager:libwm",
+    "window_manager:libdm_lite",
   ]
 }
 

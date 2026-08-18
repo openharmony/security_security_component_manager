@@ -24,9 +24,9 @@
 #include "ability_manager_client.h"
 #include "accesstoken_kit.h"
 #include "bundle_mgr_client.h"
-#include "display.h"
 #include "display_info.h"
-#include "display_manager.h"
+#include "display_lite.h"
+#include "display_manager_lite.h"
 #include "hisysevent.h"
 #include "i_sec_comp_dialog_callback.h"
 #include "ipc_skeleton.h"
@@ -362,8 +362,8 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
 
 bool FirstUseDialog::SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displayInfo)
 {
-    sptr<OHOS::Rosen::Display> display =
-        OHOS::Rosen::DisplayManager::GetInstance().GetDisplayById(displayInfo.displayId);
+    sptr<OHOS::Rosen::DisplayLite> display =
+        OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayInfo.displayId);
     if (display == nullptr) {
         SC_LOG_ERROR(LABEL, "Get display manager failed");
         return false;
