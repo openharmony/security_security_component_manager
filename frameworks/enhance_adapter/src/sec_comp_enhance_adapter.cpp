@@ -34,15 +34,22 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static const std::string ENHANCE_INPUT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
 static const std::string ENHANCE_SRV_INTERFACE_LIB = "libsecurity_component_service_enhance.z.so";
 static const std::string ENHANCE_CLIENT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
+#ifndef SECURITY_COMPONENT_ENHANCE_DISABLE
+static constexpr uint32_t MAX_INIT_RETRY_TIMES = 3;
+#endif
 
 std::atomic_bool g_inputHandlerReady = false;
 std::atomic_bool g_srvHandlerReady = false;
 std::atomic_bool g_clientHandlerReady = false;
+uint32_t g_inputInitRetryTimes = 0;
+uint32_t g_srvInitRetryTimes = 0;
+uint32_t g_clientInitRetryTimes = 0;
 
 struct EnhanceHandlerContext {
     const std::string* libPath = nullptr;
     std::atomic_bool* handlerReady = nullptr;
     bool* isHandlerInit = nullptr;
+    uint32_t* initRetryTimes = nullptr;
 };
 
 bool GetEnhanceHandlerContext(EnhanceInterfaceType type, EnhanceHandlerContext& context)
@@ -50,19 +57,25 @@ bool GetEnhanceHandlerContext(EnhanceInterfaceType type, EnhanceHandlerContext& 
     switch (type) {
         case SEC_COMP_ENHANCE_INPUT_INTERFACE:
             context = { &ENHANCE_INPUT_INTERFACE_LIB, &g_inputHandlerReady,
-                &SecCompEnhanceAdapter::isEnhanceInputHandlerInit };
+                &SecCompEnhanceAdapter::isEnhanceInputHandlerInit, &g_inputInitRetryTimes };
             return true;
         case SEC_COMP_ENHANCE_SRV_INTERFACE:
             context = { &ENHANCE_SRV_INTERFACE_LIB, &g_srvHandlerReady,
-                &SecCompEnhanceAdapter::isEnhanceSrvHandlerInit };
+                &SecCompEnhanceAdapter::isEnhanceSrvHandlerInit, &g_srvInitRetryTimes };
             return true;
         case SEC_COMP_ENHANCE_CLIENT_INTERFACE:
             context = { &ENHANCE_CLIENT_INTERFACE_LIB, &g_clientHandlerReady,
-                &SecCompEnhanceAdapter::isEnhanceClientHandlerInit };
+                &SecCompEnhanceAdapter::isEnhanceClientHandlerInit, &g_clientInitRetryTimes };
             return true;
         default:
             return false;
     }
+}
+
+void MarkEnhanceHandlerReady(const EnhanceHandlerContext& context)
+{
+    *context.isHandlerInit = true;
+    context.handlerReady->store(true, std::memory_order_release);
 }
 
 SecCompInputEnhanceInterface* GetInputHandler()
@@ -123,33 +136,39 @@ void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
     }
 
 #ifdef SECURITY_COMPONENT_ENHANCE_DISABLE
-    *context.isHandlerInit = true;
-    context.handlerReady->store(true, std::memory_order_release);
+    MarkEnhanceHandlerReady(context);
     return;
 #else
+    if (*context.initRetryTimes >= MAX_INIT_RETRY_TIMES) {
+        MarkEnhanceHandlerReady(context);
+        return;
+    }
+    ++(*context.initRetryTimes);
     void* handler = dlopen(context.libPath->c_str(), RTLD_LAZY);
     if (handler == nullptr) {
-        SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed, error %{public}s",
-            context.libPath->c_str(), dlerror());
+        SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed at attempt %{public}u, error %{public}s",
+            context.libPath->c_str(), *context.initRetryTimes, dlerror());
+        if (*context.initRetryTimes >= MAX_INIT_RETRY_TIMES) {
+            MarkEnhanceHandlerReady(context);
+        }
         return;
     }
     if (type == SEC_COMP_ENHANCE_CLIENT_INTERFACE) {
         EnhanceInterface getClientInstance = reinterpret_cast<EnhanceInterface>(dlsym(handler, "GetClientInstance"));
         if (getClientInstance == nullptr) {
-            SC_LOG_ERROR(LABEL, "GetClientInstance failed.");
-            dlclose(handler);
+            SC_LOG_ERROR(LABEL, "GetClientInstance failed at attempt %{public}u.", *context.initRetryTimes);
+            MarkEnhanceHandlerReady(context);
             return;
         }
         SecCompClientEnhanceInterface* instance = getClientInstance();
         if (instance == nullptr) {
-            dlclose(handler);
+            MarkEnhanceHandlerReady(context);
             return;
         }
         SC_LOG_DEBUG(LABEL, "Dlopen client enhance successful.");
         clientHandler = instance;
     }
-    *context.isHandlerInit = true;
-    context.handlerReady->store(true, std::memory_order_release);
+    MarkEnhanceHandlerReady(context);
 #endif
 }
 
