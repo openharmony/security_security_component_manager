@@ -12,8 +12,14 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("../security_component.gni")
 
 sec_comp_root_dir = ".."
+
+security_component_enhance_adapter_defines = []
+if (!security_component_enhance_enable) {
+  security_component_enhance_adapter_defines = [ "SECURITY_COMPONENT_ENHANCE_DISABLE" ]
+}
 
 config("security_component_framework_src_set_config") {
   include_dirs = [
@@ -90,6 +96,7 @@ ohos_source_set("security_component_enhance_adapter_src_set") {
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
+  defines = security_component_enhance_adapter_defines
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
@@ -120,6 +127,7 @@ ohos_source_set("security_component_enhance_adapter_service_src_set") {
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
+  defines = security_component_enhance_adapter_defines
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
@@ -190,6 +198,7 @@ ohos_source_set("security_component_no_cfi_enhance_adapter_src_set") {
 
   configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
   public_configs = [ ":security_component_enhance_adapter_src_set_config" ]
+  defines = security_component_enhance_adapter_defines
 
   external_deps = [
     "bounds_checking_function:libsec_shared",

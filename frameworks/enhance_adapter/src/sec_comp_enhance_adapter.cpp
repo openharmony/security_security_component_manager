@@ -14,6 +14,7 @@
  */
 #include "sec_comp_enhance_adapter.h"
 
+#include <atomic>
 #include <dlfcn.h>
 #include <sys/types.h>
 
@@ -33,6 +34,82 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
 static const std::string ENHANCE_INPUT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
 static const std::string ENHANCE_SRV_INTERFACE_LIB = "libsecurity_component_service_enhance.z.so";
 static const std::string ENHANCE_CLIENT_INTERFACE_LIB = "libsecurity_component_client_enhance.z.so";
+#ifndef SECURITY_COMPONENT_ENHANCE_DISABLE
+static constexpr uint32_t MAX_INIT_RETRY_TIMES = 3;
+#endif
+
+std::atomic_bool g_inputHandlerReady = false;
+std::atomic_bool g_srvHandlerReady = false;
+std::atomic_bool g_clientHandlerReady = false;
+uint32_t g_inputInitRetryTimes = 0;
+uint32_t g_srvInitRetryTimes = 0;
+uint32_t g_clientInitRetryTimes = 0;
+
+struct EnhanceHandlerContext {
+    const std::string* libPath = nullptr;
+    std::atomic_bool* handlerReady = nullptr;
+    bool* isHandlerInit = nullptr;
+    uint32_t* initRetryTimes = nullptr;
+};
+
+bool GetEnhanceHandlerContext(EnhanceInterfaceType type, EnhanceHandlerContext& context)
+{
+    switch (type) {
+        case SEC_COMP_ENHANCE_INPUT_INTERFACE:
+            context = { &ENHANCE_INPUT_INTERFACE_LIB, &g_inputHandlerReady,
+                &SecCompEnhanceAdapter::isEnhanceInputHandlerInit, &g_inputInitRetryTimes };
+            return true;
+        case SEC_COMP_ENHANCE_SRV_INTERFACE:
+            context = { &ENHANCE_SRV_INTERFACE_LIB, &g_srvHandlerReady,
+                &SecCompEnhanceAdapter::isEnhanceSrvHandlerInit, &g_srvInitRetryTimes };
+            return true;
+        case SEC_COMP_ENHANCE_CLIENT_INTERFACE:
+            context = { &ENHANCE_CLIENT_INTERFACE_LIB, &g_clientHandlerReady,
+                &SecCompEnhanceAdapter::isEnhanceClientHandlerInit, &g_clientInitRetryTimes };
+            return true;
+        default:
+            return false;
+    }
+}
+
+void MarkEnhanceHandlerReady(const EnhanceHandlerContext& context)
+{
+    *context.isHandlerInit = true;
+    context.handlerReady->store(true, std::memory_order_release);
+}
+
+SecCompInputEnhanceInterface* GetInputHandler()
+{
+    if (!g_inputHandlerReady.load(std::memory_order_acquire)) {
+        SecCompEnhanceAdapter::InitEnhanceHandler(SEC_COMP_ENHANCE_INPUT_INTERFACE);
+    }
+    if (!g_inputHandlerReady.load(std::memory_order_acquire)) {
+        return nullptr;
+    }
+    return SecCompEnhanceAdapter::inputHandler;
+}
+
+SecCompSrvEnhanceInterface* GetSrvHandler()
+{
+    if (!g_srvHandlerReady.load(std::memory_order_acquire)) {
+        SecCompEnhanceAdapter::InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
+    }
+    if (!g_srvHandlerReady.load(std::memory_order_acquire)) {
+        return nullptr;
+    }
+    return SecCompEnhanceAdapter::srvHandler;
+}
+
+SecCompClientEnhanceInterface* GetClientHandler()
+{
+    if (!g_clientHandlerReady.load(std::memory_order_acquire)) {
+        SecCompEnhanceAdapter::InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
+    }
+    if (!g_clientHandlerReady.load(std::memory_order_acquire)) {
+        return nullptr;
+    }
+    return SecCompEnhanceAdapter::clientHandler;
+}
 }
 
 SecCompInputEnhanceInterface* SecCompEnhanceAdapter::inputHandler = nullptr;
@@ -48,55 +125,58 @@ std::mutex SecCompEnhanceAdapter::initMtx;
 
 void SecCompEnhanceAdapter::InitEnhanceHandler(EnhanceInterfaceType type)
 {
+    EnhanceHandlerContext context;
+    if (!GetEnhanceHandlerContext(type, context) || context.handlerReady->load(std::memory_order_acquire)) {
+        return;
+    }
+
     std::unique_lock<std::mutex> lck(initMtx);
-    std::string libPath = "";
-    switch (type) {
-        case SEC_COMP_ENHANCE_INPUT_INTERFACE:
-            libPath = ENHANCE_INPUT_INTERFACE_LIB;
-            isEnhanceInputHandlerInit = true;
-            break;
-        case SEC_COMP_ENHANCE_SRV_INTERFACE:
-            libPath = ENHANCE_SRV_INTERFACE_LIB;
-            isEnhanceSrvHandlerInit = true;
-            break;
-        case SEC_COMP_ENHANCE_CLIENT_INTERFACE:
-            libPath = ENHANCE_CLIENT_INTERFACE_LIB;
-            isEnhanceClientHandlerInit = true;
-            break;
-        default:
-            break;
+    if (context.handlerReady->load(std::memory_order_relaxed)) {
+        return;
     }
 
 #ifdef SECURITY_COMPONENT_ENHANCE_DISABLE
-    void* handler = nullptr;
+    MarkEnhanceHandlerReady(context);
+    return;
 #else
-    void* handler = dlopen(libPath.c_str(), RTLD_LAZY);
-#endif
+    if (*context.initRetryTimes >= MAX_INIT_RETRY_TIMES) {
+        MarkEnhanceHandlerReady(context);
+        return;
+    }
+    ++(*context.initRetryTimes);
+    void* handler = dlopen(context.libPath->c_str(), RTLD_LAZY);
     if (handler == nullptr) {
-        SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed, error %{public}s", libPath.c_str(), dlerror());
+        SC_LOG_ERROR(LABEL, "init enhance lib %{public}s failed at attempt %{public}u, error %{public}s",
+            context.libPath->c_str(), *context.initRetryTimes, dlerror());
+        if (*context.initRetryTimes >= MAX_INIT_RETRY_TIMES) {
+            MarkEnhanceHandlerReady(context);
+        }
         return;
     }
     if (type == SEC_COMP_ENHANCE_CLIENT_INTERFACE) {
         EnhanceInterface getClientInstance = reinterpret_cast<EnhanceInterface>(dlsym(handler, "GetClientInstance"));
         if (getClientInstance == nullptr) {
-            SC_LOG_ERROR(LABEL, "GetClientInstance failed.");
+            SC_LOG_ERROR(LABEL, "GetClientInstance failed at attempt %{public}u.", *context.initRetryTimes);
+            MarkEnhanceHandlerReady(context);
             return;
         }
         SecCompClientEnhanceInterface* instance = getClientInstance();
-        if (instance != nullptr) {
-            SC_LOG_DEBUG(LABEL, "Dlopen client enhance successful.");
-            clientHandler = instance;
+        if (instance == nullptr) {
+            MarkEnhanceHandlerReady(context);
+            return;
         }
+        SC_LOG_DEBUG(LABEL, "Dlopen client enhance successful.");
+        clientHandler = instance;
     }
+    MarkEnhanceHandlerReady(context);
+#endif
 }
 
 int32_t SecCompEnhanceAdapter::SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen)
 {
-    if (!isEnhanceInputHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_INPUT_INTERFACE);
-    }
-    if (inputHandler != nullptr) {
-        return inputHandler->SetEnhanceCfg(cfg, cfgLen);
+    SecCompInputEnhanceInterface* handler = GetInputHandler();
+    if (handler != nullptr) {
+        return handler->SetEnhanceCfg(cfg, cfgLen);
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
@@ -104,60 +184,49 @@ int32_t SecCompEnhanceAdapter::SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen)
 int32_t SecCompEnhanceAdapter::GetPointerEventEnhanceData(void* data, uint32_t dataLen,
     uint8_t* enhanceData, uint32_t& enHancedataLen)
 {
-    if (!isEnhanceInputHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_INPUT_INTERFACE);
-    }
-    if (inputHandler != nullptr) {
-        return inputHandler->GetPointerEventEnhanceData(data, dataLen, enhanceData, enHancedataLen);
+    SecCompInputEnhanceInterface* handler = GetInputHandler();
+    if (handler != nullptr) {
+        return handler->GetPointerEventEnhanceData(data, dataLen, enhanceData, enHancedataLen);
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
 int32_t SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(SecCompClickEvent& clickInfo)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
         if (clickInfo.extraInfo.dataSize == 0 || clickInfo.extraInfo.data == nullptr) {
             SC_LOG_ERROR(LABEL, "HMAC info is invalid");
             return SC_SERVICE_ERROR_CLICK_EVENT_INVALID;
         }
-        return srvHandler->CheckAndUpdateExtraInfo(clickInfo);
+        return handler->CheckAndUpdateExtraInfo(clickInfo);
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
 void SecCompEnhanceAdapter::AddSecurityComponentProcess(int32_t pid)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        srvHandler->AddSecurityComponentProcess(pid);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        handler->AddSecurityComponentProcess(pid);
     }
 }
 
 bool SecCompEnhanceAdapter::IsBypassPermitted(const std::string& bundleName)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->IsBypassPermitted(bundleName);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->IsBypassPermitted(bundleName);
     }
     return false;
 }
 
 __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std::string& componentInfo)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        return clientHandler->EnhanceDataPreprocess(enhanceCallerAddr, componentInfo);
+    if (handler != nullptr) {
+        return handler->EnhanceDataPreprocess(enhanceCallerAddr, componentInfo);
     }
     return true;
 }
@@ -165,13 +234,10 @@ __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(std:
 __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceDataPreprocess(
     int32_t scId, std::string& componentInfo)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        return clientHandler->EnhanceDataPreprocess(enhanceCallerAddr, scId, componentInfo);
+    if (handler != nullptr) {
+        return handler->EnhanceDataPreprocess(enhanceCallerAddr, scId, componentInfo);
     }
     return true;
 }
@@ -220,13 +286,10 @@ static bool ReadMessageParcel(SecCompRawdata& tmpData, MessageParcel& data)
 __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientSerialize(
     MessageParcel& input, SecCompRawdata& output)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        return clientHandler->EnhanceClientSerialize(enhanceCallerAddr, input, output);
+    if (handler != nullptr) {
+        return handler->EnhanceClientSerialize(enhanceCallerAddr, input, output);
     }
 
     return WriteMessageParcel(input, output);
@@ -235,13 +298,10 @@ __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientSerialize(
 __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientDeserialize(
     SecCompRawdata& input, MessageParcel& output)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        return clientHandler->EnhanceClientDeserialize(enhanceCallerAddr, input, output);
+    if (handler != nullptr) {
+        return handler->EnhanceClientDeserialize(enhanceCallerAddr, input, output);
     }
 
     return ReadMessageParcel(input, output);
@@ -249,11 +309,9 @@ __attribute__((noinline)) bool SecCompEnhanceAdapter::EnhanceClientDeserialize(
 
 bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, SecCompRawdata& output)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->EnhanceSrvSerialize(input, output);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->EnhanceSrvSerialize(input, output);
     }
 
     return WriteMessageParcel(input, output);
@@ -261,11 +319,9 @@ bool SecCompEnhanceAdapter::EnhanceSrvSerialize(MessageParcel& input, SecCompRaw
 
 bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(SecCompRawdata& input, MessageParcel& output)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->EnhanceSrvDeserialize(input, output);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->EnhanceSrvDeserialize(input, output);
     }
 
     return ReadMessageParcel(input, output);
@@ -273,88 +329,70 @@ bool SecCompEnhanceAdapter::EnhanceSrvDeserialize(SecCompRawdata& input, Message
 
 __attribute__((noinline)) void SecCompEnhanceAdapter::RegisterScIdEnhance(int32_t scId)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        clientHandler->RegisterScIdEnhance(enhanceCallerAddr, scId);
+    if (handler != nullptr) {
+        handler->RegisterScIdEnhance(enhanceCallerAddr, scId);
     }
 }
 
 __attribute__((noinline)) void SecCompEnhanceAdapter::UnregisterScIdEnhance(int32_t scId)
 {
-    if (!isEnhanceClientHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_CLIENT_INTERFACE);
-    }
-
+    SecCompClientEnhanceInterface* handler = GetClientHandler();
     uintptr_t enhanceCallerAddr = reinterpret_cast<uintptr_t>(__builtin_return_address(0));
-    if (clientHandler != nullptr) {
-        clientHandler->UnregisterScIdEnhance(enhanceCallerAddr, scId);
+    if (handler != nullptr) {
+        handler->UnregisterScIdEnhance(enhanceCallerAddr, scId);
     }
 }
 
 int32_t SecCompEnhanceAdapter::EnableInputEnhance()
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->EnableInputEnhance();
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->EnableInputEnhance();
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
 int32_t SecCompEnhanceAdapter::DisableInputEnhance()
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->DisableInputEnhance();
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->DisableInputEnhance();
     }
     return SC_ENHANCE_ERROR_NOT_EXIST_ENHANCE;
 }
 
 void SecCompEnhanceAdapter::StartEnhanceService()
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        srvHandler->StartEnhanceService();
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        handler->StartEnhanceService();
     }
 }
 
 void SecCompEnhanceAdapter::ExitEnhanceService()
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        srvHandler->ExitEnhanceService();
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        handler->ExitEnhanceService();
     }
 }
 
 void SecCompEnhanceAdapter::NotifyProcessDied(int32_t pid)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        srvHandler->NotifyProcessDied(pid);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        handler->NotifyProcessDied(pid);
     }
 }
 
 int32_t SecCompEnhanceAdapter::CheckComponentInfoEnhance(int32_t pid,
     std::shared_ptr<SecCompBase>& compInfo, const nlohmann::json& jsonComponent)
 {
-    if (!isEnhanceSrvHandlerInit) {
-        InitEnhanceHandler(SEC_COMP_ENHANCE_SRV_INTERFACE);
-    }
-    if (srvHandler != nullptr) {
-        return srvHandler->CheckComponentInfoEnhance(pid, compInfo, jsonComponent);
+    SecCompSrvEnhanceInterface* handler = GetSrvHandler();
+    if (handler != nullptr) {
+        return handler->CheckComponentInfoEnhance(pid, compInfo, jsonComponent);
     }
     return SC_OK;
 }
