@@ -135,6 +135,7 @@ ohos_source_set("sec_comp_service_stub_no_cfi") {
 ohos_shared_library("security_component_common") {
   subsystem_name = "security"
   part_name = "security_component_manager"
+  version_script = "security_component_common.map"
 
   innerapi_tags = [ "sasdk" ]
   public_configs = [ ":security_component_common_config" ]
@@ -330,6 +331,7 @@ ohos_source_set("security_component_service_src_set") {
 ohos_shared_library("security_component_service") {
   subsystem_name = "security"
   part_name = "security_component_manager"
+  version_script = "security_component_service.map"
   sanitize = {
     cfi = true
     cfi_cross_dso = true

@@ -26,6 +26,7 @@ ohos_shared_library("libsecurity_component_sdk") {
   subsystem_name = "security"
   part_name = "security_component_manager"
   output_name = "libsecurity_component_sdk"
+  version_script = "libsecurity_component_sdk.map"
 
   public_configs = [ ":sec_comp_config" ]
   innerapi_tags = [ "sasdk" ]
