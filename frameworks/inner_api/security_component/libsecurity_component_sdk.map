@@ -19,17 +19,15 @@
     extern "C++" {
       OHOS::Security::SecurityComponent::JsonTagConstants::*;
       OHOS::Security::SecurityComponent::SecCompBase::ToJsonStr*;
-      "vtable for OHOS::Security::SecurityComponent::SecCompBase";
-      "vtable for OHOS::Security::SecurityComponent::LocationButton";
-      "vtable for OHOS::Security::SecurityComponent::PasteButton";
-      "vtable for OHOS::Security::SecurityComponent::SaveButton";
-      "vtable for OHOS::Security::SecurityComponent::SecCompUiRegister";
       OHOS::Security::SecurityComponent::SecCompUiRegister::SecCompUiRegister*;
       OHOS::Security::SecurityComponent::SecCompUiRegister::callbackProbe;
       OHOS::Security::SecurityComponent::SecCompKit::*;
       OHOS::Security::SecurityComponent::SecCompEnhanceKit::*;
       OHOS::Security::SecurityComponent::SecCompEnhanceAdapter::inputHandler;
       OHOS::Security::SecurityComponent::SecCompEnhanceAdapter::clientHandler;
+      *vtable*for*;
+      *typeinfo*for*;
+      *VTT*for*;
     };
   local:
     *;

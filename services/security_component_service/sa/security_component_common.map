@@ -22,12 +22,14 @@
       OHOS::Security::SecurityComponent::DelayExitTask::Init*;
       OHOS::Security::SecurityComponent::DelayExitTask::Start*;
       OHOS::Security::SecurityComponent::DelayExitTask::Stop*;
-      "vtable for OHOS::Security::SecurityComponent::SecEventHandler";
       OHOS::Security::SecurityComponent::SecEventHandler::SecEventHandler*;
       OHOS::Security::SecurityComponent::SecEventHandler::~SecEventHandler*;
       OHOS::Security::SecurityComponent::SecEventHandler::ProxyPostTask*;
       OHOS::Security::SecurityComponent::SecEventHandler::ProxyRemoveTask*;
       OHOS::Security::SecurityComponent::WindowInfoHelper::CheckOtherWindowCoverComp*;
+      *vtable*for*;
+      *typeinfo*for*;
+      *VTT*for*;
     };
   local:
     *;
