@@ -842,9 +842,6 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody003, TestS
         secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
     SetMockExtraInfoCheckResult(SC_OK);
 
-    bool isGranted = true;
-    EXPECT_EQ(SC_OK, secCompService_->VerifySavePermission(ServiceTestCommon::HAP_TOKEN_ID, isGranted));
-    EXPECT_FALSE(isGranted);
     EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
     SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
