@@ -14,6 +14,8 @@
  */
 #include "sec_comp_enhance_adapter.h"
 
+#include <atomic>
+
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
 
@@ -23,6 +25,12 @@ namespace SecurityComponent {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "MockSecCompEnhanceAdapter"};
+static std::atomic<int32_t> g_extraInfoCheckResult { SC_OK };
+}
+
+void SetMockExtraInfoCheckResult(int32_t result)
+{
+    g_extraInfoCheckResult.store(result);
 }
 
 int32_t SecCompEnhanceAdapter::SetEnhanceCfg(uint8_t* cfg, uint32_t cfgLen)
@@ -40,8 +48,8 @@ int32_t SecCompEnhanceAdapter::GetPointerEventEnhanceData(void* data, uint32_t d
 
 int32_t SecCompEnhanceAdapter::CheckAndUpdateExtraInfo(SecCompClickEvent& clickInfo)
 {
-    SC_LOG_DEBUG(LABEL, "CheckAndUpdateExtraInfo success");
-    return SC_OK;
+    SC_LOG_DEBUG(LABEL, "CheckAndUpdateExtraInfo result %{public}d", g_extraInfoCheckResult.load());
+    return g_extraInfoCheckResult.load();
 }
 
 int32_t SecCompEnhanceAdapter::EnableInputEnhance()
