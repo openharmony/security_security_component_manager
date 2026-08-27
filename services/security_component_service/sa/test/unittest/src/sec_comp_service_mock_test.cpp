@@ -39,6 +39,15 @@ using namespace OHOS;
 using namespace OHOS::Security::SecurityComponent;
 using namespace OHOS::Security::AccessToken;
 
+namespace OHOS {
+namespace Security {
+namespace SecurityComponent {
+// Implemented by the mock enhance adapter linked into this test binary.
+void SetMockExtraInfoCheckResult(int32_t result);
+} // namespace SecurityComponent
+} // namespace Security
+} // namespace OHOS
+
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {
     LOG_CORE, SECURITY_DOMAIN_SECURITY_COMPONENT, "SecCompServiceMockTest"};
@@ -790,6 +799,51 @@ HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody002, TestS
     ASSERT_NE(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID, "ohos.permission.LOCATION"), 0);
     ASSERT_NE(AccessTokenKit::VerifyAccessToken(ServiceTestCommon::HAP_TOKEN_ID,
         "ohos.permission.APPROXIMATELY_LOCATION"), 0);
+}
+
+/**
+ * @tc.name: ReportSecurityComponentClickEventBody003
+ * @tc.desc: Test report click event with enhance extra info check failed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompServiceMockTest, ReportSecurityComponentClickEventBody003, TestSize.Level0)
+{
+    int32_t scId;
+    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
+    secCompService_->Initialize();
+    nlohmann::json jsonRes;
+    ServiceTestCommon::BuildPasteComponentJson(jsonRes);
+    std::string pasteInfo = jsonRes.dump();
+
+    ASSERT_EQ(0, SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID));
+    AppExecFwk::AppStateData stateData = {
+        .uid = getuid()
+    };
+    secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
+    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(PASTE_COMPONENT, pasteInfo, scId));
+    uint8_t buffer[1] = { 0 };
+    struct SecCompClickEvent clickInfo = {
+        .type = ClickEventType::POINT_EVENT_TYPE,
+        .point.touchX = 100,
+        .point.touchY = 100,
+        .point.timestamp =
+            static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) /
+            ServiceTestCommon::TIME_CONVERSION_UNIT,
+        .extraInfo = {
+            .data = buffer,
+            .dataSize = 1
+        },
+    };
+    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
+    std::string message;
+    SetMockExtraInfoCheckResult(SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL);
+    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
+        secCompService_->ReportSecurityComponentClickEventBody(secCompInfo, nullptr, nullptr, message));
+    SetMockExtraInfoCheckResult(SC_OK);
+
+    EXPECT_EQ(SC_OK, secCompService_->UnregisterSecurityComponentBody(scId));
+    SecCompPermManager::GetInstance().applySaveCountMap_.clear();
 }
 
 /**

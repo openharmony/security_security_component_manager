@@ -205,25 +205,6 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent004, TestSize.Lev
     int32_t scId;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count())
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, saveInfo, clickInfo };
-    std::string message;
-    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -243,24 +224,6 @@ HWTEST_F(SecCompRegisterCallbackTest, RegisterSecurityComponent005, TestSize.Lev
     int32_t scId;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -296,25 +259,6 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent001, Test
     int32_t scId;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -377,27 +321,6 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportSecurityComponentClickEvent003, Test
     g_token_sum ++;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-#ifdef SECURITY_COMPONENT_ENHANCE_ENABLE
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
-#else
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
-#endif
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
@@ -454,24 +377,6 @@ HWTEST_F(SecCompRegisterCallbackTest, ReportClickWithoutHmac001, TestSize.Level0
     int32_t scId;
     ASSERT_EQ(SC_OK, RegisterSecurityComponent(LOCATION_COMPONENT, locationInfo, scId));
     ASSERT_NE(-1, scId);
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, locationInfo, clickInfo };
-    std::string message;
-    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -494,24 +399,6 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission001, TestSize.Level0)
     ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     setuid(100);
     ASSERT_FALSE(SecCompKit::VerifySavePermission(TestCommon::HAP_TOKEN_ID));
     // mediaLibraryTokenId_ != 0
@@ -536,24 +423,6 @@ HWTEST_F(SecCompRegisterCallbackTest, VerifySavePermission002, TestSize.Level0)
     int32_t scId;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-    ASSERT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
@@ -573,24 +442,6 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     int32_t scId;
 
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
-    uint8_t data[TestCommon::MAX_HMAC_SIZE] = { 0 };
-    struct SecCompClickEvent clickInfo = {
-        .type = ClickEventType::POINT_EVENT_TYPE,
-        .point.touchX = TestCommon::TEST_COORDINATE,
-        .point.touchY = TestCommon::TEST_COORDINATE,
-        .point.timestamp = static_cast<uint64_t>(
-            std::chrono::high_resolution_clock::now().time_since_epoch().count()) / TestCommon::TIME_CONVERSION_UNIT
-    };
-    clickInfo.extraInfo.dataSize = TestCommon::MAX_HMAC_SIZE;
-    clickInfo.extraInfo.data = data;
-    sptr<SystemAbilityLoadCallbackStub> callback = new (std::nothrow) SystemAbilityLoadCallbackStub();
-    ASSERT_NE(callback, nullptr);
-    auto token = callback->AsObject();
-    OnFirstUseDialogCloseFunc func = [] (int32_t) {};
-    SecCompInfo secCompInfo{ scId, pasteInfo, clickInfo };
-    std::string message;
-    EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID,
-        ReportSecurityComponentClickEvent(secCompInfo, token, std::move(func), message));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
 }
