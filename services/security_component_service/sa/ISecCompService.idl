@@ -18,10 +18,8 @@ rawdata OHOS.Security.SecurityComponent.SecCompRawdata;
 
 interface OHOS.Security.SecurityComponent.ISecCompService {
     void RegisterSecurityComponent([in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
-    void UpdateSecurityComponent([in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
     void UnregisterSecurityComponent([in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
     void ReportSecurityComponentClickEvent([in] IRemoteObject callerToken, [in] IRemoteObject dialogCallback,
         [in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
     void VerifySavePermission([in] unsigned int tokenId, [out] boolean ret);
-    void PreRegisterSecCompProcess([in] SecCompRawdata rawData, [out] SecCompRawdata rawReply);
 }

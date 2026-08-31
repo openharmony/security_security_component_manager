@@ -66,8 +66,6 @@ public:
 
     int32_t RegisterSecurityComponent(SecCompType type, const nlohmann::json& jsonComponent,
         const SecCompCallerInfo& caller, int32_t& scId);
-    int32_t UpdateSecurityComponent(int32_t scId, const nlohmann::json& jsonComponent,
-        const SecCompCallerInfo& caller);
     int32_t UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller);
     int32_t StartDialog(const SecCompInfo& info, std::shared_ptr<SecCompEntity>& sc,
         const std::vector<sptr<IRemoteObject>>& remote);

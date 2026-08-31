@@ -45,14 +45,12 @@ static void TestInCallerNotCheckList()
     struct SecCompClickEvent click = {};
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
-    int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     SecCompInfo secCompInfo{ scId, emptyStr, click };
     std::string message;
     int reportRes = SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message);
 
     EXPECT_EQ(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
-    EXPECT_EQ(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_EQ(reportRes, SC_SERVICE_ERROR_CALLER_INVALID);
 }
 
@@ -62,14 +60,12 @@ static void TestInCallerCheckList()
     struct SecCompClickEvent click = {};
     std::string emptyStr = "";
     int registerRes = SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, emptyStr, scId);
-    int updateRes = SecCompKit::UpdateSecurityComponent(scId, emptyStr);
     OnFirstUseDialogCloseFunc func = [] (int32_t) {};
     SecCompInfo secCompInfo{ scId, emptyStr, click };
     std::string message;
     int reportRes = SecCompKit::ReportSecurityComponentClickEvent(secCompInfo, nullptr, std::move(func), message);
 
     EXPECT_NE(registerRes, SC_SERVICE_ERROR_CALLER_INVALID);
-    EXPECT_NE(updateRes, SC_SERVICE_ERROR_CALLER_INVALID);
     EXPECT_NE(reportRes, SC_SERVICE_ERROR_CALLER_INVALID);
 }
 }  // namespace
@@ -126,7 +122,6 @@ HWTEST_F(SecCompKitTest, ExceptCall001, TestSize.Level0)
     int32_t scId = -1;
     std::string jsonStr = jsonRes.dump();
     ASSERT_NE(SC_OK, SecCompKit::RegisterSecurityComponent(LOCATION_COMPONENT, jsonStr, scId));
-    ASSERT_NE(SC_OK, SecCompKit::UpdateSecurityComponent(scId, jsonStr));
 
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -305,17 +300,6 @@ HWTEST_F(SecCompKitTest, IsSystemAppCalling001, TestSize.Level0)
 HWTEST_F(SecCompKitTest, HasCustomPermissionForSecComp001, TestSize.Level0)
 {
     EXPECT_EQ(false, SecCompKit::HasCustomPermissionForSecComp());
-}
-
-/**
- * @tc.name: PreRegisterSecCompProcess001
- * @tc.desc: Test PreRegisterSecCompProcess.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompKitTest, PreRegisterSecCompProcess001, TestSize.Level0)
-{
-    EXPECT_NE(SC_OK, SecCompKit::PreRegisterSecCompProcess());
 }
 
 /**

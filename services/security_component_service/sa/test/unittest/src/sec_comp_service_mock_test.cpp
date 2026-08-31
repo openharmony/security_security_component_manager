@@ -198,7 +198,6 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponentBody001, TestSize.Leve
 
     // register security component ok
     EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(SAVE_COMPONENT, saveInfo, scId));
-    EXPECT_EQ(SC_OK, secCompService_->UpdateSecurityComponentBody(scId, saveInfo));
     uint8_t buffer[1] = { 0 };
     struct SecCompClickEvent touch = {
         .type = ClickEventType::POINT_EVENT_TYPE,
@@ -370,125 +369,6 @@ HWTEST_F(SecCompServiceMockTest, RegisterSecurityComponent001, TestSize.Level0)
 }
 
 /**
- * @tc.name: UpdateReadFromRawdata001
- * @tc.desc: Test UpdateReadFromRawdata
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, UpdateReadFromRawdata001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    MessageParcel data;
-    int32_t scIdOut;
-    std::string componentInfoOut;
-
-    // rawdata.data is nullptr
-    SecCompRawdata rawdataVoid;
-    rawdataVoid.size = 1;
-    EXPECT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL,
-        secCompService_->UpdateReadFromRawdata(rawdataVoid, scIdOut, componentInfoOut));
-
-    // scId is invalid
-    data.WriteInt32(-1);
-    SecCompRawdata rawdataScidInvalid;
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdataScidInvalid));
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->UpdateReadFromRawdata(rawdataScidInvalid, scIdOut, componentInfoOut));
-    data.FlushBuffer();
-
-    // UpdateReadFromRawdata OK
-    data.WriteInt32(ServiceTestCommon::TEST_SC_ID_1);
-    data.WriteString("");
-    SecCompRawdata rawdata;
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
-    EXPECT_EQ(SC_OK,
-        secCompService_->UpdateReadFromRawdata(rawdata, scIdOut, componentInfoOut));
-    data.FlushBuffer();
-}
-
-/**
- * @tc.name: UpdateWriteToRawdata001
- * @tc.desc: Test UpdateWriteToRawdata
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, UpdateWriteToRawdata001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    SecCompRawdata rawReply;
-    EXPECT_EQ(SC_OK,
-        secCompService_->UpdateWriteToRawdata(SC_OK, rawReply));
-}
-
-/**
- * @tc.name: UpdateSecurityComponent001
- * @tc.desc: Test UpdateSecurityComponent fail
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    MessageParcel data;
-
-    // UpdateReadFromRawdata from fail
-    SecCompRawdata rawdataVoid;
-    rawdataVoid.size = 1;
-    SecCompRawdata rawReplyVoid;
-    MessageParcel replyVoid;
-    EXPECT_EQ(SC_OK,
-        secCompService_->UpdateSecurityComponent(rawdataVoid, rawReplyVoid));
-    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReplyVoid, replyVoid));
-    EXPECT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, replyVoid.ReadInt32());
-
-    // UpdateSecurityComponentBody fail
-    SecCompRawdata rawdataBodyFail;
-    SecCompRawdata rawReplyBodyFail;
-    MessageParcel replyBodyFail;
-    data.WriteInt32(ServiceTestCommon::TEST_SC_ID_1);
-    data.WriteString("");
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdataBodyFail));
-    EXPECT_EQ(SC_OK,
-        secCompService_->UpdateSecurityComponent(rawdataBodyFail, rawReplyBodyFail));
-    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReplyBodyFail, replyBodyFail));
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, replyBodyFail.ReadInt32());
-    data.FlushBuffer();
-}
-
-/**
- * @tc.name: UpdateSecurityComponent002
- * @tc.desc: Test UpdateSecurityComponent OK
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, UpdateSecurityComponent002, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    MessageParcel data;
-    nlohmann::json jsonRes;
-    ServiceTestCommon::BuildLocationComponentJson(jsonRes);
-    std::string locationInfo = jsonRes.dump();
-    int32_t scId;
-    EXPECT_EQ(SC_OK, secCompService_->RegisterSecurityComponentBody(
-        LOCATION_COMPONENT, locationInfo, scId));
-
-    SecCompRawdata rawdata;
-    SecCompRawdata rawReply;
-    MessageParcel reply;
-    data.WriteInt32(scId);
-    data.WriteString(locationInfo);
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
-    EXPECT_EQ(SC_OK,
-        secCompService_->UpdateSecurityComponent(rawdata, rawReply));
-    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReply, reply));
-    EXPECT_EQ(SC_OK, reply.ReadInt32());
-}
-
-/**
  * @tc.name: UnregisterReadFromRawdata001
  * @tc.desc: Test UnregisterReadFromRawdata
  * @tc.type: FUNC
@@ -500,7 +380,6 @@ HWTEST_F(SecCompServiceMockTest, UnregisterReadFromRawdata001, TestSize.Level0)
     secCompService_->Initialize();
     MessageParcel data;
     int32_t scIdOut;
-    std::string componentInfoOut;
 
     // rawdata.data is nullptr
     SecCompRawdata rawdataVoid;
@@ -516,7 +395,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterReadFromRawdata001, TestSize.Level0)
         secCompService_->UnregisterReadFromRawdata(rawdataScidInvalid, scIdOut));
     data.FlushBuffer();
 
-    // UpdateReadFromRawdata OK
+    // UnregisterReadFromRawdata OK
     data.WriteInt32(ServiceTestCommon::TEST_SC_ID_1);
     SecCompRawdata rawdata;
     EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
@@ -563,7 +442,7 @@ HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent001, TestSize.Level0
     ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReplyVoid, replyVoid));
     EXPECT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, replyVoid.ReadInt32());
 
-    // UpdateSecurityComponentBody fail
+    // UnregisterSecurityComponentBody fail
     SecCompRawdata rawdataBodyFail;
     SecCompRawdata rawReplyBodyFail;
     MessageParcel replyBodyFail;
@@ -600,79 +479,6 @@ HWTEST_F(SecCompServiceMockTest, UnregisterSecurityComponent002, TestSize.Level0
     EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
     EXPECT_EQ(SC_OK,
         secCompService_->UnregisterSecurityComponent(rawdata, rawReply));
-    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReply, reply));
-    EXPECT_EQ(SC_OK, reply.ReadInt32());
-}
-
-/**
- * @tc.name: PreRegisterReadFromRawdata001
- * @tc.desc: Test PreRegisterReadFromRawdata
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, PreRegisterReadFromRawdata001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    MessageParcel data;
-
-    // rawdata.data is nullptr
-    SecCompRawdata rawdataVoid;
-    rawdataVoid.size = 1;
-    EXPECT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL,
-        secCompService_->PreRegisterReadFromRawdata(rawdataVoid));
-
-    // PreRegisterReadFromRawdata OK
-    SecCompRawdata rawdata;
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
-    EXPECT_EQ(SC_OK,
-        secCompService_->PreRegisterReadFromRawdata(rawdata));
-}
-
-/**
- * @tc.name: PreRegisterWriteToRawdata001
- * @tc.desc: Test PreRegisterWriteToRawdata
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, PreRegisterWriteToRawdata001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    SecCompRawdata rawReply;
-    EXPECT_EQ(SC_OK,
-        secCompService_->PreRegisterWriteToRawdata(SC_OK, rawReply));
-}
-
-/**
- * @tc.name: PreRegisterSecCompProcess001
- * @tc.desc: Test PreRegisterSecCompProcess
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceMockTest, PreRegisterSecCompProcess001, TestSize.Level0)
-{
-    secCompService_->state_ = ServiceRunningState::STATE_RUNNING;
-    secCompService_->Initialize();
-    MessageParcel data;
-
-    // UnregisterReadFromRawdata fail
-    SecCompRawdata rawdataVoid;
-    rawdataVoid.size = 1;
-    SecCompRawdata rawReplyVoid;
-    MessageParcel replyVoid;
-    EXPECT_EQ(SC_OK,
-        secCompService_->PreRegisterSecCompProcess(rawdataVoid, rawReplyVoid));
-    ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReplyVoid, replyVoid));
-    EXPECT_EQ(SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL, replyVoid.ReadInt32());
-
-    // UnregisterReadFromRawdata OK
-    SecCompRawdata rawdata;
-    SecCompRawdata rawReply;
-    MessageParcel reply;
-    EXPECT_EQ(true, SecCompEnhanceAdapter::EnhanceSrvSerialize(data, rawdata));
-    EXPECT_EQ(SC_OK,
-        secCompService_->PreRegisterSecCompProcess(rawdata, rawReply));
     ASSERT_TRUE(SecCompEnhanceAdapter::EnhanceSrvDeserialize(rawReply, reply));
     EXPECT_EQ(SC_OK, reply.ReadInt32());
 }

@@ -68,18 +68,11 @@ static __attribute__((noinline)) int32_t ReportSecurityComponentClickEvent(
         std::move(dialogCall), message);
 }
 
-static __attribute__((noinline)) int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo)
-{
-    SC_LOG_INFO(LABEL, "UpdateSecurityComponent enter");
-    return SecCompKit::UpdateSecurityComponent(scId, componentInfo);
-}
-
 static void InitUiRegister()
 {
     std::vector<uintptr_t> callerList = {
         reinterpret_cast<uintptr_t>(RegisterSecurityComponent),
         reinterpret_cast<uintptr_t>(ReportSecurityComponentClickEvent),
-        reinterpret_cast<uintptr_t>(UpdateSecurityComponent)
     };
     SecCompUiRegister registerCallback(callerList, &g_probe);
 }
@@ -444,47 +437,6 @@ HWTEST_F(SecCompRegisterCallbackTest, UnregisterSecurityComponent001, TestSize.L
     EXPECT_EQ(SC_OK, RegisterSecurityComponent(PASTE_COMPONENT, pasteInfo, scId));
     EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
     system("param set sec.comp.enhance 0");
-}
-
-/**
- * @tc.name: UpdateSecurityComponent001
- * @tc.desc: Test update security component success
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent001, TestSize.Level0)
-{
-    nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
-    int32_t scId;
-    ASSERT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
-    ASSERT_NE(-1, scId);
-    ASSERT_EQ(SC_OK, UpdateSecurityComponent(scId, saveInfo));
-    EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
-}
-
-/**
- * @tc.name: UpdateSecurityComponent002
- * @tc.desc: Test update security component caller error
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompRegisterCallbackTest, UpdateSecurityComponent002, TestSize.Level0)
-{
-    nlohmann::json jsonRes;
-    TestCommon::BuildSaveComponentInfo(jsonRes);
-    std::string saveInfo = jsonRes.dump();
-    int32_t scId;
-
-    ASSERT_EQ(0, SetSelfTokenID(TestCommon::HAP_TOKEN_ID + g_token_sum));
-    g_token_sum ++;
-    ASSERT_EQ(SC_OK, RegisterSecurityComponent(SAVE_COMPONENT, saveInfo, scId));
-    ASSERT_NE(-1, scId);
-    setuid(100);
-    ASSERT_EQ(SC_SERVICE_ERROR_VALUE_INVALID, UpdateSecurityComponent(scId, saveInfo));
-    setuid(g_selfUid);
-    EXPECT_EQ(SC_OK, SecCompKit::UnregisterSecurityComponent(scId));
 }
 
 /**

@@ -376,50 +376,6 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level0)
 }
 
 /**
- * @tc.name: UpdateSecurityComponent001
- * @tc.desc: Test update security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompManagerTest, UpdateSecurityComponent001, TestSize.Level0)
-{
-    SecCompManager::GetInstance().malicious_.maliciousAppList_.insert(ServiceTestCommon::TEST_PID_1);
-    nlohmann::json jsonValid;
-    LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonValid);
-    SecCompCallerInfo caller = {
-        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
-        .uid = 1,
-        .pid = ServiceTestCommon::TEST_PID_1,
-        .userId = ServiceTestCommon::TEST_USER_ID
-    };
-    EXPECT_EQ(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST,
-        SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
-    SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
-    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
-
-    std::shared_ptr<LocationButton> compPtr = std::make_shared<LocationButton>();
-    compPtr->type_ = LOCATION_COMPONENT;
-    std::shared_ptr<SecCompEntity> entity =
-        std::make_shared<SecCompEntity>(compPtr, ServiceTestCommon::TEST_SC_ID_1, BuildOwnerInfo());
-    EXPECT_EQ(SC_OK,
-        SecCompManager::GetInstance().AddSecurityComponentToList(ServiceTestCommon::TEST_PID_1, 0, entity));
-
-    // wrong json
-    nlohmann::json jsonInvalid;
-    LocationButton buttonInvalid = BuildInvalidLocationComponent();
-    buttonInvalid.ToJson(jsonInvalid);
-    EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID,
-        SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonInvalid, caller));
-
-    // no enhance data
-    EXPECT_EQ(SC_OK,
-        SecCompManager::GetInstance().UpdateSecurityComponent(ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
-    SecCompManager::GetInstance().malicious_.maliciousAppList_.clear();
-    SecCompManager::GetInstance().malicious_.maliciousFailCountMap_.clear();
-}
-
-/**
  * @tc.name: UnregisterSecurityComponent001
  * @tc.desc: Test unregister security component
  * @tc.type: FUNC
@@ -565,30 +521,6 @@ HWTEST_F(SecCompManagerTest, DeleteSecurityComponentFromList002, TestSize.Level0
     auto component = SecCompManager::GetInstance().GetSecurityComponentFromList(1, 1);
     ASSERT_NE(nullptr, component);
     ASSERT_EQ(SC_OK, SecCompManager::GetInstance().DeleteSecurityComponentFromList(1, 1));
-}
-
-/**
- * @tc.name: UpdateSecurityComponent002
- * @tc.desc: Test update security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompManagerTest, UpdateSecurityComponent002, TestSize.Level0)
-{
-    nlohmann::json jsonValid;
-    SecCompCallerInfo caller = {
-        .tokenId = ServiceTestCommon::TEST_TOKEN_ID,
-        .pid = ServiceTestCommon::TEST_PID_1,
-        .userId = ServiceTestCommon::TEST_USER_ID
-    };
-    ASSERT_NE(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID, SecCompManager::GetInstance().UpdateSecurityComponent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
-
-    SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
-    LocationButton buttonValid = BuildValidLocationComponent();
-    buttonValid.ToJson(jsonValid);
-    ASSERT_NE(SC_ENHANCE_ERROR_IN_MALICIOUS_LIST, SecCompManager::GetInstance().UpdateSecurityComponent(
-        ServiceTestCommon::TEST_SC_ID_1, jsonValid, caller));
 }
 
 /**

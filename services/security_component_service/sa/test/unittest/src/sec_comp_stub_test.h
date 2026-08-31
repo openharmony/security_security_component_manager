@@ -32,11 +32,6 @@ public:
         return 0;
     };
 
-    int32_t UpdateSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
-    {
-        return 0;
-    };
-
     int32_t UnregisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
     {
         return 0;
@@ -51,11 +46,6 @@ public:
     int32_t VerifySavePermission(uint32_t tokenId, bool& isGranted) override
     {
         return true;
-    };
-
-    int32_t PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override
-    {
-        return 0;
     };
 };
 
