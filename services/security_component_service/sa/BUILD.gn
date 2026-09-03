@@ -172,7 +172,7 @@ ohos_shared_library("security_component_common") {
   deps = [
     ":wm_mini_src_set",
     "${sec_comp_root_dir}/frameworks:security_component_enhance_adapter_service_src_set",
-    "${sec_comp_root_dir}/frameworks:security_component_no_cfi_framework_src_set",
+    "${sec_comp_root_dir}/frameworks:security_component_framework_src_set",
   ]
 
   external_deps = [
