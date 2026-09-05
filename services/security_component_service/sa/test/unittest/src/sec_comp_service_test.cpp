@@ -214,27 +214,6 @@ HWTEST_F(SecCompServiceTest, UnregisterSecurityComponentBody001, TestSize.Level0
 }
 
 /**
- * @tc.name: UpdateSecurityComponentBody001
- * @tc.desc: Test update security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompServiceTest, UpdateSecurityComponentBody001, TestSize.Level0)
-{
-    // get caller fail
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->UpdateSecurityComponentBody(ServiceTestCommon::TEST_SC_ID_1, ""));
-
-    ASSERT_EQ(0, SetSelfTokenID(ServiceTestCommon::HAP_TOKEN_ID));
-    AppExecFwk::AppStateData stateData = {
-        .uid = getuid()
-    };
-    secCompService_->appStateObserver_->AddProcessToForegroundSet(stateData);
-    EXPECT_EQ(SC_SERVICE_ERROR_VALUE_INVALID,
-        secCompService_->UpdateSecurityComponentBody(ServiceTestCommon::TEST_SC_ID_1, "{a"));
-}
-
-/**
  * @tc.name: ReportSecurityComponentClickEventBody001
  * @tc.desc: Test report security component
  * @tc.type: FUNC

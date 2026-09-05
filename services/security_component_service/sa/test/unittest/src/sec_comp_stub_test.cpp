@@ -90,22 +90,6 @@ HWTEST_F(SecCompStubTest, RegisterSecurityComponentInner001, TestSize.Level0)
 }
 
 /**
- * @tc.name: UpdateSecurityComponentInner001
- * @tc.desc: Test update security component
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(SecCompStubTest, UpdateSecurityComponentInner001, TestSize.Level0)
-{
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option(MessageOption::TF_SYNC);
-    data.WriteInterfaceToken(u"OHOS.Security.SecurityComponent.ISecCompService");
-    ASSERT_EQ(ERR_INVALID_DATA, stub_->OnRemoteRequest(static_cast<uint32_t>(
-        ISecCompServiceIpcCode::COMMAND_UPDATE_SECURITY_COMPONENT), data, reply, option));
-}
-
-/**
  * @tc.name: UnregisterSecurityComponentInner001
  * @tc.desc: Test unregister security component
  * @tc.type: FUNC

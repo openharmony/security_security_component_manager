@@ -392,51 +392,6 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     return ret;
 }
 
-int32_t SecCompManager::UpdateSecurityComponent(int32_t scId, const nlohmann::json& jsonComponent,
-    const SecCompCallerInfo& caller)
-{
-    SC_LOG_DEBUG(LABEL, "PID: %{public}d, update security component", caller.pid);
-    if (malicious_.IsInMaliciousAppList(caller.pid, caller.uid)) {
-        SC_LOG_ERROR(LABEL, "app is in MaliciousAppList, never allow it");
-        return SC_ENHANCE_ERROR_IN_MALICIOUS_LIST;
-    }
-
-    std::unique_lock<ffrt::shared_mutex> lk(this->componentInfoLock_);
-    std::shared_ptr<SecCompEntity> sc = GetSecurityComponentFromList(caller.pid, scId);
-    if (sc == nullptr) {
-        SC_LOG_ERROR(LABEL, "Can not find target component");
-        return SC_SERVICE_ERROR_COMPONENT_NOT_EXIST;
-    }
-    std::string message;
-    SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, sc->userId_, message);
-    std::shared_ptr<SecCompBase> reportComponentInfo(report);
-    if (reportComponentInfo == nullptr) {
-        SC_LOG_ERROR(LABEL, "Update component info invalid");
-        int32_t uid = IPCSkeleton::GetCallingUid();
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(uid, bundleName);
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
-            "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "UPDATE",
-            "SC_TYPE", sc->GetType());
-        return SC_SERVICE_ERROR_COMPONENT_INFO_INVALID;
-    }
-
-    int32_t enhanceRes =
-        SecCompEnhanceAdapter::CheckComponentInfoEnhance(caller.pid, reportComponentInfo, jsonComponent);
-    if (enhanceRes != SC_OK) {
-        SendCheckInfoEnhanceSysEvent(scId, sc->GetType(), "UPDATE", enhanceRes);
-        SC_LOG_ERROR(LABEL, "enhance check failed");
-        malicious_.AddAppToMaliciousAppList(caller.pid);
-        return enhanceRes;
-    }
-
-    malicious_.ResetAppMaliciousFailCount(caller.pid);
-    sc->componentInfo_ = reportComponentInfo;
-    return SC_OK;
-}
-
 int32_t SecCompManager::UnregisterSecurityComponent(int32_t scId, const SecCompCallerInfo& caller)
 {
     SC_LOG_DEBUG(LABEL, "PID: %{public}d, unregister security component", caller.pid);

@@ -85,8 +85,6 @@ private:
     void SaveFirstUseRecord(void);
     bool StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
         sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
-    void StartToastAbility(const std::shared_ptr<SecCompEntity> entity, const sptr<IRemoteObject> callerToken,
-        const DisplayInfo& displayInfo);
     bool SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displayInfo);
     void SendSaveEventHandler(void);
 

@@ -120,30 +120,6 @@ void ConstructClickEvent(CompoRandomGenerator &generator, SecCompClickEvent& cli
     }
 }
 
-static void PreRegisterSecCompProcessStubFuzzTest(const uint8_t *data, size_t size)
-{
-    uint32_t code =
-        static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_PRE_REGISTER_SEC_COMP_PROCESS);
-    MessageParcel rawData;
-    MessageParcel input;
-    SecCompRawdata inputData;
-    MessageParcel reply;
-    CompoRandomGenerator generator(data, size);
-    uint32_t type = generator.GetScType();
-
-    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
-        return;
-    }
-    rawData.WriteUint32(type);
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
-    input.WriteUint32(inputData.size);
-    input.WriteRawData(inputData.data, inputData.size);
-    MessageOption option(MessageOption::TF_SYNC);
-    g_service->OnRemoteRequest(code, input, reply, option);
-    g_service->OnStart();
-    g_service->OnStop();
-}
-
 static bool ReadRegisterReply(MessageParcel& reply, int32_t& scId)
 {
     SecCompRawdata replyData;
@@ -196,32 +172,6 @@ static void RegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t si
     MessageOption option(MessageOption::TF_SYNC);
     g_service->OnRemoteRequest(code, input, reply, option);
     (void)ReadRegisterReply(reply, g_scId);
-}
-
-static void UpdateSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
-{
-    uint32_t code = static_cast<uint32_t>(ISecCompServiceIpcCode::COMMAND_UPDATE_SECURITY_COMPONENT);
-    MessageParcel rawData;
-    MessageParcel input;
-    SecCompRawdata inputData;
-    MessageParcel reply;
-    CompoRandomGenerator generator(data, size);
-    if (!input.WriteInterfaceToken(ISecCompService::GetDescriptor())) {
-        return;
-    }
-    if (!rawData.WriteInt32(g_scId)) {
-        return;
-    }
-    g_compoInfo = generator.GenerateRandomCompoStr(g_type);
-    if (!rawData.WriteString(g_compoInfo)) {
-        return;
-    }
-    SecCompEnhanceAdapter::EnhanceClientSerialize(rawData, inputData);
-    input.WriteUint32(inputData.size);
-    input.WriteRawData(inputData.data, inputData.size);
-
-    MessageOption option(MessageOption::TF_SYNC);
-    g_service->OnRemoteRequest(code, input, reply, option);
 }
 
 static void UnRegisterSecurityComponentStubFuzzTest(const uint8_t *data, size_t size)
@@ -457,10 +407,8 @@ static void ExerciseWindowInfoFuzzPaths(CompoRandomGenerator& generator)
 
 static void SecurityComponentFuzzTest(const uint8_t *data, size_t size)
 {
-    PreRegisterSecCompProcessStubFuzzTest(data, size);
     RegisterSecurityComponentStubFuzzTest(data, size);
     ReportSecurityComponentClickEventStubFuzzTest(data, size);
-    UpdateSecurityComponentStubFuzzTest(data, size);
     UnRegisterSecurityComponentStubFuzzTest(data, size);
     VerifySavePermissionStubFuzzTest(data, size);
     CompoRandomGenerator generator(data, size);

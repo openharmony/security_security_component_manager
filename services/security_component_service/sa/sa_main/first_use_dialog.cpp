@@ -60,18 +60,12 @@ const std::string DISPLAY_HEIGHT = "ohos.display.height";
 const std::string DISPLAY_TOP = "ohos.display.top";
 const std::string DIALOG_OFFSET = "ohos.dialog.offset";
 const std::string NOTIFY_TYPE = "ohos.ability.notify.type";
-const std::string TOAST_POSITION = "ohos.toast.position";
-const std::string TOAST_OFFSET = "ohos.toast.offset";
 
 constexpr int32_t DISPLAY_HALF_RATIO = 2;
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
-constexpr int32_t ABOVE_BOTTOM_OFFSET = 80;
-constexpr int32_t BELOW_TOP_OFFSET = 112;
 static std::mutex g_instanceMutex;
-static std::unordered_map<TipPosition, int32_t> tipPositionsMap = {{TipPosition::ABOVE_BOTTOM, ABOVE_BOTTOM_OFFSET},
-    {TipPosition::BELOW_TOP, BELOW_TOP_OFFSET}};
 }
 
 bool ReportUserData(const std::string& filePath, const std::string& folderPath)
@@ -392,36 +386,6 @@ bool FirstUseDialog::SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displa
     return true;
 }
 
-void FirstUseDialog::StartToastAbility(const std::shared_ptr<SecCompEntity> entity,
-    const sptr<IRemoteObject> callerToken, const DisplayInfo& displayInfo)
-{
-    if (!entity->AllowToShowToast()) {
-        return;
-    }
-    AAFwk::Want want;
-    want.SetElementName(GRANT_ABILITY_BUNDLE_NAME, GRANT_ABILITY_ABILITY_NAME);
-    want.SetParam(NOTIFY_TYPE, NotifyType::TOAST);
-    want.SetParam(TOAST_POSITION, entity->componentInfo_->tipPosition_);
-    int32_t toastOffset = ABOVE_BOTTOM_OFFSET;
-    if (tipPositionsMap.find(entity->componentInfo_->tipPosition_) != tipPositionsMap.end()) {
-        toastOffset = tipPositionsMap[entity->componentInfo_->tipPosition_];
-    }
-    want.SetParam(TOAST_OFFSET, toastOffset);
-    int32_t superFoldOffsetY = 0;
-    if (entity->IsInPCVirtualScreen(displayInfo.crossAxisState)) {
-        superFoldOffsetY = displayInfo.superFoldOffsetY;
-    }
-    want.SetParam(DISPLAY_TOP, superFoldOffsetY);
-    if (!SetDisplayInfo(want, displayInfo)) {
-        SC_LOG_ERROR(LABEL, "Set display info failed.");
-        return;
-    }
-
-    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
-        want, callerToken, entity->userId_);
-    SC_LOG_INFO(LABEL, "Start toast ability res %{public}d", startRes);
-}
-
 bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
     sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo)
 {
@@ -562,7 +526,6 @@ int32_t FirstUseDialog::NotifyFirstUseDialog(std::shared_ptr<SecCompEntity> enti
     uint64_t compTypes = firstUseMap_[tokenId];
     if ((typeMask == SAVE_BUTTON_FIRST_USE) && ((compTypes & typeMask) == typeMask)) {
         SC_LOG_INFO(LABEL, "no need notify dialog again.");
-        StartToastAbility(entity, callerToken, displayInfo);
         return SC_OK;
     }
     if (!StartDialogAbility(entity, callerToken, dialogCallback, displayInfo)) {

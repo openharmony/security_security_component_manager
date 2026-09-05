@@ -63,34 +63,6 @@ __attribute__((noinline)) int32_t SecCompKit::RegisterSecurityComponent(SecCompT
 }
 
 SECURITY_COMPONENT_API_CALLER
-__attribute__((noinline)) int32_t SecCompKit::UpdateSecurityComponent(int32_t scId, std::string& componentInfo)
-{
-    if (!SecCompCallerAuthorization::GetInstance().IsKitCaller(
-        reinterpret_cast<uintptr_t>(__builtin_return_address(0)))) {
-        SC_LOG_ERROR(LABEL, "update security component fail, caller invalid");
-        int32_t uid = IPCSkeleton::GetCallingUid();
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(uid, bundleName);
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CALLER_CHECK_FAILED",
-            HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
-            "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALL_SCENE", "UPDATE");
-        return SC_SERVICE_ERROR_CALLER_INVALID;
-    }
-
-    if (!SecCompEnhanceAdapter::EnhanceDataPreprocess(scId, componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Preprocess security component fail");
-        return SC_ENHANCE_ERROR_VALUE_INVALID;
-    }
-
-    int32_t res = SecCompClient::GetInstance().UpdateSecurityComponent(scId, componentInfo);
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "update security component fail, error: %{public}d", res);
-    }
-    return res;
-}
-
-SECURITY_COMPONENT_API_CALLER
 int32_t SecCompKit::UnregisterSecurityComponent(int32_t scId)
 {
     int32_t res = SecCompClient::GetInstance().UnregisterSecurityComponent(scId);
@@ -154,11 +126,6 @@ bool SecCompKit::VerifySavePermission(AccessToken::AccessTokenID tokenId)
         SC_LOG_ERROR(LABEL, "verify temp save permission, error: %{public}d", res);
     }
     return res;
-}
-
-int32_t SecCompKit::PreRegisterSecCompProcess()
-{
-    return SecCompClient::GetInstance().PreRegisterSecCompProcess();
 }
 
 bool SecCompKit::IsServiceExist()

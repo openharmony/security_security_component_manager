@@ -28,12 +28,10 @@ namespace SecurityComponent {
 class __attribute__((visibility("default"))) SecCompKit {
 public:
     static int32_t RegisterSecurityComponent(SecCompType type, std::string& componentInfo, int32_t& scId);
-    static int32_t UpdateSecurityComponent(int32_t scId, std::string& componentInfo);
     static int32_t UnregisterSecurityComponent(int32_t scId);
     static int32_t ReportSecurityComponentClickEvent(SecCompInfo& SecCompInfo, sptr<IRemoteObject> callerToken,
         OnFirstUseDialogCloseFunc&& callback, std::string& message);
     static bool VerifySavePermission(AccessToken::AccessTokenID tokenId);
-    static int32_t PreRegisterSecCompProcess();
     static bool IsServiceExist();
     static bool LoadService();
     static bool IsSystemAppCalling();

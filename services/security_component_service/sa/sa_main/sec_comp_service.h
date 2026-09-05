@@ -46,12 +46,10 @@ public:
     void OnStop() override;
 
     int32_t RegisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
-    int32_t UpdateSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
     int32_t UnregisterSecurityComponent(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
     int32_t ReportSecurityComponentClickEvent(const sptr<IRemoteObject>& callerToken,
         const sptr<IRemoteObject>& dialogCallback, const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
     int32_t VerifySavePermission(AccessToken::AccessTokenID tokenId, bool& isGranted) override;
-    int32_t PreRegisterSecCompProcess(const SecCompRawdata& rawData, SecCompRawdata& rawReply) override;
 
     int Dump(int fd, const std::vector<std::u16string>& args) override;
 #if (!defined (TDD_ENABLE)) && (!defined (FUZZ_ENABLE))
@@ -63,18 +61,12 @@ private:
     int32_t RegisterReadFromRawdata(SecCompRawdata& rawData, SecCompType& type, std::string& componentInfo);
     int32_t RegisterSecurityComponentBody(SecCompType type, const std::string& componentInfo, int32_t& scId);
     int32_t RegisterWriteToRawdata(int32_t res, int32_t scId, SecCompRawdata& rawReply);
-    int32_t UpdateReadFromRawdata(SecCompRawdata& rawData, int32_t& scId, std::string& componentInfo);
-    int32_t UpdateSecurityComponentBody(int32_t scId, const std::string& componentInfo);
-    int32_t UpdateWriteToRawdata(int32_t res, SecCompRawdata& rawReply);
     int32_t UnregisterReadFromRawdata(SecCompRawdata& rawData, int32_t& scId);
     int32_t UnregisterSecurityComponentBody(int32_t scId);
     int32_t UnregisterWriteToRawdata(int32_t res, SecCompRawdata& rawReply);
     int32_t ReportSecurityComponentClickEventBody(SecCompInfo& secCompInfo,
         sptr<IRemoteObject> callerToken, sptr<IRemoteObject> dialogCallback, std::string& message);
     int32_t ReportWriteToRawdata(int32_t res, std::string message, SecCompRawdata& rawReply);
-    int32_t PreRegisterReadFromRawdata(SecCompRawdata& rawData);
-    int32_t PreRegisterSecCompProcessBody();
-    int32_t PreRegisterWriteToRawdata(int32_t res, SecCompRawdata& rawReply);
     int32_t ParseParams(const std::string& componentInfo, SecCompCallerInfo& caller, nlohmann::json& jsonRes);
     bool Initialize() const;
     bool RegisterAppStateObserver();

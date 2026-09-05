@@ -159,63 +159,6 @@ int32_t SecCompClient::RegisterSecurityComponent(SecCompType type,
     return res;
 }
 
-int32_t SecCompClient::UpdateWriteToRawdata(int32_t scId, const std::string& componentInfo, SecCompRawdata& rawData)
-{
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInt32(scId)) {
-        SC_LOG_ERROR(LABEL, "Update write scId failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-    if (!dataParcel.WriteString(componentInfo)) {
-        SC_LOG_ERROR(LABEL, "Update write componentInfo failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
-        SC_LOG_ERROR(LABEL, "Update serialize session info failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-    return SC_OK;
-}
-
-int32_t SecCompClient::UpdateSecurityComponent(int32_t scId, const std::string& componentInfo)
-{
-    auto proxy = GetProxy(true);
-    if (proxy == nullptr) {
-        SC_LOG_ERROR(LABEL, "Proxy is null.");
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-
-    std::lock_guard<std::mutex> lock(useIPCMutex_);
-    SecCompRawdata rawData;
-    int32_t res = UpdateWriteToRawdata(scId, componentInfo, rawData);
-    if (res != SC_OK) {
-        return res;
-    }
-
-    SecCompRawdata rawReply;
-    res = proxy->UpdateSecurityComponent(rawData, rawReply);
-
-    MessageParcel deserializedReply;
-    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
-        SC_LOG_ERROR(LABEL, "Update deserialize session info failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Update request failed, result: %{public}d.", res);
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    int32_t serviceRes;
-    if (!deserializedReply.ReadInt32(serviceRes)) {
-        SC_LOG_ERROR(LABEL, "Update read res failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    return serviceRes;
-}
-
 int32_t SecCompClient::UnregisterWriteToRawdata(int32_t scId, SecCompRawdata& rawData)
 {
     MessageParcel dataParcel;
@@ -370,53 +313,6 @@ bool SecCompClient::IsSystemAppCalling()
 {
     auto selfToken = IPCSkeleton::GetSelfTokenID();
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
-}
-
-int32_t SecCompClient::PreRegisterWriteToRawdata(SecCompRawdata& rawData)
-{
-    MessageParcel dataParcel;
-    if (!SecCompEnhanceAdapter::EnhanceClientSerialize(dataParcel, rawData)) {
-        SC_LOG_ERROR(LABEL, "PreRegister serialize session info failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    return SC_OK;
-}
-
-int32_t SecCompClient::PreRegisterSecCompProcess()
-{
-    auto proxy = GetProxy(true);
-    if (proxy == nullptr) {
-        SC_LOG_ERROR(LABEL, "Proxy is null");
-        return SC_SERVICE_ERROR_VALUE_INVALID;
-    }
-    std::lock_guard<std::mutex> lock(useIPCMutex_);
-    SecCompRawdata rawData;
-    int32_t res = PreRegisterWriteToRawdata(rawData);
-    if (res != SC_OK) {
-        return res;
-    }
-
-    SecCompRawdata rawReply;
-    res = proxy->PreRegisterSecCompProcess(rawData, rawReply);
-    MessageParcel deserializedReply;
-    if (!SecCompEnhanceAdapter::EnhanceClientDeserialize(rawReply, deserializedReply)) {
-        SC_LOG_ERROR(LABEL, "PreRegister deserialize session info failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    if (res != SC_OK) {
-        SC_LOG_ERROR(LABEL, "PreRegister request failed, result: %{public}d.", res);
-        return res;
-    }
-
-    int32_t serviceRes;
-    if (!deserializedReply.ReadInt32(serviceRes)) {
-        SC_LOG_ERROR(LABEL, "PreRegister read serviceRes failed.");
-        return SC_SERVICE_ERROR_PARCEL_OPERATE_FAIL;
-    }
-
-    return serviceRes;
 }
 
 static sptr<IRemoteObject> GetServiceHandler()
