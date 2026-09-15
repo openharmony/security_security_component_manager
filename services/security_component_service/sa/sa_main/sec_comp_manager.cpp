@@ -14,21 +14,19 @@
  */
 #include "sec_comp_manager.h"
 
-#include "bundle_mgr_client.h"
 #include "delay_exit_task.h"
-#include "display_info.h"
-#include "display_lite.h"
-#include "display_manager_lite.h"
 #include "first_use_dialog.h"
 #include "hisysevent.h"
 #include "isec_comp_service.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "sec_comp_bundle_name_cache.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_comp_info_helper.h"
 #include "sec_comp_log.h"
+#include "sec_comp_grant_adapter.h"
 
 namespace OHOS {
 namespace Security {
@@ -305,9 +303,8 @@ void SecCompManager::SendCheckInfoEnhanceSysEvent(int32_t scId,
     SecCompType type, const std::string& scene, int32_t res)
 {
     int32_t uid = IPCSkeleton::GetCallingUid();
-    OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    std::string bundleName = "";
-    bmsClient.GetNameForUid(uid, bundleName);
+    std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(
+        IPCSkeleton::GetCallingTokenID());
     if (res == SC_ENHANCE_ERROR_CHALLENGE_CHECK_FAIL) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "CHALLENGE_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
@@ -358,9 +355,8 @@ int32_t SecCompManager::RegisterSecurityComponent(SecCompType type,
     if (component == nullptr) {
         SC_LOG_ERROR(LABEL, "Parse component info invalid");
         int32_t uid = IPCSkeleton::GetCallingUid();
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(uid, bundleName);
+        std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(
+            IPCSkeleton::GetCallingTokenID());
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "COMPONENT_INFO_CHECK_FAILED",
             HiviewDFX::HiSysEvent::EventType::SECURITY, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "CALL_SCENE", "REGITSTER", "SC_TYPE", type);
@@ -409,9 +405,8 @@ int32_t SecCompManager::CheckClickSecurityComponentInfo(std::shared_ptr<SecCompE
     SecCompBase* report = SecCompInfoHelper::ParseComponent(sc->GetType(), jsonComponent, sc->userId_, message, true);
     std::shared_ptr<SecCompBase> reportComponentInfo(report);
     int32_t uid = IPCSkeleton::GetCallingUid();
-    OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    std::string bundleName = "";
-    bmsClient.GetNameForUid(uid, bundleName);
+    std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(
+        IPCSkeleton::GetCallingTokenID());
 
     ComponentCheckParams checkParams;
     checkParams.sc = sc;
@@ -495,12 +490,7 @@ int32_t SecCompManager::CheckRectInfo(const ComponentCheckParams& params)
 
 bool SecCompManager::AllowToBypassArkuiCheck(const SecCompCallerInfo& caller)
 {
-    std::string bundleName = "";
-    OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    int32_t ret = bmsClient.GetNameForUid(caller.uid, bundleName);
-    if (ret != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Failed to get bundle name, uid=%{public}d, ret=%{public}d", caller.uid, ret);
-    }
+    std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(caller.tokenId);
     if (SecCompEnhanceAdapter::IsBypassPermitted(bundleName)) {
         return true;
     }
@@ -518,12 +508,10 @@ bool SecCompManager::IsPasteboardPermissionGranted(
 }
 
 static void ReportEvent(std::string eventName, HiviewDFX::HiSysEvent::EventType eventType, int32_t scId,
-    SecCompType scType)
+    SecCompType scType, AccessToken::AccessTokenID tokenId)
 {
     int32_t uid = IPCSkeleton::GetCallingUid();
-    OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    std::string bundleName = "";
-    bmsClient.GetNameForUid(uid, bundleName);
+    std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(tokenId);
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, eventName,
         eventType, "CALLER_UID", uid, "CALLER_BUNDLE_NAME", bundleName,
         "CALLER_PID", IPCSkeleton::GetCallingPid(), "SC_ID", scId, "SC_TYPE", scType);
@@ -537,19 +525,12 @@ void SecCompManager::GetFoldOffsetY(const CrossAxisState crossAxisState)
     if (superFoldOffsetY_ != 0) {
         return;
     }
-    auto foldCreaseRegion = OHOS::Rosen::DisplayManagerLite::GetInstance().GetCurrentFoldCreaseRegion();
-    if (foldCreaseRegion == nullptr) {
-        SC_LOG_ERROR(LABEL, "foldCreaseRegion is nullptr");
+    int32_t foldCreaseBottomY = 0;
+    if (!SecCompGrantAdapter::GetFoldCreaseBottomY(foldCreaseBottomY)) {
         return;
     }
-    const auto& creaseRects = foldCreaseRegion->GetCreaseRects();
-    if (creaseRects.empty()) {
-        SC_LOG_ERROR(LABEL, "creaseRects is empty");
-        return;
-    }
-    const auto& rect = creaseRects.front();
-    superFoldOffsetY_ = rect.height_ + rect.posY_;
-    SC_LOG_INFO(LABEL, "height: %{public}d, posY: %{public}d", rect.height_, rect.posY_);
+    superFoldOffsetY_ = foldCreaseBottomY;
+    SC_LOG_INFO(LABEL, "Fold crease bottom: %{public}d", superFoldOffsetY_);
 }
 
 int32_t SecCompManager::CheckClickEventParams(const SecCompCallerInfo& caller,
@@ -587,7 +568,8 @@ int32_t SecCompManager::StartDialog(const SecCompInfo& info, std::shared_ptr<Sec
 
     res = sc->GrantTempPermission();
     if (res != SC_OK) {
-        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, info.scId, sc->GetType());
+        ReportEvent("TEMP_GRANT_FAILED", HiviewDFX::HiSysEvent::EventType::FAULT, info.scId, sc->GetType(),
+            sc->tokenId_);
         return res;
     }
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_SUCCESS",
@@ -632,7 +614,7 @@ int32_t SecCompManager::ReportSecurityComponentClickEvent(SecCompInfo& info, con
     res = sc->CheckClickInfo(info.clickInfo, superFoldOffsetY_, sc->componentInfo_->crossAxisState_, message);
     if (res != SC_OK) {
         ReportEvent("CLICK_INFO_CHECK_FAILED", HiviewDFX::HiSysEvent::EventType::SECURITY,
-            info.scId, sc->GetType());
+            info.scId, sc->GetType(), caller.tokenId);
         if (res == SC_ENHANCE_ERROR_CLICK_EXTRA_CHECK_FAIL) {
             malicious_.AddAppToMaliciousAppList(caller.pid);
         }
@@ -683,18 +665,30 @@ bool SecCompManager::Initialize()
         SC_LOG_ERROR(LABEL, "failed to create a recvRunner.");
         return false;
     }
-
+    SecCompEnhanceAdapter::EnableInputEnhance();
     secHandler_ = std::make_shared<SecEventHandler>(secRunner_);
     exitSaProcessFunc_ = []() {
         SecCompManager::GetInstance().ExitSaProcess();
     };
     DelayExitTask::GetInstance().Init(secHandler_, exitSaProcessFunc_);
     FirstUseDialog::GetInstance().Init(secHandler_);
-    SecCompEnhanceAdapter::EnableInputEnhance();
     SecCompPermManager::GetInstance().InitEventHandler(secHandler_);
     DelayExitTask::GetInstance().Start();
 
     return true;
+}
+
+void SecCompManager::InitGrantAdapterAsync()
+{
+    if (secHandler_ == nullptr) {
+        SC_LOG_ERROR(LABEL, "Failed to get EventHandler");
+        return;
+    }
+    std::function<void()> initUiTask = []() {
+        SC_LOG_INFO(LABEL, "warm up ui adapter");
+        SecCompGrantAdapter::InitGrantAdapter();
+    };
+    secHandler_->ProxyPostTask(initUiTask, "InitGrantAdapterTask");
 }
 
 bool SecCompManager::HasCustomPermissionForSecComp()

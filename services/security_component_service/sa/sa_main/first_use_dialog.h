@@ -28,7 +28,6 @@
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
 #include "sec_event_handler.h"
-#include "want.h"
 
 namespace OHOS {
 namespace Security {
@@ -85,7 +84,6 @@ private:
     void SaveFirstUseRecord(void);
     bool StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
         sptr<IRemoteObject> dialogCallback, const DisplayInfo& displayInfo);
-    bool SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displayInfo);
     void SendSaveEventHandler(void);
 
     std::mutex useMapMutex_;

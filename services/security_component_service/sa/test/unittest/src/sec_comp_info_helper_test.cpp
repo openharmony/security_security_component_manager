@@ -27,6 +27,7 @@
 #include "sec_comp_log.h"
 #include "sec_comp_err.h"
 #include "sec_comp_tool.h"
+#include "sec_comp_grant_adapter_mock.h"
 #include "service_test_common.h"
 #include "window_manager.h"
 
@@ -45,7 +46,9 @@ static constexpr uint32_t FOLD_VIRTUAL_DISPLAY_ID = 999;
 
 static SecCompBase* ParseTestComponent(SecCompType type, const nlohmann::json& jsonComponent, std::string& message)
 {
-    return SecCompInfoHelper::ParseComponent(type, jsonComponent, ServiceTestCommon::TEST_USER_ID, message);
+    // click path exercises the validity check; registration path defers it
+    return SecCompInfoHelper::ParseComponent(
+        type, jsonComponent, ServiceTestCommon::TEST_USER_ID, message, true);
 }
 
 static bool CheckTestComponentValid(SecCompBase* comp, std::string& message)
@@ -886,6 +889,93 @@ HWTEST_F(SecCompInfoHelperTest, CheckComponentValid005, TestSize.Level0)
 
     Rosen::WindowManager::GetInstance().result_ = static_cast<OHOS::Rosen::WMError>(-1);
     ASSERT_TRUE(CheckTestComponentValid(comp, message));
+}
+
+/*
+ * @tc.name: CheckRectValidGrantAdapterFail001
+ * @tc.desc: ui adapter load failure degrades to the same false path as display query failure
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, CheckRectValidGrantAdapterFail001, TestSize.Level1)
+{
+    SetGrantAdapterAlwaysFail(true);
+    SecCompInfoHelper::ScreenInfo screenInfo = { 0, CrossAxisState::STATE_INVALID, false, 0, false };
+    SecCompRect rect = { 10.0, 10.0, 100.0, 50.0 };
+    SecCompRect windowRect = { 0.0, 0.0, 1500.0, 1500.0 };
+    std::string message;
+    EXPECT_FALSE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, 1.0f));
+    SetGrantAdapterAlwaysFail(false);
+}
+
+/*
+ * @tc.name: CheckRectValidWearable001
+ * @tc.desc: wearable isWearable flag with adapter screen shape goes through the watch screen check
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, CheckRectValidWearable001, TestSize.Level1)
+{
+    // wearable round screen path is decided by the isRoundScreen flag from the ui adapter
+    SecCompInfoHelper::ScreenInfo screenInfo = { 0, CrossAxisState::STATE_INVALID, true, 0, false };
+    SecCompRect rect = { 10.0, 10.0, 100.0, 50.0 };
+    SecCompRect windowRect = { 0.0, 0.0, 1500.0, 1500.0 };
+    std::string message;
+    // mock returns a non round 1500x1500 screen: the wearable check reads screenShape
+    // from the adapter result, so this exercises the screen shape assignment branch
+    EXPECT_TRUE(SecCompInfoHelper::CheckRectValid(rect, windowRect, screenInfo, message, 1.0f));
+}
+
+/*
+ * @tc.name: ParseComponentRegisterBypass001
+ * @tc.desc: registration path skips component valid check and always returns valid
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, ParseComponentRegisterBypass001, TestSize.Level1)
+{
+    // invalid component on the registration path (isClicked=false): validity check
+    // is deferred to click time, so the component must be created as valid
+    nlohmann::json jsonInvalid;
+    ServiceTestCommon::BuildLocationComponentJson(jsonInvalid);
+    auto& sizeJson = jsonInvalid[JsonTagConstants::JSON_SIZE_TAG];
+    sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    std::string message;
+    SecCompBase* comp = SecCompInfoHelper::ParseComponent(
+        LOCATION_COMPONENT, jsonInvalid, ServiceTestCommon::TEST_USER_ID, message, false);
+    ASSERT_NE(nullptr, comp);
+    EXPECT_TRUE(comp->GetValid());
+
+    // same invalid component on the click path (isClicked=true): validity check runs
+    SecCompBase* clickComp = SecCompInfoHelper::ParseComponent(
+        LOCATION_COMPONENT, jsonInvalid, ServiceTestCommon::TEST_USER_ID, message, true);
+    ASSERT_NE(nullptr, clickComp);
+    EXPECT_FALSE(clickComp->GetValid());
+}
+
+/*
+ * @tc.name: ParseComponentRegisterBypass002
+ * @tc.desc: valid component stays valid on both registration and click paths
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompInfoHelperTest, ParseComponentRegisterBypass002, TestSize.Level1)
+{
+    nlohmann::json jsonValid;
+    ServiceTestCommon::BuildLocationComponentJson(jsonValid);
+    std::string message;
+
+    // valid component on registration path: still valid
+    SecCompBase* regComp = SecCompInfoHelper::ParseComponent(
+        LOCATION_COMPONENT, jsonValid, ServiceTestCommon::TEST_USER_ID, message, false);
+    ASSERT_NE(nullptr, regComp);
+    EXPECT_TRUE(regComp->GetValid());
+
+    // valid component on click path: still valid
+    SecCompBase* clickComp = SecCompInfoHelper::ParseComponent(
+        LOCATION_COMPONENT, jsonValid, ServiceTestCommon::TEST_USER_ID, message, true);
+    ASSERT_NE(nullptr, clickComp);
+    EXPECT_TRUE(clickComp->GetValid());
 }
 
 /**

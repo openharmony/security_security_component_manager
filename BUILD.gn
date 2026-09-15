@@ -17,6 +17,7 @@ group("security_component_build_module") {
   if (is_standard_system) {
     deps = [
       "frameworks/inner_api/security_component:libsecurity_component_sdk",
+      "frameworks:libsecurity_component_click_grant",
       "services/security_component_service/sa:security_component_common",
       "services/security_component_service/sa:security_component_service",
       "services/security_component_service/sa/sa_profile:security_component_sa_profile_standard",

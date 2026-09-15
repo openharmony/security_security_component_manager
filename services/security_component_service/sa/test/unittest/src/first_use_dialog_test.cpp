@@ -16,7 +16,7 @@
 
 #include <cstdio>
 #include "accesstoken_kit.h"
-#include "ability_manager_client.h"
+#include "sec_comp_grant_adapter_mock.h"
 #include "i_sec_comp_dialog_callback.h"
 #include "location_button.h"
 #include "save_button.h"
@@ -76,7 +76,7 @@ void FirstUseDialogTest::TearDownTestCase()
 void FirstUseDialogTest::SetUp()
 {
     SC_LOG_INFO(LABEL, "setup");
-    AAFwk::AbilityManagerClient::GetInstance()->lastUserId_ = -1;
+    ResetGrantAdapterLastUserId();
     struct stat fstat = {};
     if (stat(SEC_COMP_SRV_CFG_FILE.c_str(), &fstat) != 0) {
         return;
@@ -534,7 +534,7 @@ HWTEST_F(FirstUseDialogTest, NotifyFirstUseDialog003, TestSize.Level0)
     EXPECT_EQ(diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo),
         SC_SERVICE_ERROR_WAIT_FOR_DIALOG_CLOSE);
     diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject, displayInfo);
-    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, AAFwk::AbilityManagerClient::GetInstance()->lastUserId_);
+    EXPECT_EQ(ServiceTestCommon::TEST_USER_ID, GetGrantAdapterLastUserId());
     sleep(3);
 }
 
@@ -702,3 +702,52 @@ HWTEST_F(FirstUseDialogTest, SecCompDialogSrvCallback001, TestSize.Level0)
     data2.WriteInterfaceToken(ISecCompDialogCallback::GetDescriptor());
     EXPECT_NE(srvCallback->OnRemoteRequest(-1, data2, reply, option), 0);
 }
+
+/*
+ * @tc.name: StartDialogAbilityAdapterFail001
+ * @tc.desc: adapter start failure makes NotifyFirstUseDialog fail and cleans the wait map
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, StartDialogAbilityAdapterFail001, TestSize.Level1)
+{
+    FirstUseDialog diag;
+    const FirstUseDialog::DisplayInfo displayInfo = {0, CrossAxisState::STATE_INVALID, 0};
+    std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(nullptr, runner);
+    diag.secHandler_ = std::make_shared<SecEventHandler>(runner);
+
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
+    entity->componentInfo_ = std::make_shared<SaveButton>();
+    entity->componentInfo_->type_ = SAVE_COMPONENT;
+    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
+
+    SetGrantAdapterAlwaysFail(true);
+    EXPECT_EQ(SC_SERVICE_ERROR_START_FIRST_USE_DIALOG_FAILED,
+        diag.NotifyFirstUseDialog(entity, testRemoteObject, testRemoteObject, displayInfo));
+    // the dialog wait entity must be removed when the start fails
+    EXPECT_EQ(0UL, diag.dialogWaitMap_.size());
+    SetGrantAdapterAlwaysFail(false);
+}
+
+/*
+ * @tc.name: StartDialogAbilityAdapterFail002
+ * @tc.desc: direct StartDialogAbility call with adapter failure returns false and cleans map
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FirstUseDialogTest, StartDialogAbilityAdapterFail002, TestSize.Level1)
+{
+    FirstUseDialog diag;
+    const FirstUseDialog::DisplayInfo displayInfo = {0, CrossAxisState::STATE_INVALID, 0};
+    std::shared_ptr<SecCompEntity> entity = CreateTestEntity();
+    entity->componentInfo_ = std::make_shared<LocationButton>();
+    entity->componentInfo_->type_ = LOCATION_COMPONENT;
+    sptr<TestRemoteObject> testRemoteObject = new TestRemoteObject(std::u16string());
+
+    SetGrantAdapterAlwaysFail(true);
+    EXPECT_FALSE(diag.StartDialogAbility(entity, testRemoteObject, testRemoteObject, displayInfo));
+    EXPECT_EQ(0UL, diag.dialogWaitMap_.size());
+    SetGrantAdapterAlwaysFail(false);
+}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,9 @@
 namespace OHOS::Rosen {
 class FoldCreaseRegion : public RefBase {
 public:
+    FoldCreaseRegion() = default;
+    explicit FoldCreaseRegion(std::vector<DMRect> rects) : creaseRects_(std::move(rects)) {}
+
     const std::vector<DMRect>& GetCreaseRects() const
     {
         return creaseRects_;
@@ -34,4 +37,4 @@ private:
 };
 }  // namespace OHOS::Rosen
 
-#endif  // SECURITY_COMPONENT_MANAGER_FOLD_SCREEN_INFO_MOCK_H
+#endif // SECURITY_COMPONENT_MANAGER_FOLD_SCREEN_INFO_MOCK_H

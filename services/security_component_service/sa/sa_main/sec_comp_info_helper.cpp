@@ -20,9 +20,6 @@
 #include <sstream>
 
 #include "accesstoken_kit.h"
-#include "display_info.h"
-#include "display_lite.h"
-#include "display_manager_lite.h"
 #include "ipc_skeleton.h"
 #include "location_button.h"
 #include "paste_button.h"
@@ -31,6 +28,7 @@
 #include "sec_comp_info.h"
 #include "sec_comp_log.h"
 #include "sec_comp_tool.h"
+#include "sec_comp_grant_adapter.h"
 #include "tokenid_kit.h"
 #include "window_info_helper.h"
 
@@ -102,33 +100,28 @@ SecCompBase* SecCompInfoHelper::ParseComponent(SecCompType type, const nlohmann:
     }
 
     comp->userId_ = userId;
-    comp->SetValid(CheckComponentValid(comp, message));
+    if (isClicked) {
+        comp->SetValid(CheckComponentValid(comp, message));
+    } else {
+        comp->SetValid(true);
+    }
     comp->isClickEvent_ = isClicked;
     return comp;
 }
 
 static bool GetScreenSize(double& width, double& height, SecCompInfoHelper::ScreenInfo& screenInfo)
 {
-    sptr<OHOS::Rosen::DisplayLite> display =
-        OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(screenInfo.displayId);
-    if (display == nullptr) {
-        SC_LOG_ERROR(LABEL, "Get display manager failed");
+    int32_t dispWidth = 0;
+    int32_t dispHeight = 0;
+    bool isRoundScreen = false;
+    if (!SecCompGrantAdapter::GetDisplaySize(screenInfo.displayId,
+        static_cast<int32_t>(screenInfo.crossAxisState), dispWidth, dispHeight, isRoundScreen)) {
+        SC_LOG_ERROR(LABEL, "Get display size failed");
         return false;
     }
-
-    auto info = display->GetDisplayInfo();
-    if (info == nullptr) {
-        SC_LOG_ERROR(LABEL, "Get display info failed");
-        return false;
-    }
-
-    screenInfo.screenShape = info->GetScreenShape();
-    width = static_cast<double>(info->GetWidth());
-    if (screenInfo.crossAxisState == CrossAxisState::STATE_CROSS) {
-        height = static_cast<double>(info->GetPhysicalHeight());
-    } else {
-        height = static_cast<double>(info->GetHeight());
-    }
+    screenInfo.screenShape = isRoundScreen ? Rosen::ScreenShape::ROUND : Rosen::ScreenShape::RECTANGLE;
+    width = static_cast<double>(dispWidth);
+    height = static_cast<double>(dispHeight);
     SC_LOG_DEBUG(LABEL, "display manager Screen width %{public}f height %{public}f",
         width, height);
     return true;
