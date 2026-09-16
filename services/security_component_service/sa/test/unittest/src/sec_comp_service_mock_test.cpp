@@ -20,6 +20,7 @@
 #include "location_button.h"
 #include "paste_button.h"
 #include "save_button.h"
+#include "sec_comp_bundle_name_cache.h"
 #include "sec_comp_client.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info.h"
@@ -114,7 +115,14 @@ HWTEST_F(SecCompServiceMockTest, AllowToBypassArkuiCheck001, TestSize.Level0)
         .pid = ServiceTestCommon::TEST_PID_1,
         .userId = ServiceTestCommon::TEST_USER_ID
     };
+    // bundle name now comes from the token cache: prime the token info with the
+    // whitelisted bundle and clear stale cache entries of this token
+    SecCompBundleNameCache::GetInstance().ClearCache();
+    OHOS::Security::AccessToken::AccessTokenKit::hapTokenInfoRes_.bundleName = "test.bypass";
     EXPECT_TRUE(SecCompManager::GetInstance().AllowToBypassArkuiCheck(caller));
+    // restore mock state and cached value so later cases are not affected
+    SecCompBundleNameCache::GetInstance().ClearCache();
+    OHOS::Security::AccessToken::AccessTokenKit::hapTokenInfoRes_.bundleName = "";
 }
 
 /**

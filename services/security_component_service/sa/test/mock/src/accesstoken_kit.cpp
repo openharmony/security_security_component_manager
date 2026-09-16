@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Security {
 namespace AccessToken {
 int32_t AccessTokenKit::getHapTokenInfoRes = 0;
+HapTokenInfo AccessTokenKit::hapTokenInfoRes_;
 std::mutex AccessTokenKit::mutex_;
 std::map<AccessTokenID, std::set<std::string>> AccessTokenKit::permMap_;
 

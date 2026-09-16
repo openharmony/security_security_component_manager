@@ -25,6 +25,8 @@ namespace OHOS {
 namespace Security {
 namespace AccessToken {
 struct HapTokenInfo {
+    std::string bundleName;
+    int32_t instIndex = 0;
 };
 
 typedef enum TypePermissionState {
@@ -42,6 +44,9 @@ public:
 
     static int GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo& hapTokenInfoRes)
     {
+        if (AccessTokenKit::getHapTokenInfoRes == 0) {
+            hapTokenInfoRes = AccessTokenKit::hapTokenInfoRes_;
+        }
         return AccessTokenKit::getHapTokenInfoRes;
     };
 
@@ -65,6 +70,7 @@ public:
     static std::mutex mutex_;
     static std::map<AccessTokenID, std::set<std::string>> permMap_;
     static int getHapTokenInfoRes;
+    static HapTokenInfo hapTokenInfoRes_;
 };
 } // namespace SECURITY_COMPONENT_INTERFACES_INNER_KITS_ACCESSTOKEN_KIT_H
 } // namespace Security

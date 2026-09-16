@@ -245,3 +245,76 @@ ohos_source_set("security_component_no_cfi_disable_enhance_adapter_src_set") {
     "-DSECURITY_COMPONENT_ENHANCE_DISABLE"
   ]
 }
+
+config("security_component_grant_adapter_src_set_config") {
+  include_dirs = [
+    "common/include",
+    "click_grant/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
+  ]
+}
+
+ohos_source_set("security_component_grant_adapter_src_set") {
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+  include_dirs = [ "common/include" ]
+
+  sources = [ "click_grant/src/sec_comp_grant_adapter.cpp" ]
+
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+  public_configs = [ ":security_component_grant_adapter_src_set_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+    "-fvisibility=hidden",
+  ]
+}
+
+ohos_shared_library("libsecurity_component_click_grant") {
+  subsystem_name = "security"
+  part_name = "security_component_manager"
+  version_script = "click_grant/libsecurity_component_click_grant.map"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  include_dirs = [
+    "common/include",
+    "click_grant/include",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component_common",
+    "${sec_comp_root_dir}/interfaces/inner_api/security_component/include",
+  ]
+
+  sources = [ "click_grant/src/sec_comp_grant_adapter_impl.cpp" ]
+
+  configs = [ "${sec_comp_root_dir}/config:coverage_flags" ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "window_manager:libdm_lite",
+  ]
+
+  cflags_cc = [
+    "-DHILOG_ENABLE",
+  ]
+}

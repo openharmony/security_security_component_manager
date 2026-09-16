@@ -15,6 +15,8 @@
 
 #include "sec_comp_manager_test.h"
 
+#include <chrono>
+#include <thread>
 #include "sec_comp_log.h"
 #define private public
 #include "sec_comp_manager.h"
@@ -26,6 +28,7 @@
 #include "save_button.h"
 #include "sec_comp_err.h"
 #include "sec_comp_info_helper.h"
+#include "sec_comp_grant_adapter_mock.h"
 #include "service_test_common.h"
 #include "system_ability.h"
 
@@ -362,8 +365,20 @@ HWTEST_F(SecCompManagerTest, RegisterSecurityComponent001, TestSize.Level0)
 
     LocationButton buttonInvalid = BuildInvalidLocationComponent();
     buttonInvalid.ToJson(jsonInvalid);
+    // BuildInvalidLocationComponent produces structurally invalid JSON that
+    // fails FromJson parsing, so registration still returns COMPONENT_INFO_INVALID
     EXPECT_EQ(SC_SERVICE_ERROR_COMPONENT_INFO_INVALID,
         SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonInvalid, caller, scId));
+
+    // structurally valid JSON with invalid attribute values (small font size):
+    // FromJson succeeds, the validity check is deferred to click time
+    nlohmann::json jsonAttrInvalid;
+    LocationButton buttonAttrInvalid = BuildValidLocationComponent();
+    buttonAttrInvalid.ToJson(jsonAttrInvalid);
+    auto& sizeJson = jsonAttrInvalid[JsonTagConstants::JSON_SIZE_TAG];
+    sizeJson[JsonTagConstants::JSON_FONT_SIZE_TAG] = ServiceTestCommon::TEST_INVALID_DIMENSION;
+    EXPECT_EQ(SC_OK,
+        SecCompManager::GetInstance().RegisterSecurityComponent(LOCATION_COMPONENT, jsonAttrInvalid, caller, scId));
 
     nlohmann::json jsonValid;
     LocationButton buttonValid = BuildValidLocationComponent();
@@ -632,17 +647,17 @@ HWTEST_F(SecCompManagerTest, SendCheckInfoEnhanceSysEvent001, TestSize.Level0)
  */
 HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold001, TestSize.Level0)
 {
-    constexpr int32_t TEST_UID = 1;
+    constexpr int32_t testUid = 1;
     SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
     ASSERT_FALSE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1,
-        TEST_UID));
+        testUid));
 
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
-    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, TEST_UID));
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, testUid));
 
     SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 }
@@ -655,7 +670,7 @@ HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold001, TestSize.Level0)
  */
 HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold002, TestSize.Level0)
 {
-    constexpr int32_t TEST_UID = 1;
+    constexpr int32_t testUid = 1;
     SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
@@ -666,10 +681,10 @@ HWTEST_F(SecCompManagerTest, MaliciousAppListThreshold002, TestSize.Level0)
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
     ASSERT_FALSE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1,
-        TEST_UID));
+        testUid));
 
     SecCompManager::GetInstance().malicious_.AddAppToMaliciousAppList(ServiceTestCommon::TEST_PID_1);
-    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, TEST_UID));
+    ASSERT_TRUE(SecCompManager::GetInstance().malicious_.IsInMaliciousAppList(ServiceTestCommon::TEST_PID_1, testUid));
 
     SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
 }
@@ -1207,4 +1222,109 @@ HWTEST_F(SecCompManagerTest, CheckClickSecurityComponentInfo004, TestSize.Level0
     EXPECT_EQ(SC_SERVICE_ERROR_CLICK_EVENT_INVALID, SecCompManager::GetInstance().ReportSecurityComponentClickEvent(
         secCompInfo, jsonValid, caller, remote, message));
     SecCompManager::GetInstance().malicious_.RemoveAppFromMaliciousAppList(ServiceTestCommon::TEST_PID_1);
+}
+
+/*
+ * @tc.name: InitGrantAdapterAsync001
+ * @tc.desc: InitGrantAdapterAsync with null event handler fails without posting any task
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, InitGrantAdapterAsync001, TestSize.Level1)
+{
+    // the manager may not have been initialized by any earlier suite: create a
+    // local handler pair so the case is self-contained
+    auto savedRunner = SecCompManager::GetInstance().secRunner_;
+    auto savedHandler = SecCompManager::GetInstance().secHandler_;
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(nullptr, runner);
+    SecCompManager::GetInstance().secRunner_ = runner;
+    SecCompManager::GetInstance().secHandler_ = nullptr;
+
+    ResetGrantAdapterCallState();
+    // no event handler: the warmup task must not be posted
+    SecCompManager::GetInstance().InitGrantAdapterAsync();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(0U, GetGrantAdapterInitCallCount());
+
+    // restore the previous state so later suites are not affected
+    SecCompManager::GetInstance().secRunner_ = savedRunner;
+    SecCompManager::GetInstance().secHandler_ = savedHandler;
+}
+
+/*
+ * @tc.name: InitGrantAdapterAsync002
+ * @tc.desc: InitGrantAdapterAsync posts the warmup task which runs on the event thread
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, InitGrantAdapterAsync002, TestSize.Level1)
+{
+    auto savedRunner = SecCompManager::GetInstance().secRunner_;
+    auto savedHandler = SecCompManager::GetInstance().secHandler_;
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_NE(nullptr, runner);
+    auto handler = std::make_shared<SecEventHandler>(runner);
+    ASSERT_NE(nullptr, handler);
+    SecCompManager::GetInstance().secRunner_ = runner;
+    SecCompManager::GetInstance().secHandler_ = handler;
+
+    ResetGrantAdapterCallState();
+    // warmup task is posted with no delay: it must run on the ff rt event thread
+    SecCompManager::GetInstance().InitGrantAdapterAsync();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_EQ(1U, GetGrantAdapterInitCallCount());
+    // second call posts one more warmup task
+    SecCompManager::GetInstance().InitGrantAdapterAsync();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_EQ(2U, GetGrantAdapterInitCallCount());
+
+    // restore the previous state so later suites are not affected
+    SecCompManager::GetInstance().secRunner_ = savedRunner;
+    SecCompManager::GetInstance().secHandler_ = savedHandler;
+}
+
+/*
+ * @tc.name: GetFoldOffsetY001
+ * @tc.desc: invalid cross axis state keeps fold offset zero without adapter query
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, GetFoldOffsetY001, TestSize.Level1)
+{
+    SecCompManager::GetInstance().superFoldOffsetY_ = 0;
+    SecCompManager::GetInstance().GetFoldOffsetY(CrossAxisState::STATE_INVALID);
+    EXPECT_EQ(0, SecCompManager::GetInstance().superFoldOffsetY_);
+}
+
+/*
+ * @tc.name: GetFoldOffsetY002
+ * @tc.desc: adapter failure keeps fold offset zero on the fallback branch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, GetFoldOffsetY002, TestSize.Level1)
+{
+    SecCompManager::GetInstance().superFoldOffsetY_ = 0;
+    SetGrantAdapterAlwaysFail(true);
+    SecCompManager::GetInstance().GetFoldOffsetY(CrossAxisState::STATE_CROSS);
+    EXPECT_EQ(0, SecCompManager::GetInstance().superFoldOffsetY_);
+    SetGrantAdapterAlwaysFail(false);
+}
+
+/*
+ * @tc.name: GetFoldOffsetY003
+ * @tc.desc: cached non zero offset short circuits later queries
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(SecCompManagerTest, GetFoldOffsetY003, TestSize.Level1)
+{
+    // non zero cached value: query must return early and keep the value
+    SecCompManager::GetInstance().superFoldOffsetY_ = 42;
+    SetGrantAdapterAlwaysFail(true); // would reset to 0 if the adapter were queried
+    SecCompManager::GetInstance().GetFoldOffsetY(CrossAxisState::STATE_CROSS);
+    EXPECT_EQ(42, SecCompManager::GetInstance().superFoldOffsetY_);
+    SetGrantAdapterAlwaysFail(false);
+    SecCompManager::GetInstance().superFoldOffsetY_ = 0;
 }

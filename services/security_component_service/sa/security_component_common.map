@@ -27,6 +27,7 @@
       OHOS::Security::SecurityComponent::SecEventHandler::ProxyPostTask*;
       OHOS::Security::SecurityComponent::SecEventHandler::ProxyRemoveTask*;
       OHOS::Security::SecurityComponent::WindowInfoHelper::CheckOtherWindowCoverComp*;
+      OHOS::Security::SecurityComponent::SecCompBundleNameCache::*;
       *vtable*for*;
       *typeinfo*for*;
       *VTT*for*;

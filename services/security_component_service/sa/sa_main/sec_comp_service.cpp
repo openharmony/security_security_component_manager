@@ -17,17 +17,17 @@
 #include <unistd.h>
 
 #include "app_mgr_death_recipient.h"
-#include "bundle_info.h"
-#include "bundle_mgr_client.h"
 #include "hisysevent.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "sec_comp_bundle_name_cache.h"
 #include "sec_comp_click_event_parcel.h"
 #include "sec_comp_enhance_adapter.h"
 #include "sec_comp_err.h"
 #include "sec_comp_manager.h"
 #include "sec_comp_log.h"
+#include "sec_comp_grant_adapter.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -80,6 +80,7 @@ void SecCompService::OnStart()
         FinishTrace(HITRACE_TAG_ACCESS_CONTROL);
         return;
     }
+    SecCompManager::GetInstance().InitGrantAdapterAsync();
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "SERVICE_INIT_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PID", getpid());
     SC_LOG_INFO(LABEL, "Congratulations, SecCompService start successfully!");
@@ -266,25 +267,11 @@ int32_t SecCompService::RegisterSecurityComponentBody(SecCompType type,
         return res;
     }
 
-    OHOS::AppExecFwk::BundleMgrClient bmsClient;
-    std::string bundleName = "";
-    int32_t ret = bmsClient.GetNameForUid(caller.uid, bundleName);
-    if (ret != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Failed to get bundle name, uid=%{public}d, ret=%{public}d", caller.uid, ret);
-        return res;
-    }
-
-    AppExecFwk::BundleInfo bundleInfo;
-    if (bmsClient.GetBundleInfo(
-        bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT, bundleInfo, caller.userId) != SC_OK) {
-        SC_LOG_ERROR(LABEL, "Failed to get bundle info for bundle name %{public}s", bundleName.c_str());
-        return res;
-    }
-
+    std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(caller.tokenId);
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "REGISTER_SUCCESS",
         HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "CALLER_UID", caller.uid,
-        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALLER_BUNDLE_NAME", bundleName, "CALLER_BUNDLE_VERSION",
-        bundleInfo.versionName, "SC_ID", scId, "SC_TYPE", type);
+        "CALLER_PID", IPCSkeleton::GetCallingRealPid(), "CALLER_BUNDLE_NAME", bundleName,
+        "SC_ID", scId, "SC_TYPE", type);
     return res;
 }
 

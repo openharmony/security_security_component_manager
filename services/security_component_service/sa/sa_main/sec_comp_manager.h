@@ -77,6 +77,7 @@ public:
     void NotifyProcessDied(int32_t pid, bool isProcessCached);
     void DumpSecComp(std::string& dumpStr);
     bool Initialize();
+    void InitGrantAdapterAsync();
     void ExitSaProcess();
     void ExitWhenAppMgrDied();
     int32_t AddSecurityComponentProcess(const SecCompCallerInfo& caller);

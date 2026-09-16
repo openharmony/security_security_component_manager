@@ -21,19 +21,15 @@
 #include <sys/statfs.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "ability_manager_client.h"
 #include "accesstoken_kit.h"
-#include "bundle_mgr_client.h"
-#include "display_info.h"
-#include "display_lite.h"
-#include "display_manager_lite.h"
 #include "hisysevent.h"
 #include "i_sec_comp_dialog_callback.h"
 #include "ipc_skeleton.h"
+#include "sec_comp_bundle_name_cache.h"
 #include "sec_comp_dialog_callback_proxy.h"
 #include "sec_comp_err.h"
 #include "sec_comp_log.h"
-#include "want_params_wrapper.h"
+#include "sec_comp_grant_adapter.h"
 
 namespace OHOS {
 namespace Security {
@@ -48,20 +44,6 @@ static const std::string TOKEN_ID_TAG = "TokenId";
 static const std::string COMP_TYPE_TAG = "CompType";
 static const char* DATA_FOLDER = "/data";
 
-const std::string GRANT_ABILITY_BUNDLE_NAME = "com.ohos.permissionmanager";
-const std::string GRANT_ABILITY_ABILITY_NAME = "com.ohos.permissionmanager.SecurityExtAbility";
-const std::string TYPE_KEY = "ohos.user.security.type";
-const std::string TOKEN_KEY = "ohos.ability.params.token";
-const std::string CALLBACK_KEY = "ohos.ability.params.callback";
-const std::string WINDOW_ID_KEY = "ohos.ability.params.windowId";
-const std::string CALLER_UID_KEY = "ohos.caller.uid";
-const std::string DISPLAY_WIDTH = "ohos.display.width";
-const std::string DISPLAY_HEIGHT = "ohos.display.height";
-const std::string DISPLAY_TOP = "ohos.display.top";
-const std::string DIALOG_OFFSET = "ohos.dialog.offset";
-const std::string NOTIFY_TYPE = "ohos.ability.notify.type";
-
-constexpr int32_t DISPLAY_HALF_RATIO = 2;
 constexpr uint32_t MAX_CFG_FILE_SIZE = 100 * 1024; // 100k
 constexpr uint64_t LOCATION_BUTTON_FIRST_USE = 1 << 0;
 constexpr uint64_t SAVE_BUTTON_FIRST_USE = 1 << 1;
@@ -339,9 +321,7 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     }
     int32_t res = sc->GrantTempPermission();
     if (res != SC_OK) {
-        OHOS::AppExecFwk::BundleMgrClient bmsClient;
-        std::string bundleName = "";
-        bmsClient.GetNameForUid(sc->uid_, bundleName);
+        std::string bundleName = SecCompBundleNameCache::GetInstance().GetBundleName(sc->tokenId_);
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::SEC_COMPONENT, "TEMP_GRANT_FAILED",
             HiviewDFX::HiSysEvent::EventType::FAULT, "CALLER_UID", sc->uid_, "CALLER_BUNDLE_NAME", bundleName,
             "CALLER_PID", sc->pid_, "SC_ID", scId, "SC_TYPE", sc->GetType());
@@ -352,38 +332,6 @@ int32_t FirstUseDialog::GrantDialogWaitEntity(int32_t scId)
     }
     dialogWaitMap_.erase(scId);
     return res;
-}
-
-bool FirstUseDialog::SetDisplayInfo(AAFwk::Want& want, const DisplayInfo& displayInfo)
-{
-    sptr<OHOS::Rosen::DisplayLite> display =
-        OHOS::Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayInfo.displayId);
-    if (display == nullptr) {
-        SC_LOG_ERROR(LABEL, "Get display manager failed");
-        return false;
-    }
-
-    auto info = display->GetDisplayInfo();
-    if (info == nullptr) {
-        SC_LOG_ERROR(LABEL, "Get display info failed");
-        return false;
-    }
-    /* crossAxisState is INVALID or NO_CROSS */
-    int32_t width = info->GetWidth();
-    int32_t height = info->GetHeight();
-    int32_t offset = 0;
-    /* crossAxisState is CROSS */
-    if (displayInfo.crossAxisState == CrossAxisState::STATE_CROSS) {
-        height = info->GetPhysicalHeight();
-        offset = static_cast<int32_t>(info->GetAvailableHeight()) / DISPLAY_HALF_RATIO;
-    }
-    SC_LOG_INFO(LABEL, "Display info width %{public}d height %{public}d, dialog offset %{public}d",
-        width, height, offset);
-
-    want.SetParam(DISPLAY_WIDTH, width);
-    want.SetParam(DISPLAY_HEIGHT, height);
-    want.SetParam(DIALOG_OFFSET, offset);
-    return true;
 }
 
 bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, sptr<IRemoteObject> callerToken,
@@ -407,24 +355,16 @@ bool FirstUseDialog::StartDialogAbility(std::shared_ptr<SecCompEntity> entity, s
         return false;
     }
     dialogWaitMap_[scId] = entity;
-    AAFwk::Want want;
-    want.SetElementName(GRANT_ABILITY_BUNDLE_NAME, GRANT_ABILITY_ABILITY_NAME);
-    want.SetParam(TYPE_KEY, typeNum);
-    want.SetParam(TOKEN_KEY, callerToken);
-    want.SetParam(CALLBACK_KEY, srvCallback);
-    want.SetParam(WINDOW_ID_KEY, displayInfo.windowId);
-    want.SetParam(NOTIFY_TYPE, NotifyType::DIALOG);
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    want.SetParam(CALLER_UID_KEY, uid);
-    if (!SetDisplayInfo(want, displayInfo)) {
-        SC_LOG_ERROR(LABEL, "Set display info failed.");
-        return false;
-    }
 
-    int startRes = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(
-        want, callerToken, entity->userId_);
-    SC_LOG_INFO(LABEL, "Start ability res %{public}d", startRes);
-    if (startRes != 0) {
+    SecCompGrantParams params;
+    params.typeNum = typeNum;
+    params.callerUid = IPCSkeleton::GetCallingUid();
+    params.userId = entity->userId_;
+    params.windowId = displayInfo.windowId;
+    params.displayId = displayInfo.displayId;
+    params.crossAxisState = static_cast<int32_t>(displayInfo.crossAxisState);
+    if (!SecCompGrantAdapter::StartGrantAbility(params, callerToken, srvCallback)) {
+        SC_LOG_ERROR(LABEL, "Start dialog ability failed.");
         dialogWaitMap_.erase(scId);
         return false;
     }
