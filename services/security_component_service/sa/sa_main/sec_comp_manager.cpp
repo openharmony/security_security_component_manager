@@ -256,6 +256,11 @@ void SecCompManager::ExitSaProcess()
         return;
     }
 
+    int32_t statusRet = AccessToken::AccessTokenKit::SetSecCompEnhanceStatus(false);
+    if (statusRet != SC_OK) {
+        SC_LOG_ERROR(LABEL, "SetSecCompEnhanceStatus false failed, ret: %{public}d", statusRet);
+    }
+
     isSaExit_ = true;
     SecCompEnhanceAdapter::DisableInputEnhance();
     SecCompEnhanceAdapter::ExitEnhanceService();
