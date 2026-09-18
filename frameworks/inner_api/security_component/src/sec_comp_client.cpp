@@ -37,7 +37,7 @@ static constexpr int32_t SENDREQ_FAIL_ERR = 32;
 static const std::vector<int32_t> RETRY_CODE_LIST = {
     SC_SERVICE_ERROR_SERVICE_NOT_EXIST, BR_DEAD_REPLY, BR_FAILED_REPLY, SENDREQ_FAIL_ERR };
 static constexpr int32_t SA_DIED_TIME_OUT = 500;
-constexpr int32_t SA_LOAD_TIME_OUT = 3000;
+constexpr int32_t SA_LOAD_TIME_OUT = 1500;
 }  // namespace
 
 SecCompClient& SecCompClient::GetInstance()
