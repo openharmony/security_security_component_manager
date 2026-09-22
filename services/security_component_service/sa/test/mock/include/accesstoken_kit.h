@@ -67,6 +67,11 @@ public:
         return static_cast<int32_t>(idInner->dlpFlag);
     }
 
+    static int32_t SetSecCompEnhanceStatus(bool isEnable)
+    {
+        return 0;
+    }
+
     static std::mutex mutex_;
     static std::map<AccessTokenID, std::set<std::string>> permMap_;
     static int getHapTokenInfoRes;

@@ -343,6 +343,11 @@ bool SecCompClient::LoadService()
 
 bool SecCompClient::StartLoadSecCompSa()
 {
+    int32_t ret = AccessToken::AccessTokenKit::SetSecCompEnhanceStatus(true);
+    if (ret != SC_OK) {
+        SC_LOG_ERROR(LABEL, "SetSecCompEnhanceStatus true failed, ret: %{public}d", ret);
+    }
+
     {
         std::unique_lock<std::mutex> lock(cvLock_);
         readyFlag_ = false;

@@ -548,7 +548,7 @@ int SecCompService::Dump(int fd, const std::vector<std::u16string>& args)
 #if (!defined (TDD_ENABLE)) && (!defined (FUZZ_ENABLE))
 void SecCompService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    SC_LOG_ERROR(LABEL, "Accessibility service is started");
+    SC_LOG_INFO(LABEL, "Accessibility service is started");
     SecCompEnhanceAdapter::EnableInputEnhance();
 }
 #endif
