@@ -149,6 +149,7 @@ HWTEST_F(SecCompKitTest, TestCallerCheck001, TestSize.Level0)
     };
     SecCompUiRegister registerCallback(callerList, nullptr);
     TestInCallerCheckList();
+    SecCompCallerAuthorization::GetInstance().kitCallerList_ = { static_cast<uintptr_t>(1) };
     TestInCallerNotCheckList();
 
     // prohibit init caller list repeately
